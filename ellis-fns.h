@@ -12,21 +12,14 @@
 // **********************   FDA IMPLEMENTATIONS   **************************
 // *************************************************************************
 ////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fda_xi(const VD& old_xi, const VD& cn_xi, const VD& cn_pi,
-		  const VD& cn_al, const VD& cn_be, const VD& cn_ps, PAR *p, int k)
+inline dbl fda_xi(FLDS *f, PAR *p, int k)
 {
-  return old_xi[k] + (p->lam2val)*(cn_al[k+1]*cn_pi[k+1]/sq(cn_ps[k+1]) + cn_be[k+1]*cn_xi[k+1]
-				 - cn_al[k-1]*cn_pi[k-1]/sq(cn_ps[k-1]) - cn_be[k-1]*cn_xi[k-1]);
+  return f->old_xi[k] + (p->lam2val)*d_c(f->cn_pi, k);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fda_pi(const VD& old_pi, const VD& cn_xi, const VD& cn_pi, const VD& cn_al,
-		  const VD& cn_be, const VD& cn_ps, PAR *p, int k)
+inline dbl fda_pi(FLDS *f, PAR *p, int k)
 {
-  dbl lam6_part = (p->lam6val) * (d_c(cn_be,k) + cn_be[k]*(4*(p->dr)*(p->r[-k]) + 6*d_c(cn_ps,k)/cn_ps[k]));
-  return ( old_pi[k]*(1 - lam6_part) + ((p->lam2val) / sq((p->r[k])*sq(cn_ps[k]))) *
-    (sq((p->r[k+1])*sq(cn_ps[k+1]))*(cn_al[k+1]*cn_xi[k+1]/sq(cn_ps[k+1]) + cn_be[k+1]*cn_pi[k+1])
-     - sq((p->r[k-1])*sq(cn_ps[k-1]))*(cn_al[k-1]*cn_xi[k-1]/sq(cn_ps[k-1]) + cn_be[k-1]*cn_pi[k-1])) )
-    / (1 + lam6_part);
+  return f->old_pi[k] + (p->lam2val)*d_c(f->cn_xi, k) + 2*(p->r[k])*(f->cn_xi[k])/(sq(p->r[k]) + p->lsq);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // *****************************CHECK

@@ -1,21 +1,6 @@
 #ifndef EKG_PROC_H_INCLUDED
 #define EKG_PROC_H_INCLUDED
 
-#ifndef INDRSQ
-#define INDRSQ 32500
-#define IN2DR 32501
-#define INDT 32502
-#define RMIN 32503
-#define RMAX 32504
-#define DRVAL 32505
-#define DTVAL 32506
-#define LAMVAL 32507
-#define LAM2VAL 32508
-#define LAM6VAL 32509
-#define CSOMM 32510
-#define INRMAX 32511
-#endif
-
 #include <iostream>
 #include <algorithm> // for max_element()
 #include <fstream> // for mass/itn files

@@ -161,7 +161,7 @@ int params_init(PAR *p, int argc, char **argv)
       {"-nsteps",&(p->nsteps)}, {"-save_step",&(p->save_step)},
       {"-norm_type",&(p->norm_type)}, {"-maxit",&(p->maxit)},
       {"-check_step",&(p->check_step)}, {"-resn_factor",&(p->resn_factor)}};
-  map<str, dbl *> p_dbl {{"-lam",&(p->lam)}, {"-r2m",&(p->r2m)}, {"-rmin",&(p->rmin)}, {"-rmax",&(p->rmax)},
+  map<str, dbl *> p_dbl {{"-lam",&(p->lam)}, {"-lsq",&(p->lsq)}, {"-rmin",&(p->rmin)}, {"-rmax",&(p->rmax)},
       {"-dspn",&(p->dspn)}, {"-tol",&(p->tol)}, {"-ell_tol",&(p->ell_tol)}, {"-ell_up_weight",&(p->ell_up_weight)},
       {"-ic_Dsq",&(p->ic_Dsq)}, {"-ic_r0",&(p->ic_r0)}, {"-ic_Amp",&(p->ic_Amp)}};
   map<str, bool *> p_bool { {"-psi_hyp",&(p->psi_hyp)}, {"-zero_pi",&(p->zero_pi)}, {"-static_metric",&(p->static_metric)},

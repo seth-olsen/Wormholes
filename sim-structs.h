@@ -89,7 +89,7 @@ struct sim_params {
   dbl lam = 0.25; // dt/dr
   dbl rmin = 0;
   dbl rmax = 50;
-  dbl r2m = 0;
+  dbl lsq = 1;
   dbl dspn = 0.5; // dissipation coefficient
   dbl tol = 0.000000001; // iterative method tolerance
   dbl ell_tol = 0.01*tol;
