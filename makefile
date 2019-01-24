@@ -16,14 +16,14 @@ ellis-sim: ellis-sim.o
 	-${CXX} -o ellis ellis-sim.o ${LDLIBS}
 	rm -f ellis-sim.o
 
-ellis-sim.o: solvers.h ellis-proc.h ellis-clean.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
+ellis-sim.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
 	$(CXX) -c $(CXXFLAGS) ellis-sim.cpp
 
 ellis-debug: ellis-debug.o
 	-${CXX} -o ellis-debug ellis-debug.o ${LDLIBS}
 	rm -f ellis-debug.o
 
-ellis-debug.o: solvers.h ellis-proc.h ellis-clean.h jacobian.h ellis-fns.h fda-fns.h fda-io.h ellis-debug.cpp
+ellis-debug.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h ellis-debug.cpp
 	$(CXX) -c $(CXXFLAGS) ellis-debug.cpp
 
 ellis-conv: fda-io.h ellis-conv.cpp
@@ -35,14 +35,14 @@ test-code: test-code.o
 	-${CXX} -o test-code test-code.o ${LDLIBS}
 	rm -f test-code.o
 
-test-code.o: ellis-proc.h ellis-clean.h ellis-fns.h fda-fns.h fda-io.h test-code.cpp
+test-code.o: ellis-proc.h ellis-fns.h fda-fns.h fda-io.h test-code.cpp
 	$(CXX) -c $(CXXFLAGS) test-code.cpp
 
 test-data: test-data.o
 	-${CXX} -o test-data test-data.o ${LDLIBS}
 	rm -f test-data.o
 
-test-data.o: ellis-proc.h ellis-clean.h ellis-fns.h fda-fns.h fda-io.h test-data.cpp
+test-data.o: ellis-proc.h ellis-fns.h fda-fns.h fda-io.h test-data.cpp
 	$(CXX) -c $(CXXFLAGS) test-data.cpp
 
 .PHONY : clean

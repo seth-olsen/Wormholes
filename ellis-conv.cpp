@@ -44,26 +44,25 @@ vector<str> get_unames(str pre, vector<str>& fnames) {
 int main(int argc, char **argv)
 {
   // coarse simulation parameters
-  str outfile = "ekg";
+  str outfile = "ellis";
   str outname = "0";
-  str pre1 = "maspect", pre2 = "0", pre3 = "0", pre4 = "0", pre5 = "0",
+  str pre1 = "Xi", pre2 = "Pi", pre3 = "0", pre4 = "0", pre5 = "0",
     pre6 = "0", pre7 = "0", pre8 = "0", pre9 = "0", pre10 = "0";
-  int lastpt = 500; // grid size
+  int lastpt = 2000; // grid size
   int save_pt = 1; // write only every (save_pt)th grid point
-  int nsteps = 1000; // time steps
+  int nsteps = 8000; // time steps
   int save_step = 4; // write only every (save_step)th time step
   dbl lam = 0.25; // dt/dr
   dbl r2m = 0;
-  dbl rmin = 0;
-  dbl rmax = 50.0;
+  dbl rmax = 100;
+  dbl rmin = -rmax;
   dbl dspn = 0.5; // dissipation coefficient
-  dbl tol = 0.000000001; // iterative method tolerance
+  dbl tol = 0.000000000001; // iterative method tolerance
   dbl ell_tol = 0.01*tol;
   int maxit = 100; // max iterations for debugging
   dbl ic_Dsq = 25.0; // gaussian width
-  dbl ic_r0 = 20.0; // gaussian center
-  dbl ic_Amp = 0.004; // gaussian amplitude
-  bool zero_pi = false; // zero initial time derivative?
+  dbl ic_r0 = 50.0; // gaussian center
+  dbl ic_Amp = 1; // gaussian amplitude
   bool sommerfeld = true; // sommerfeld condition at outer bound?
   bool dspn_bound = false; // dissipate boundary points?
   bool psi_hyp = false; // psi evolved with hyperbolic eom?
@@ -133,8 +132,8 @@ int main(int argc, char **argv)
   ofs <<  "coarse,mid,fine,constant,points,times,same_times,same_grids\n"
       <<  fnames[0]+","+fnames[1]+","+fnames[2]+","+hold_const+"," << npts0
       <<","<< num_steps <<","<< boolalpha << same_times <<","<< same_grids
-      << "\n\ndspn,dspn_bound,zero_pi,sommerfeld,tol,maxit\n" << dspn <<","
-      << dspn_bound <<","<< zero_pi <<","<< sommerfeld <<","<< tol <<","
+      << "\n\ndspn,dspn_bound,sommerfeld,tol,maxit\n" << dspn <<","
+      << dspn_bound <<","<< sommerfeld <<","<< tol <<","
       << maxit << "\n\nr2m,rmin,rmax,ic_Dsq,ic_r0,ic_Amp\n" << r2m <<","
       << rmin <<","<< rmax <<","<< ic_Dsq <<","<< ic_r0 <<","<< ic_Amp
       << "\n\ncoarse grid:\nlastpt,save_pt,nsteps,save_step,\n" << lastpt
