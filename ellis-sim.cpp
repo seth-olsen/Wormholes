@@ -37,10 +37,12 @@ int main(int argc, char **argv)
     cout << "\nFIELD INIT error code = " << err_code << endl;
     return err_code;
   }
+  else { cout << "\nsimulation in progress..." << endl; }
   vector<BBHP *> writer_vec = writers_init(&wr, &f, &p);
   gft_set_multi();
   // DO SOME CHECKS HERE
   for (int i = 0; i < p.nsteps; ++i) {
+    // WRITING
     if (i % p.save_step == 0) {
       write_bbhp_vec(writer_vec, &p);
       if (i % p.check_diagnostics == 0) {

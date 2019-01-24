@@ -77,14 +77,7 @@ inline void apply_up_ab_cn(const VD& deltas, VD& f_al, VD& f_be, PAR *p, int npt
 inline void apply_up_abp_join(const VD& deltas, VD& f_al, VD& f_be, VD& f_ps, PAR *p, int npts);
 inline void apply_up_abp_join_cn(const VD& deltas, const VD& old_al, const VD& old_be, const VD& old_ps,
 				 VD& f_al, VD& f_be, VD& f_ps, VD& cn_al, VD& cn_be, VD& cn_ps, PAR *p, int npts);
-int search_for_horizon(const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
-{
-  if (outgoing_null_b(f_al, f_be, f_ps, p, p->lastpt) <= 0) { return p->lastpt; }
-  int k = p->lastpt;
-  while (--k > 0) { if (outgoing_null(f_al, f_be, f_ps, p, k) <= 0) { return k; } }
-  if (outgoing_null_f(f_al, f_be, f_ps, p, 0) <= 0) { return p->npts; }
-  return 0;
-}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////

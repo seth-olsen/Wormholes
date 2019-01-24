@@ -86,22 +86,24 @@ vector<BBHP *> writers_init(WRS *wr, FLDS *f, PAR *p)
 int fields_init(FLDS *f, PAR *p)
 {
   VD zeros(p->npts, 0);
-  f->Al = zeros;
-  f->Be = zeros;
-  f->Ps = zeros;
   f->Xi = zeros;
   f->Pi = zeros;
+  //f->Al = zeros;
+  //f->Be = zeros;
+  //f->Ps = zeros;
   // PUT INITIAL CONDITIONS
-  f->Al[0] = 1;
-  f->Be[0] = 0;
-  f->Ps[0] = 1;
-  for (int k = 1; k < p->npts; ++k) {
-    f->Al[k] = 1;
-    f->Be[k] = 0;
-    f->Ps[k] = 1;
+  //f->Al[0] = 1;
+  //f->Be[0] = 0;
+  //f->Ps[0] = 1;
+  
+  for (int k = (p->zeropt) + 1; k < (p->lastpt); ++k) {
+    //f->Al[k] = 1;
+    //f->Be[k] = 0;
+    //f->Ps[k] = 1;
     f->Xi[k] = ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
-    if (!(p->zero_pi)) { f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0); }
+    f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
   }
+  /*
   dirichlet0(f->Xi);
   neumann0(f->Pi);
   if (!(p->static_metric)) {
@@ -126,24 +128,25 @@ int fields_init(FLDS *f, PAR *p)
   f->oldPs = f->Ps;
   f->cnPs = f->Ps;
   f->resPs = zeros;
-  
+  */  
   f->oldXi = f->Xi;
   f->cnXi = f->Xi;
   f->resXi = zeros;
   f->oldPi = f->Pi;
   f->cnPi = f->Pi;
   f->resPi = zeros;
-  
+  /*
   if (p->write_ires_abp) {
     f->olderAl = zeros;
     f->olderBe = zeros;
     f->olderPs = zeros;
   }
+  */
   if (p->write_ires_xp) {
     f->olderXi = zeros;
     f->olderPi = zeros;
   }
-
+  /*
   VD hyp_res_zeros(p->n_hyp * p->npts, 0);
   VD ell_res_zeros(p->lp_ldb, 0);
   VD jac_zeros(p->lp_ldab * p->lp_n, 0);
@@ -151,6 +154,7 @@ int fields_init(FLDS *f, PAR *p)
   f->res_hyp = hyp_res_zeros;
   f->res_ell = ell_res_zeros;
   f->jac = jac_zeros;
+  */
   return 0;
 }
 
@@ -164,7 +168,7 @@ int params_init(PAR *p, int argc, char **argv)
   map<str, dbl *> p_dbl {{"-lam",&(p->lam)}, {"-lsq",&(p->lsq)}, {"-rmin",&(p->rmin)}, {"-rmax",&(p->rmax)},
       {"-dspn",&(p->dspn)}, {"-tol",&(p->tol)}, {"-ell_tol",&(p->ell_tol)}, {"-ell_up_weight",&(p->ell_up_weight)},
       {"-ic_Dsq",&(p->ic_Dsq)}, {"-ic_r0",&(p->ic_r0)}, {"-ic_Amp",&(p->ic_Amp)}};
-  map<str, bool *> p_bool { {"-psi_hyp",&(p->psi_hyp)}, {"-zero_pi",&(p->zero_pi)}, {"-static_metric",&(p->static_metric)},
+  map<str, bool *> p_bool { {"-psi_hyp",&(p->psi_hyp)}, {"-static_metric",&(p->static_metric)},
       {"-somm_cond",&(p->somm_cond)}, {"-dspn_bound",&(p->dspn_bound)}, {"-dr3_up",&(p->dr3_up)}, {"-dspn_psi",&(p->dspn_psi)},
       {"-write_res",&(p->write_res)},{"-write_ricci",&(p->write_ricci)}, {"-write_itn",&(p->write_itn)},
       {"-write_mtot",&(p->write_mtot)},{"-write_maspect",&(p->write_maspect)}, {"-write_outnull",&(p->write_outnull)},
@@ -177,9 +181,9 @@ int params_init(PAR *p, int argc, char **argv)
   
   // *****************************************CHECKS**********************
   // check that grid size (lastpt = npts-1) is divisible by save_pt 
-  if (p->lastpt % p->save_pt != 0) {
+  if (((p->lastpt) % (2*(p->save_pt))) != 0) {
     cout << "ERROR: save_pt = " << p->save_pt << " entered for grid size " << p->lastpt << endl;
-    p->save_pt -= p->lastpt % p->save_pt;
+    p->save_pt -= ((p->lastpt) % (2*(p->save_pt)));
     cout << "--> corrected: save_pt = " << p->save_pt << endl;
   }
   // check that p->norm_type is valid
@@ -197,6 +201,7 @@ int params_init(PAR *p, int argc, char **argv)
   // bbhutil parameters for writing data to sdf
   p->lastwr = p->lastpt / p->save_pt;
   p->wr_shape = p->lastwr + 1;
+  p->zerowr = p->lastwr / 2;
   p->coord_lims[0] = p->rmin; p->coord_lims[1] = p->rmax;
   p->wr_dr = (p->rmax - p->rmin) / ((dbl) p->lastwr);
   p->lastpt = p->lastpt * p->resn_factor;
@@ -206,25 +211,29 @@ int params_init(PAR *p, int argc, char **argv)
   p->outfile = to_string(p->resn_factor) + "-" + p->outfile;
   // derived parameters
   p->npts = p->lastpt + 1;
+  p->zeropt = p->lastpt / 2;
   p->norm_factor = 1 / ((dbl) p->npts);
   if (p->norm_type == 1) { p->norm_factor = sqrt(p->norm_factor); }
   p->dr = (p->rmax - p->rmin) / ((dbl) p->lastpt);
   p->dt = p->lam * p->dr;
   p->check_diagnostics = p->save_step * p->check_step;
-  p->r[0] = p->rmin;
-  for (int k = 1; k < (p->npts); ++k) {
+  for (int k = 0; k < (p->npts); ++k) {
     p->r[k] = (p->rmin) + k*(p->dr);
-    p->r[-k] = 1 / (p->r[k]);
+    p->r[-k] = 2 * (p->r[k]) / (sq(p->r[k]) + (p->lsq));
+  }
+  if (p->r[p->zeropt] != 0 || p->r[p->lastpt] != p->rmax) {
+    cout << "\n***COORDINATE INIT ERROR***\n" << endl;
   }
   p->t = 0;
   for (int k = 0; k < p->wr_shape; ++k) {
     (p->inds).push_back({k, (p->save_pt)*k});
   }
-  if ((p->inds[p->lastwr]).second != p->lastpt || p->r[p->lastpt] != p->rmax) {
+  if ((p->inds[p->lastwr]).second != p->lastpt || (p->inds[p->zerowr]).second != p->zeropt) {
     cout << "\n***INDEX INIT ERROR***\n" << endl;
   }
   
   // lapack object declaration
+  /*
   p->lp_n = p->n_ell * p->npts;
   p->lp_kl = 2;
   p->lp_ku = 2;
@@ -234,6 +243,29 @@ int params_init(PAR *p, int argc, char **argv)
   vector<lapack_int> ipiv_zeros(p->lp_n, 0);
   p->ipiv = ipiv_zeros;
   p->lp_ipiv = &(p->ipiv[0]);
+  */
+
+  p->lam2val = 0.5 * (p->lam);
+  //p->lam6val = (p->lam2val) * (p->one_third);
+  p->drsq = (p->dr) * (p->dr);
+  p->indr = 1 / (p->dr);
+  p->in2dr = 0.5 * (p->indr);
+  p->indrsq = sq(p->indr);
+  //p->neg2indrsq = -2 * (p->indrsq);
+  p->indt = 1 / (p->dt);
+  p->inrmax = 1 / (p->rmax);
+  // SPECIFIC TERMS
+  p->csomm = 0.75*(p->lam) + 0.5*(p->dt)*(p->inrmax);
+  p->csomm_rhs = 1 / (1 + (p->csomm));
+  p->csomm_old = 1 - (p->csomm);
+  //p->jacRR = 3*(p->in2dr) + (p->inrmax);
+  //p->jacRRm1 = -4 * (p->in2dr);
+  //p->jacRRm2 = (p->in2dr);
+  //p->jacN00 = -3 * (p->in2dr);
+  //p->jacN01 = 4 * (p->in2dr);
+  //p->jacN02 = -1 * (p->in2dr);
+  //p->dt_twelve = (p->twelfth) * (p->dt);
+  //p->cpsi_rhs = 1 / (p->jacRR);
 
   // PARAMETER DATA OUTPUT
   str param_data = "\nPARAMETERS:\n\n";

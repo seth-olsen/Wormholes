@@ -109,6 +109,12 @@ inline void dirichlet0(VD& field)
 inline void neumann0(VD& field)
 { field[0] = (4*field[1] - field[2]) / 3.0; }
 
+inline dbl dirichlet0res(const VD& field)
+{ return field[0]; }
+
+inline dbl neumann0res(const VD& field, PAR *p)
+{ return ddr_f(field, p, 0); }
+
 inline void sommerfeld(const VD& oldfield, VD& field, PAR *p, int ind)
 {
   field[ind] = (p->csomm_rhs)*( (p->lam)*(field[ind-1] + oldfield[ind-1])
@@ -116,18 +122,25 @@ inline void sommerfeld(const VD& oldfield, VD& field, PAR *p, int ind)
 			      + (p->csomm_old)*oldfield[ind] );
   return;
 }
-
-inline dbl dirichlet0res(const VD& field)
-{ return field[0]; }
-
-inline dbl neumann0res(const VD& field, PAR *p)
-{ return ddr_f(field, p, 0); }
+inline void sommerfeld_f(const VD& oldfield, VD& field, PAR *p, int ind)
+{
+  field[ind] = (p->csomm_rhs)*( (p->lam)*(field[ind+1] + oldfield[ind+1])
+			      - 0.25*(p->lam)*(field[ind+2] + oldfield[ind+2])
+			      + (p->csomm_old)*oldfield[ind] );
+  return;
+}
 
 inline dbl sommerfeldres(const VD& oldfield, const VD& field, PAR *p, int ind)
 {
-  return 0.5*(field[ind] + oldfield[ind]) +
-    (p->r[ind])*( (p->indt)*(field[ind] - oldfield[ind])
-	    + 0.5*(ddr_b(field,p,ind) + ddr_b(oldfield,p,ind)) );
+  return (p->indt)*(field[ind] - oldfield[ind]) +
+    0.5*( (p->inrmax)*(field[ind] + oldfield[ind]) +
+	  ddr_b(field,p,ind) + ddr_b(oldfield,p,ind) );
+}
+inline dbl sommerfeldres_f(const VD& oldfield, const VD& field, PAR *p, int ind)
+{
+  return (p->indt)*(field[ind] - oldfield[ind]) +
+    0.5*( (p->inrmax)*(field[ind] + oldfield[ind])
+	  - ddr_f(field,p,ind) - ddr_f(oldfield,p,ind) );
 }
 
 

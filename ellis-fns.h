@@ -19,73 +19,27 @@ inline dbl fda_xi(FLDS *f, PAR *p, int k)
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl fda_pi(FLDS *f, PAR *p, int k)
 {
-  return f->oldPi[k] + (p->lam2val)*d_c(f->cnXi, k) + 2*(p->r[k])*(f->cnXi[k])/(sq(p->r[k]) + p->lsq);
+  return f->oldPi[k] + (p->lam2val)*d_c(f->cnXi, k) + (p->dt)*(p->r[-k])*(f->cnXi[k]);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // *****************************CHECK
 ////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fda_resXi(FLDS *f, PAR *p, int k)
+{
+  return (p->indt)*(f->Xi[k] - f->oldXi[k]) - ddr_c(f->cnPi,p,k);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fda_resPi(FLDS *f, PAR *p, int k)
+{
+  return (p->indt)*(f->Pi[k] - f->oldPi[k]) - ddr_c(f->cnXi,p,k) - (p->r[-k])*(f->cnXi[k]);
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl fda_hyp_ps(const VD& old_ps, const VD& cn_xi, const VD& cn_pi, const VD& cn_al,
 		      const VD& cn_be, const VD& cn_ps, PAR *p, int k)
 {
   return 0;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fdaR_hyp_ps(const VD& f_ps, PAR *p, int k)
-{
-  return (p->cpsi_rhs)*( (p->inrmax) - (p->jacRRm1)*f_ps[k-1] - (p->jacRRm2)*f_ps[k-2] );
-}
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fda_hyp_resPs(const VD& old_ps, const VD& f_ps, const VD& cn_xi, const VD& cn_pi, const VD& cn_al,
-			 const VD& cn_be, const VD& cn_ps, PAR *p, int k)
-{
-  return 0;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fdaR_hyp_resPs(const VD& f_ps, PAR *p, int k)
-{
-  return (p->jacRR)*f_ps[k] + (p->jacRRm1)*f_ps[k-1] + (p->jacRRm2)*f_ps[k-2] - (p->inrmax);
-}
-///////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fda_resXi(const VD& old_xi, const VD& f_xi, const VD& cn_xi, const VD& cn_pi,
-		     const VD& cn_al, const VD& cn_be, const VD& cn_ps, PAR *p, int k)
-{
-  return (p->indt)*( f_xi[k] - old_xi[k] );
-}
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fda_resPi(const VD& old_pi, const VD& f_pi, const VD& cn_xi, const VD& cn_pi, const VD& cn_al,
-		     const VD& cn_be, const VD& cn_ps, PAR *p, int k)
-{
-  return (p->indt)*( f_pi[k] - old_pi[k] );
-}
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fda_resPs(const VD& f_xi, const VD& f_pi, const VD& f_al, const VD& f_be, const VD& f_ps,
-		     PAR *p, int k)
-{
-  return 0;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fda_resBe(const VD& f_xi, const VD& f_pi, const VD& f_al, const VD& f_be, const VD& f_ps,
-		     PAR *p, int k)
-{
-  return 0;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fda_resAl(const VD& f_xi, const VD& f_pi, const VD& f_al, const VD& f_be, const VD& f_ps,
-		     PAR *p, int k)
-{
-  return 0;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fdaR_resPs(const VD& f_ps, PAR *p, int k)
-{ return ddr_b(f_ps,p,k) + (p->inrmax)*(f_ps[k] - 1); }
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fdaR_resBe(const VD& f_be, PAR *p, int k)
-{ return ddr_b(f_be,p,k) + (p->inrmax)*f_be[k]; }
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fdaR_resAl(const VD& f_al, PAR *p, int k)
-{ return ddr_b(f_al,p,k) + (p->inrmax)*(f_al[k] - 1); }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // **********************************************************
 // **********************************************************
@@ -233,6 +187,16 @@ inline dbl sRicci(const VD& f_xi, const VD& f_pi, const VD& f_ps, int k)
 void get_ricci(VD& ricci, const VD& f_xi, const VD& f_pi, const VD& f_ps, const vector< pair<int,int> >& indices)
 {
   for (auto k : indices) { ricci[k.first] = sRicci(f_xi, f_pi, f_ps, k.second); }
+}
+////////////////////////////////////////////////////////////////////////////////////
+// HORIZON SEARCH
+int search_for_horizon(const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
+{
+  if (outgoing_null_b(f_al, f_be, f_ps, p, p->lastpt) <= 0) { return p->lastpt; }
+  int k = p->lastpt;
+  while (--k > 0) { if (outgoing_null(f_al, f_be, f_ps, p, k) <= 0) { return k; } }
+  if (outgoing_null_f(f_al, f_be, f_ps, p, 0) <= 0) { return p->npts; }
+  return 0;
 }
 
 #endif

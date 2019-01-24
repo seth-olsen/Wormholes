@@ -138,7 +138,7 @@ void record_horizon(PAR *p, const VD& f_ps, int ind, int itn, int t_itn)
     to_string(p->ic_r0) + "\nic_Amp = " + to_string(p->ic_Amp) + "\nic_Dsq = " +
     to_string(p->ic_Dsq) + "\ndr = " + to_string(p->dr);
   param_str += "\noptions:\nhyperbolic psi evolution = " + bool_to_str(p->psi_hyp) +
-    "\nzero pi_0 = " + bool_to_str(p->zero_pi) + "\nsommerfeld bc = " + bool_to_str(p->somm_cond)
+    "\nsommerfeld bc = " + bool_to_str(p->somm_cond)
     + "\ndissipation at bound = " + bool_to_str(p->dspn_bound) + "\nclean hyperbolic update functions = "
     + bool_to_str(p->clean_hyp) + "\nclean elliptic update functions = " + bool_to_str(p->clean_ell) + "\n";
   ofstream specs;

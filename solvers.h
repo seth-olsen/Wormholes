@@ -29,6 +29,67 @@ typedef int (*SOLVER)(VD& , VD& , VD& , VD& , VD& ,
 		      int , int , int ,
 		      int , int , int , int , int , vector<int>& , int);
 
+int solve_static(FLDS *f, PAR *p);
+int fields_step(FLDS *f, PAR *p, int i);
+
+int solve_static(FLDS *f, PAR *p)
+{
+  update_xp(f, p);
+  int itn = 1;
+  dbl res = get_res_xp(f, p);
+  while (res > p->tol) {
+    update_xp(f, p);
+    res = get_res_xp(f, p);
+    if (++itn == p->maxit) { return -1; }
+  }
+  return itn;
+}
+
+int fields_step(FLDS *f, PAR *p, int i)
+{
+  if (p->write_ires_xp) {
+    f->olderXi = f->oldXi;
+    f->olderPi = f->oldPi;
+  }
+  //if (p->write_ires_abp) { f->olderPs = f->oldPs; }
+  //f->oldAl = f->Al;  f->cnAl = f->Al;  
+  //f->oldBe = f->Be;  f->cnBe = f->Be;
+  //f->oldPs = f->Ps;  f->cnPs = f->Ps;
+  f->oldXi = f->Xi;  f->cnXi = f->Xi;
+  f->oldPi = f->Pi;  f->cnPi = f->Pi;
+
+
+  int itn = solve_static(f, p);
+  /* solve_Hsearch(f->oldXi, f->oldPi, f->oldAl, f->oldBe, f->oldPs,
+			  f->Xi, f->Pi, f->Al, f->Be, f->Ps,
+			  f->cnXi, f->cnPi, f->cnAl, f->cnBe, f->cnPs,
+			  f->res_hyp, f->res_ell, f->jac,
+			  p, p->r, p->lastpt, p->maxit, i,
+			  p->lp_n, p->lp_kl, p->lp_ku, p->lp_nrhs, p->lp_ldab, p->ipiv, p->lp_ldb); */
+  // ****************** ITERATIVE SOLUTION COMPLETE ******************
+  
+  // *********************** kreiss-oliger DISSIPATION ************************
+  dissipationNB2_xp(f->oldXi, f->oldPi, f->Xi, f->Pi, (p->lastpt)-1, p->dspn);
+
+  // ************************ APPARENT HORIZON SEARCH *************************
+  if (itn < 0) {
+    cout << endl << i << "\n\nSTEP EXIT CODE " << itn << endl;
+    cout << "\n\nSTEP EXIT ITN " << p->exit_itn << endl;
+    cout << "\nt = " << p->t << endl;
+    /*
+    int horizon_code = 0;//search_for_horizon(f->Al, f->Be, f->Ps, p);
+    if (horizon_code) {
+      record_horizon(p, f->Ps, horizon_code, p->exit_itn, i);
+      return horizon_code;
+    }
+    else { return -(p->maxit); }
+    */
+    return -1;
+  }
+  p->t += p->dt;
+  return 0;
+}
+/*
 int solve_t0_slow(const VD& f_xi, const VD& f_pi, VD& f_al, VD& f_be, VD& f_ps,
 		  PAR *p, int lastpt);
 
@@ -38,46 +99,6 @@ int solve_Hsearch(VD& old_xi, VD& old_pi, VD& old_al, VD& old_be, VD& old_ps,
 		  VD& res_hyp, VD& res_ell, const VD& jac_zero, PAR *p, MAPID& r,
 		  int lastpt, int maxit, int i,
 		  int N, int kl, int ku, int nrhs, int ldab, vector<int>& ipiv, int ldb);
-
-int fields_step(FLDS *f, PAR *p, int i)
-{
-  if (p->write_ires_xp) {
-    f->olderXi = f->oldXi;
-    f->olderPi = f->oldPi;
-  }
-  if (p->write_ires_abp) { f->olderPs = f->oldPs; }
-  f->oldAl = f->Al;  f->cnAl = f->Al;  
-  f->oldBe = f->Be;  f->cnBe = f->Be;
-  f->oldPs = f->Ps;  f->cnPs = f->Ps;
-  f->oldXi = f->Xi;  f->cnXi = f->Xi;
-  f->oldPi = f->Pi;  f->cnPi = f->Pi;
-
-  int itn = solve_Hsearch(f->oldXi, f->oldPi, f->oldAl, f->oldBe, f->oldPs,
-			  f->Xi, f->Pi, f->Al, f->Be, f->Ps,
-			  f->cnXi, f->cnPi, f->cnAl, f->cnBe, f->cnPs,
-			  f->res_hyp, f->res_ell, f->jac,
-			  p, p->r, p->lastpt, p->maxit, i,
-			  p->lp_n, p->lp_kl, p->lp_ku, p->lp_nrhs, p->lp_ldab, p->ipiv, p->lp_ldb);
-  
-  // ****************** ITERATIVE SOLUTION COMPLETE ******************
-  
-  // *********************** kreiss-oliger DISSIPATION ************************
-  dissipationNB_xp(f->oldXi, f->oldPi, f->Xi, f->Pi, p->lastpt-1, p->dspn);
-
-  // ************************ APPARENT HORIZON SEARCH *************************
-  if (itn < 0) {
-    cout << "\n\nSTEP EXIT CODE " << itn << endl;
-    cout << "\n\nSTEP EXIT ITN " << p->exit_itn << endl;
-    int horizon_code = 0;//search_for_horizon(f->Al, f->Be, f->Ps, p);
-    if (horizon_code) {
-      record_horizon(p, f->Ps, horizon_code, p->exit_itn, i);
-      return horizon_code;
-    }
-    else { return -(p->maxit); }
-  }
-  p->t += p->dt;
-  return 0;
-}
 
 int solve_t0_slow(const VD& f_xi, const VD& f_pi, VD& f_al, VD& f_be, VD& f_ps,
 		  PAR *p, int lastpt)
@@ -135,8 +156,6 @@ int solve_t0_slow(const VD& f_xi, const VD& f_pi, VD& f_al, VD& f_be, VD& f_ps,
   return ell_itn;
 }
 
-
-
 int solve_Hsearch(VD& old_xi, VD& old_pi, VD& old_al, VD& old_be, VD& old_ps,
 		  VD& f_xi, VD& f_pi, VD& f_al, VD& f_be, VD& f_ps,
 		  VD& cn_xi, VD& cn_pi, VD& cn_al, VD& cn_be, VD& cn_ps,
@@ -155,12 +174,10 @@ int solve_Hsearch(VD& old_xi, VD& old_pi, VD& old_al, VD& old_be, VD& old_ps,
     while (res > (p->ell_tol)) {
       //hyp_solve_PSI_ONLY(old_ps, f_ps, cn_xi, cn_pi, cn_al, cn_be, cn_ps, p, p->r, lastpt);      
       res_hyp[kps] = neumann0res(f_ps, p);
-      /*
       for (int k = 1; k < lastpt; ++k) {
 	res_hyp[kps + k] = fda_hyp_resPs(old_ps, f_ps, cn_xi, cn_pi, cn_al, cn_be, cn_ps, p, k);
       }
       res_hyp[kps + lastpt] = fdaR_hyp_resPs(f_ps, p, lastpt);
-      */
       res = max(  *max_element(res_hyp.begin() + kps, res_hyp.end()),
 		  -(*min_element(res_hyp.begin() + kps, res_hyp.end()))  );
       if (++hyp_itn > maxit) {
@@ -215,7 +232,6 @@ int solve_Hsearch(VD& old_xi, VD& old_pi, VD& old_al, VD& old_be, VD& old_ps,
         else { return -4; }
       }
     }
-    /*
       set2_cn(old_al, old_be, f_al, f_be, cn_al, cn_be, p->npts);
     for (int k = 1; k < lastpt; ++k) {
       res_hyp[kps + k] = fda_hyp_resPs(old_ps, f_ps, cn_xi, cn_pi, cn_al, cn_be, cn_ps, p, k);
@@ -226,7 +242,6 @@ int solve_Hsearch(VD& old_xi, VD& old_pi, VD& old_al, VD& old_be, VD& old_ps,
       res = get_hyp_res(res_hyp, old_xi, old_pi, f_xi, f_pi, cn_xi, cn_pi, cn_al, cn_be, cn_ps, p, p->r, lastpt);
     }
     else { res = (p->tol) + 1; }
-    */
     if (++itn > maxit) {
       res = max(norm_inf(res_ell), norm_inf(res_hyp));
       cout << endl << i << " solver STUCK at t = " << (p->t) << "\nres = " << res << endl;
@@ -241,6 +256,6 @@ int solve_Hsearch(VD& old_xi, VD& old_pi, VD& old_al, VD& old_be, VD& old_ps,
   }  
   return itn;
 }
-
+*/
 
 #endif
