@@ -14,9 +14,9 @@
 #include "sim-structs.h"
 #include "fda-io.h"
 #include "fda-fns.h"
-#include "ekg-fns.h"
+#include "ellis-fns.h"
 #include "jacobian.h"
-#include "ekg-proc.h"
+#include "ellis-proc.h"
 #include "lapacke.h"
 
 using namespace std;
@@ -313,35 +313,6 @@ dbl get_hyp_res_ppx(VD& res_hyp, const VD& old_xi, const VD& old_pi, const VD& o
   res_hyp[lastpt] = sommerfeldres(old_xi, f_xi, p, lastpt);
   res_hyp[kpi + lastpt] = sommerfeldres(old_pi, f_pi, p, lastpt);
   res_hyp[kps + lastpt] = fdaR_hyp_resPs(f_ps, p, lastpt);
-  return max(  *max_element(res_hyp.begin(), res_hyp.end()),
-	      -(*min_element(res_hyp.begin(), res_hyp.end()))  );
-}
-
-dbl get_hyp_res_fast(VD& res_hyp, const VD& old_xi, const VD& old_pi, const VD& f_xi, const VD& f_pi,
-		     const VD& cn_xi, const VD& cn_pi, const VD& cn_al, const VD& cn_be, const VD& cn_ps,
-		     PAR *p, MAPID& r, int lastpt)
-{
-  double lam6_part;
-  double ps2_m, ps2 = sq(cn_ps[0]), ps2_p = sq(cn_ps[1]);
-  double al_ps2_m, al_ps2 = cn_al[0] / ps2, al_ps2_p = cn_al[1] / ps2_p;
-  int kpi = lastpt + 1;
-  res_hyp[0] = dirichlet0res(f_xi);
-  res_hyp[kpi] = neumann0res(f_pi, p);
-  for (int k = 1; k < lastpt; ++k) {
-    lam6_part = r[LAM6VAL] * (d_c(cn_be,k) + cn_be[k]*(4*r[DRVAL]*r[-k] + 6*d_c(cn_ps,k)/cn_ps[k]));
-    ps2_m = ps2; ps2 = ps2_p; ps2_p = sq(cn_ps[k+1]);
-    al_ps2_m = al_ps2; al_ps2 = al_ps2_p; al_ps2_p = cn_al[k+1] / ps2_p;
-    
-    res_hyp[k] = r[INDT]*( f_xi[k] - old_xi[k] -
-			   r[LAM2VAL]*(al_ps2_p*cn_pi[k+1] + cn_be[k+1]*cn_xi[k+1]
-				       - al_ps2_m*cn_pi[k-1] - cn_be[k-1]*cn_xi[k-1]) );
-    res_hyp[kpi + k] = r[INDT]*( f_pi[k]*(lam6_part + 1) + old_pi[k]*(lam6_part - 1)
-				 - (r[LAM2VAL] / sq(r[k]*ps2)) *
-				 (sq(r[k+1]*ps2_p)*(al_ps2_p*cn_xi[k+1] + cn_be[k+1]*cn_pi[k+1])
-				  - sq(r[k-1]*ps2_m)*(al_ps2_m*cn_xi[k-1] + cn_be[k-1]*cn_pi[k-1])) );
-  }
-  res_hyp[lastpt] = sommerfeldres(old_xi, f_xi, p, lastpt);
-  res_hyp[kpi + lastpt] = sommerfeldres(old_pi, f_pi, p, lastpt);
   return max(  *max_element(res_hyp.begin(), res_hyp.end()),
 	      -(*min_element(res_hyp.begin(), res_hyp.end()))  );
 }

@@ -15,8 +15,8 @@
 #include "sim-structs.h"
 #include "fda-io.h"
 #include "fda-fns.h"
-#include "ekg-fns.h"
-#include "ekg-proc.h"
+#include "ellis-fns.h"
+#include "ellis-proc.h"
 
 
 using namespace std;

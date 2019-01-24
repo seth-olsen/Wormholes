@@ -14,10 +14,10 @@
 #include "lapacke.h"
 #include "fda-io.h"
 #include "fda-fns.h"
-#include "ekg-fns.h"
+#include "ellis-fns.h"
 #include "jacobian.h"
-//#include "ekg-clean.h"
-#include "ekg-proc.h"
+//#include "ellis-clean.h"
+#include "ellis-proc.h"
 #include "solvers.h"
 #include "sim-header.h"
 #include "sim-structs.h"
@@ -211,10 +211,10 @@ int params_init(PAR *p, int argc, char **argv)
   p->dr = (p->rmax - p->rmin) / ((dbl) p->lastpt);
   p->dt = p->lam * p->dr;
   p->check_diagnostics = p->save_step * p->check_step;
-  p->r[0] = p->rmin
-  for (int k = 1; k < p->npts; ++k) {
+  p->r[0] = p->rmin;
+  for (int k = 1; k < (p->npts); ++k) {
     p->r[k] = (p->rmin) + k*(p->dr);
-    p->r[-k] = 1 / (p->r[k]); }
+    p->r[-k] = 1 / (p->r[k]);
   }
   p->t = 0;
   for (int k = 0; k < p->wr_shape; ++k) {

@@ -12,9 +12,9 @@
 #include "bbhutil.h" // for output to .sdf
 #include "fda-io.h"
 #include "fda-fns.h"
-#include "ekg-fns.h"
+#include "ellis-fns.h"
 #include "jacobian.h"
-#include "ekg-clean.h"
+//#include "ellis-clean.h"
 #include "lapacke.h"
 
 using namespace std;

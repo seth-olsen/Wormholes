@@ -15,8 +15,8 @@
 #include "sim-structs.h"
 #include "sim-header.h"
 #include "fda-fns.h"
-#include "ekg-fns.h"
-#include "ekg-proc.h"
+#include "ellis-fns.h"
+#include "ellis-proc.h"
 
 inline str bool_to_str(bool bool_in)
 {
