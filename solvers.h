@@ -11,12 +11,12 @@
 #include <cstdlib> // for atoi() and atof()
 #include "bbhutil.h" // for output to .sdf
 #include "lapacke.h"
+#include "jacobian.h"
 #include "sim-header.h"
 #include "sim-structs.h"
 #include "fda-io.h"
 #include "fda-fns.h"
 #include "ellis-fns.h"
-#include "jacobian.h"
 #include "ellis-proc.h"
 //#include "ellis-clean.h"
 
@@ -30,7 +30,47 @@ typedef int (*SOLVER)(VD& , VD& , VD& , VD& , VD& ,
 		      int , int , int , int , int , vector<int>& , int);
 
 int solve_static(FLDS *f, PAR *p);
-int fields_step(FLDS *f, PAR *p, int i);
+int solve_dynamic(FLDS *f, PAR *p);
+int solve_t0(FLDS *f, PAR *p);
+
+int fields_step(FLDS *f, PAR *p, int i)
+{
+  if (p->write_ires_xp) {
+    f->olderXi = f->oldXi;
+    f->olderPi = f->oldPi;
+  }
+  if (p->write_ires_abp) { f->olderPs = f->oldPs; }
+  f->oldAl = f->Al;  f->cnAl = f->Al;  
+  f->oldBe = f->Be;  f->cnBe = f->Be;
+  f->oldPs = f->Ps;  f->cnPs = f->Ps;
+  f->oldXi = f->Xi;  f->cnXi = f->Xi;
+  f->oldPi = f->Pi;  f->cnPi = f->Pi;
+
+
+  int itn = (*(p->solver))(f, p);
+  // ****************** ITERATIVE SOLUTION COMPLETE ******************
+  
+  // *********************** kreiss-oliger DISSIPATION ************************
+  dissipationNB2_xp(f->oldXi, f->oldPi, f->Xi, f->Pi, (p->lastpt)-1, p->dspn);
+
+  // ************************ APPARENT HORIZON SEARCH *************************
+  if (itn < 0) {
+    cout << endl << i << "\n\nSTEP EXIT CODE " << itn << endl;
+    cout << "\n\nSTEP EXIT ITN " << p->exit_itn << endl;
+    cout << "\nt = " << p->t << endl;
+    /*
+    int horizon_code = search_for_horizon(f->Al, f->Be, f->Ps, p);
+    if (horizon_code) {
+      record_horizon(p, f->Ps, horizon_code, p->exit_itn, i);
+      return horizon_code;
+    }
+    else { return -(p->maxit); }
+    */
+    return itn;
+  }
+  p->t += p->dt;
+  return 0;
+}
 
 int solve_static(FLDS *f, PAR *p)
 {
@@ -45,60 +85,25 @@ int solve_static(FLDS *f, PAR *p)
   return itn;
 }
 
-int fields_step(FLDS *f, PAR *p, int i)
+int solve_t0(FLDS *f, PAR *p)
 {
-  if (p->write_ires_xp) {
-    f->olderXi = f->oldXi;
-    f->olderPi = f->oldPi;
-  }
-  //if (p->write_ires_abp) { f->olderPs = f->oldPs; }
-  //f->oldAl = f->Al;  f->cnAl = f->Al;  
-  //f->oldBe = f->Be;  f->cnBe = f->Be;
-  //f->oldPs = f->Ps;  f->cnPs = f->Ps;
-  f->oldXi = f->Xi;  f->cnXi = f->Xi;
-  f->oldPi = f->Pi;  f->cnPi = f->Pi;
-
-
-  int itn = solve_static(f, p);
-  /* solve_Hsearch(f->oldXi, f->oldPi, f->oldAl, f->oldBe, f->oldPs,
-			  f->Xi, f->Pi, f->Al, f->Be, f->Ps,
-			  f->cnXi, f->cnPi, f->cnAl, f->cnBe, f->cnPs,
-			  f->res_hyp, f->res_ell, f->jac,
-			  p, p->r, p->lastpt, p->maxit, i,
-			  p->lp_n, p->lp_kl, p->lp_ku, p->lp_nrhs, p->lp_ldab, p->ipiv, p->lp_ldb); */
-  // ****************** ITERATIVE SOLUTION COMPLETE ******************
-  
-  // *********************** kreiss-oliger DISSIPATION ************************
-  dissipationNB2_xp(f->oldXi, f->oldPi, f->Xi, f->Pi, (p->lastpt)-1, p->dspn);
-
-  // ************************ APPARENT HORIZON SEARCH *************************
-  if (itn < 0) {
-    cout << endl << i << "\n\nSTEP EXIT CODE " << itn << endl;
-    cout << "\n\nSTEP EXIT ITN " << p->exit_itn << endl;
-    cout << "\nt = " << p->t << endl;
-    /*
-    int horizon_code = 0;//search_for_horizon(f->Al, f->Be, f->Ps, p);
-    if (horizon_code) {
-      record_horizon(p, f->Ps, horizon_code, p->exit_itn, i);
-      return horizon_code;
-    }
-    else { return -(p->maxit); }
-    */
-    return -1;
-  }
-  p->t += p->dt;
   return 0;
 }
-/*
-int solve_t0_slow(const VD& f_xi, const VD& f_pi, VD& f_al, VD& f_be, VD& f_ps,
-		  PAR *p, int lastpt);
 
-int solve_Hsearch(VD& old_xi, VD& old_pi, VD& old_al, VD& old_be, VD& old_ps,
-		  VD& f_xi, VD& f_pi, VD& f_al, VD& f_be, VD& f_ps,
-		  VD& cn_xi, VD& cn_pi, VD& cn_al, VD& cn_be, VD& cn_ps,
-		  VD& res_hyp, VD& res_ell, const VD& jac_zero, PAR *p, MAPID& r,
-		  int lastpt, int maxit, int i,
-		  int N, int kl, int ku, int nrhs, int ldab, vector<int>& ipiv, int ldb);
+int solve_dynamic(FLDS *f, PAR *p)
+{
+  update_xp(f, p);
+  int itn = 1;
+  dbl res = get_res_xp(f, p);
+  while (res > p->tol) {
+    update_xp(f, p);
+    res = get_res_xp(f, p);
+    if (++itn == p->maxit) { return -1; }
+  }
+  return itn;
+}
+  
+/*
 
 int solve_t0_slow(const VD& f_xi, const VD& f_pi, VD& f_al, VD& f_be, VD& f_ps,
 		  PAR *p, int lastpt)

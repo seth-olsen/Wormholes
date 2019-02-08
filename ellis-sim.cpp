@@ -53,6 +53,7 @@ int main(int argc, char **argv)
     err_code = fields_step(&f, &p, i);
     if (err_code) {
       cout << "\nFIELD STEP error code = " << err_code << endl;
+      gft_close_all();
       return err_code;
     }
   }

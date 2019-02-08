@@ -88,64 +88,35 @@ int fields_init(FLDS *f, PAR *p)
   VD zeros(p->npts, 0);
   f->Xi = zeros;
   f->Pi = zeros;
-  //f->Al = zeros;
-  //f->Be = zeros;
-  //f->Ps = zeros;
+  f->Al = zeros;
+  f->Be = zeros;
+  f->Ps = zeros;
   // PUT INITIAL CONDITIONS
-  //f->Al[0] = 1;
-  //f->Be[0] = 0;
-  //f->Ps[0] = 1;
-  
-  for (int k = (p->zeropt) + 1; k < (p->lastpt); ++k) {
-    //f->Al[k] = 1;
+  for (int k = 0; k < (p->zeropt) + 1; ++k) {
+    f->Al[k] = 1;
     //f->Be[k] = 0;
-    //f->Ps[k] = 1;
+    f->Ps[k] = 1;
+  }
+  for (int k = (p->zeropt) + 1; k < (p->lastpt); ++k) {
+    f->Al[k] = 1;
+    //f->Be[k] = 0;
+    f->Ps[k] = 1;
     f->Xi[k] = ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
     f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
   }
-  /*
-  dirichlet0(f->Xi);
-  neumann0(f->Pi);
-  if (!(p->static_metric)) {
-    int itn = solve_t0_slow(f->Xi, f->Pi, f->Al, f->Be, f->Ps, p, p->lastpt);
-    if (itn < 0) {
-      if (itn > -(p->npts)) {
-	record_horizon(p, f->Ps, -itn, 0, 0);
-      }
-      else if (itn == -(p->npts)) {
-	record_horizon(p, f->Ps, 0, 0, 0);
-      }
-      else { cout << "\nUNDETERMINED ERROR IN T = 0 ELLIPTIC CONSTRAINTS" << endl; }
-      return itn;
-    }
-  }
-  f->oldAl = f->Al;
-  f->cnAl = f->Al;
-  f->resAl = zeros;
-  f->oldBe = f->Be;
-  f->cnBe = f->Be;
-  f->resBe = zeros;
-  f->oldPs = f->Ps;
-  f->cnPs = f->Ps;
-  f->resPs = zeros;
-  */  
+  apply_bcR_xp(f, p);
+
   f->oldXi = f->Xi;
   f->cnXi = f->Xi;
   f->resXi = zeros;
   f->oldPi = f->Pi;
   f->cnPi = f->Pi;
   f->resPi = zeros;
-  /*
-  if (p->write_ires_abp) {
-    f->olderAl = zeros;
-    f->olderBe = zeros;
-    f->olderPs = zeros;
-  }
-  */
   if (p->write_ires_xp) {
     f->olderXi = zeros;
     f->olderPi = zeros;
   }
+  
   /*
   VD hyp_res_zeros(p->n_hyp * p->npts, 0);
   VD ell_res_zeros(p->lp_ldb, 0);
@@ -155,6 +126,35 @@ int fields_init(FLDS *f, PAR *p)
   f->res_ell = ell_res_zeros;
   f->jac = jac_zeros;
   */
+
+  if (!(p->static_metric)) {
+    int t0_itn = solve_t0(f, p);
+    if (t0_itn < 0) {
+      if (t0_itn > -(p->npts)) {
+	record_horizon(p, f->Ps, -t0_itn, 0, 0);
+      }
+      else if (t0_itn == -(p->npts)) {
+	record_horizon(p, f->Ps, 0, 0, 0);
+      }
+      else { cout << "\nUNDETERMINED ERROR IN T = 0 ELLIPTIC CONSTRAINTS" << endl; }
+      return t0_itn;
+    }
+  }
+  f->oldAl = f->Al;
+  f->cnAl = f->Al;
+  //f->resAl = zeros;
+  f->oldBe = f->Be;
+  f->cnBe = f->Be;
+  //f->resBe = zeros;
+  f->oldPs = f->Ps;
+  f->cnPs = f->Ps;
+  //f->resPs = zeros;
+  if (p->write_ires_abp) {
+    f->olderAl = zeros;
+    f->olderBe = zeros;
+    f->olderPs = zeros;
+  }
+  
   return 0;
 }
 
@@ -199,6 +199,7 @@ int params_init(PAR *p, int argc, char **argv)
     p->n_hyp = 3;
   }
   // bbhutil parameters for writing data to sdf
+  p->rmin = -(p->rmax);
   p->lastwr = p->lastpt / p->save_pt;
   p->wr_shape = p->lastwr + 1;
   p->zerowr = p->lastwr / 2;
@@ -266,6 +267,9 @@ int params_init(PAR *p, int argc, char **argv)
   //p->jacN02 = -1 * (p->in2dr);
   //p->dt_twelve = (p->twelfth) * (p->dt);
   //p->cpsi_rhs = 1 / (p->jacRR);
+
+  if (p->static_metric) { p->solver = solve_static; }
+  else { p->solver = solve_dynamic; }
 
   // PARAMETER DATA OUTPUT
   str param_data = "\nPARAMETERS:\n\n";

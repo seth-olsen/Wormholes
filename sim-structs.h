@@ -149,20 +149,20 @@ struct sim_params {
   vector<int> ipiv; 
   
   // FREQUENTLY USED
-  //dbl one_third = 1.0 / 3.0;
+  dbl one_third = 1.0 / 3.0;
   //dbl two_thirds = 2 * one_third;
   //dbl four_thirds = 2 * two_thirds;
   //dbl twelfth = 0.25 * one_third;
   //dbl five_twelfths = 5 * twelfth;
-  //dbl eight_pi = 8 * M_PI;
-  //dbl twelve_pi = 1.5 * eight_pi;
+  dbl eight_pi = 8 * M_PI;
+  dbl twelve_pi = 1.5 * eight_pi;
   dbl lam2val = 0.5 * lam;
-  //dbl lam6val = lam2val * one_third;
+  dbl lam6val = lam2val * one_third;
   dbl drsq = dr * dr;
   dbl indr = 1 / dr;
   dbl in2dr = 0.5 / dr;
   dbl indrsq = indr * indr;
-  //dbl neg2indrsq = -2 * indrsq;
+  dbl neg2indrsq = -2 * indrsq;
   dbl indt = 1 / dt;
   dbl inrmax = 1 / rmax;
   // SPECIFIC TERMS
@@ -177,13 +177,12 @@ struct sim_params {
   //dbl jacN02 = -1 * in2dr;
   //dbl dt_twelve = twelfth * dt;
   //dbl cpsi_rhs = 1 / jacRR;
-  
+
+
+  int (*solver)(FLDS *, struct sim_params *) = NULL;
   
 } ;
 typedef struct sim_params PAR;
-
-  
-  
   
 
 
