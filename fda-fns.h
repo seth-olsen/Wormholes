@@ -9,8 +9,6 @@
 #include "sim-structs.h"
 #include "sim-header.h"
 
-using namespace std;
-
 // x^n and 1/x^n
 inline dbl sq(dbl x) { return (x*x); }
 inline dbl pw3(dbl x) { return (x*x*x); }
@@ -51,25 +49,30 @@ inline dbl dlog_f(const VD& u, int ind)
 inline dbl dlog_b(const VD& u, int ind)
 { return 3*log(u[ind]) - 4*log(u[ind+1]) + log(u[ind+2]); }
 
+inline dbl dln_c(const VD& u, int ind)
+{ return ((u[ind+1] - u[ind-1]) / u[ind]); }
+inline dbl ddrln_c(const VD& u, PAR *p, int ind)
+{ return ((p->in2dr) * (u[ind+1] - u[ind-1]) / u[ind]); }
+
 // DERIVATIVES
 
 inline dbl ddr_c(const VD& u, PAR *p, int ind)
-{ return (p->in2dr)*(u[ind+1] - u[ind-1]); }
+{ return ((p->in2dr)*(u[ind+1] - u[ind-1])); }
 
 inline dbl ddr_f(const VD& u, PAR *p, int ind)
-{ return (p->in2dr)*(-3*u[ind] + 4*u[ind+1] - u[ind+2]); }
+{ return ((p->in2dr)*(-3*u[ind] + 4*u[ind+1] - u[ind+2])); }
 
 inline dbl ddr_b(const VD& u, PAR *p, int ind)
-{ return (p->in2dr)*(3*u[ind] - 4*u[ind-1] + u[ind-2]); }
+{ return ((p->in2dr)*(3*u[ind] - 4*u[ind-1] + u[ind-2])); }
 
 inline dbl ddr2_c(const VD& u, PAR *p, int ind)
-{ return (p->indrsq)*(u[ind-1] - 2*u[ind] + u[ind+1]); }
+{ return ((p->indrsq)*(u[ind-1] - 2*u[ind] + u[ind+1])); }
 
 inline dbl ddr2_f(const VD& u, PAR *p, int ind)
-{ return (p->indrsq)*(2*u[ind] - 5*u[ind+1] + 4*u[ind+2] - u[ind+3]); }
+{ return ((p->indrsq)*(2*u[ind] - 5*u[ind+1] + 4*u[ind+2] - u[ind+3])); }
 
 inline dbl ddr2_b(const VD& u, PAR *p, int ind)
-{ return (p->indrsq)*(2*u[ind] - 5*u[ind-1] + 4*u[ind-2] - u[ind-3]); }
+{ return ((p->indrsq)*(2*u[ind] - 5*u[ind-1] + 4*u[ind-2] - u[ind-3])); }
 
 
 // CRANK-NICHOLSON

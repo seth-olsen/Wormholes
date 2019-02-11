@@ -8,6 +8,13 @@
 #include <string>
 #include "sim-header.h"
 
+/*
+typedef struct bbhutil_params BBHP;
+typedef struct sim_fields FLDS;
+typedef struct sim_writers WRS;
+typedef struct sim_params PAR;
+*/
+
 struct bbhutil_params {
   str filename = "file";
   VD *full_field = NULL;
@@ -19,7 +26,7 @@ struct bbhutil_params {
   dbl *data = NULL;
   bool write_this = false;
 } ;
-typedef struct bbhutil_params BBHP;
+
 
 struct sim_fields {
   VD Al;
@@ -47,11 +54,10 @@ struct sim_fields {
   VD cnPi;
   VD resPi;
   VD olderPi;
-  VD res_hyp;
   VD res_ell;
   VD jac;
 } ;
-typedef struct sim_fields FLDS;
+
 
 struct sim_writers {
   BBHP p_Al;
@@ -73,7 +79,8 @@ struct sim_writers {
   BBHP p_outnull;
   BBHP p_ricci;
 } ;
-typedef struct sim_writers WRS;
+
+
 
 struct sim_params {
   str outfile = "ellis";
@@ -90,7 +97,7 @@ struct sim_params {
   dbl rmin = -rmax;
   dbl lsq = 1;
   dbl dspn = 0.5; // dissipation coefficient
-  dbl tol = 0.000000000001; // iterative method tolerance
+  dbl tol = 0.0000000001; // iterative method tolerance
   dbl ell_tol = 0.01*tol;
   dbl ell_up_weight = 0.5;
   dbl ic_Dsq = 25.0; // gaussian width
@@ -101,7 +108,7 @@ struct sim_params {
   bool dspn_bound = false; // dissipate boundary points?
   bool dspn_psi = false; // dissipate psi (only activated if psi_hyp=true)?
   bool dr3_up = false; // update pi with d/dr^3 scheme?
-  bool static_metric = true; // ignore scalar field's effect on metric?
+  bool static_metric = false; // ignore scalar field's effect on metric?
   bool clean_hyp = false; // use clean hyperbolic update functions (slower)?
   bool clean_ell = false; // use clean hyperbolic update functions (slower)?
   bool write_res = false; // write residuals?
@@ -111,7 +118,7 @@ struct sim_params {
   bool write_maspect = false; // write mass aspect?
   bool write_outnull = false; // write outgoing null expansion?
   bool write_xp = true; // write xi and pi?
-  bool write_abp = false; // write metric fields (alpha, beta, psi)?
+  bool write_abp = true; // write metric fields (alpha, beta, psi)?
   bool write_ires_xp = false; // write ires for xi and pi?
   bool write_ires_abp = false; // write ires for metric variables?
   bool horizon_search = false; // search for apparent horizon after each step?
@@ -150,17 +157,18 @@ struct sim_params {
   
   // FREQUENTLY USED
   dbl one_third = 1.0 / 3.0;
-  //dbl two_thirds = 2 * one_third;
+  dbl two_thirds = 2 * one_third;
   //dbl four_thirds = 2 * two_thirds;
-  //dbl twelfth = 0.25 * one_third;
-  //dbl five_twelfths = 5 * twelfth;
+  dbl twelfth = 0.25 * one_third;
+  dbl five_twelfths = 5 * twelfth;
   dbl eight_pi = 8 * M_PI;
   dbl twelve_pi = 1.5 * eight_pi;
   dbl lam2val = 0.5 * lam;
   dbl lam6val = lam2val * one_third;
   dbl drsq = dr * dr;
   dbl indr = 1 / dr;
-  dbl in2dr = 0.5 / dr;
+  dbl in2dr = 0.5 * indr;
+  dbl in3dr = one_third * indr;
   dbl indrsq = indr * indr;
   dbl neg2indrsq = -2 * indrsq;
   dbl indt = 1 / dt;
@@ -169,9 +177,9 @@ struct sim_params {
   dbl csomm = 0.75*lam + 0.5*dt*inrmax;
   dbl csomm_rhs = 1 / (1 + csomm);
   dbl csomm_old = 1 - csomm;
-  //dbl jacRR = 3*in2dr + inrmax;
-  //dbl jacRRm1 = -4 * in2dr;
-  //dbl jacRRm2 = in2dr;
+  dbl jacRR = 3*in2dr + inrmax;
+  dbl jacRRm1 = -4 * in2dr;
+  dbl jacRRm2 = in2dr;
   //dbl jacN00 = -3 * in2dr;
   //dbl jacN01 = 4 * in2dr;
   //dbl jacN02 = -1 * in2dr;
@@ -179,10 +187,10 @@ struct sim_params {
   //dbl cpsi_rhs = 1 / jacRR;
 
 
-  int (*solver)(FLDS *, struct sim_params *) = NULL;
+  int (*solver)(FLDS *, PAR *) = NULL;
   
 } ;
-typedef struct sim_params PAR;
+
   
 
 

@@ -6,7 +6,10 @@
 #include <vector> // for everything
 #include <cmath> // for ICs
 
-
+inline dbl r2(PAR *p, int k)
+{
+  return (sq(p->r[k]) + (p->lsq));
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // *************************************************************************
 // **********************   FDA IMPLEMENTATIONS   **************************
@@ -14,24 +17,35 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl fda_xi(FLDS *f, PAR *p, int k)
 {
-  return f->oldXi[k] + (p->lam2val)*d_c(f->cnPi, k);
+  return f->oldXi[k] + (p->lam2val) *
+    ((f->cnAl[k+1])*(f->cnPi[k+1])/sq(f->cnPs[k+1]) + (f->cnBe[k+1])*(f->cnXi[k+1])
+     - (f->cnAl[k-1])*(f->cnPi[k-1])/sq(f->cnPs[k-1]) - (f->cnBe[k-1])*(f->cnXi[k-1]));
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fda_pi(FLDS *f, PAR *p, int k)
+dbl fda_pi(FLDS *f, PAR *p, int k)
 {
-  return f->oldPi[k] + (p->lam2val)*d_c(f->cnXi, k) + (p->dt)*(p->r[-k])*(f->cnXi[k]);
+  dbl lam6part = 1 + (p->lam6val)*(d_c(f->cnBe,k) + (f->cnBe[k])*(6*dln_c(f->cnPs,k) + 4*(p->dr)*(p->r[-k])));
+  return ((f->oldPi[k])*(2 - lam6part) + ((p->lam2val) / (r2(p,k)*pw4(f->cnPs[k]))) *
+	  ((r2(p,k+1)*pw4(f->cnPs[k+1]))*((f->cnAl[k+1])*(f->cnXi[k+1])/sq(f->cnPs[k+1]) + (f->cnBe[k+1])*(f->cnPi[k+1])) -
+	   (r2(p,k-1)*pw4(f->cnPs[k-1]))*((f->cnAl[k-1])*(f->cnXi[k-1])/sq(f->cnPs[k-1]) + (f->cnBe[k-1])*(f->cnPi[k-1]))))
+    / lam6part;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // *****************************CHECK
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl fda_resXi(FLDS *f, PAR *p, int k)
 {
-  return (p->indt)*(f->Xi[k] - f->oldXi[k]) - ddr_c(f->cnPi,p,k);
+  return (p->indt)*(f->Xi[k] - f->oldXi[k]) - (p->in2dr) *
+    ((f->cnAl[k+1])*(f->cnPi[k+1])/sq(f->cnPs[k+1]) + (f->cnBe[k+1])*(f->cnXi[k+1])
+     - (f->cnAl[k-1])*(f->cnPi[k-1])/sq(f->cnPs[k-1]) - (f->cnBe[k-1])*(f->cnXi[k-1]));
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl fda_resPi(FLDS *f, PAR *p, int k)
 {
-  return (p->indt)*(f->Pi[k] - f->oldPi[k]) - ddr_c(f->cnXi,p,k) - (p->r[-k])*(f->cnXi[k]);
+  return (p->indt)*(f->Pi[k] - f->oldPi[k]) - ((p->in2dr) / (r2(p,k)*pw4(f->cnPs[k]))) *
+    ((r2(p,k+1)*pw4(f->cnPs[k+1]))*((f->cnAl[k+1])*(f->cnXi[k+1])/sq(f->cnPs[k+1]) + (f->cnBe[k+1])*(f->cnPi[k+1])) -
+     (r2(p,k-1)*pw4(f->cnPs[k-1]))*((f->cnAl[k-1])*(f->cnXi[k-1])/sq(f->cnPs[k-1]) + (f->cnBe[k-1])*(f->cnPi[k-1])))
+    + (f->cnPi[k])*(p->in3dr)*(d_c(f->cnBe,k) + (f->cnBe[k])*(6*dln_c(f->cnPs,k) + 4*(p->dr)*(p->r[-k])));
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl fda_hyp_ps(const VD& old_ps, const VD& cn_xi, const VD& cn_pi, const VD& cn_al,
@@ -39,7 +53,65 @@ inline dbl fda_hyp_ps(const VD& old_ps, const VD& cn_xi, const VD& cn_pi, const 
 {
   return 0;
 }
+inline dbl fdaR_hyp_ps(const VD& f_ps, PAR *p, int k)
+{
+  return 0; //r[CPSI_RHS]*( r[INRMAX] - r[JAC_RRM1]*f_ps[k-1] - r[JAC_RRM2]*f_ps[k-2] );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fda_hyp_resPs(const VD& old_ps, const VD& f_ps, const VD& cn_xi, const VD& cn_pi, const VD& cn_al,
+			 const VD& cn_be, const VD& cn_ps, PAR *p, int k)
+{
+  return 0; //r[INDT]*( f_ps[k] - old_ps[k] - r[LAM2VAL]*cn_be[k]*d_c(cn_ps,k)
+  //- r[LAM6VAL]*(0.25*d_c(cn_be,k) + cn_be[k]*r[DRVAL]*r[-k])*(f_ps[k] + old_ps[k]) );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fdaR_hyp_resPs(const VD& f_ps, PAR *p, int k)
+{
+  return 0; //r[JAC_RR]*f_ps[k] + r[JAC_RRM1]*f_ps[k-1] + r[JAC_RRM2]*f_ps[k-2] - r[INRMAX];
+}
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fda_resPs(const VD& f_xi, const VD& f_pi, const VD& f_al, const VD& f_be, const VD& f_ps,
+		     PAR *p, int k)
+{
+  return ddr2_c(f_ps,p,k) + 2*(p->r[-k])*ddr_c(f_ps,p,k)
+    + f_ps[k]*(0.25*(p->lsq)/sq((p->lsq) + sq(p->r[k])) - M_PI*(sq(f_xi[k]) + sq(f_pi[k])))
+    + (p->twelfth)*pw5(f_ps[k])*sq(ddr_c(f_be,p,k) - (p->r[-k])*f_be[k]) / sq(f_al[k]);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fda_resBe(const VD& f_xi, const VD& f_pi, const VD& f_al, const VD& f_be, const VD& f_ps,
+		     PAR *p, int k)
+{
+  return ddr2_c(f_be,p,k) - f_be[k]*(p->lsq)/sq((p->lsq) + sq(p->r[k]))
+    - (p->twelve_pi)*f_al[k]*f_xi[k]*f_pi[k] / sq(f_ps[k])
+    + (ddr_c(f_be,p,k) - (p->r[-k])*f_be[k])*(2*(p->r[-k]) + 6*ddrln_c(f_ps,p,k) - ddrln_c(f_al,p,k));
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fda_resAl(const VD& f_xi, const VD& f_pi, const VD& f_al, const VD& f_be, const VD& f_ps,
+		     PAR *p, int k)
+{
+  return ddr2_c(f_al,p,k) + (p->eight_pi)*f_al[k]*sq(f_pi[k])
+    + 2*ddr_c(f_al,p,k)*((p->r[-k]) + ddrln_c(f_ps,p,k))
+    - (p->two_thirds)*pw4(f_ps[k])*sq(ddr_c(f_be,p,k) - (p->r[-k])*f_be[k]) / f_al[k];
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fdaR_resPs(const VD& f_ps, PAR *p)
+{ return ddr_b(f_ps,p,(p->lastpt)) + (p->inrmax)*(f_ps[(p->lastpt)] - 1); }
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fdaR_resBe(const VD& f_be, PAR *p)
+{ return ddr_b(f_be,p,(p->lastpt)) + (p->inrmax)*f_be[(p->lastpt)]; }
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fdaR_resAl(const VD& f_al, PAR *p)
+{ return ddr_b(f_al,p,(p->lastpt)) + (p->inrmax)*(f_al[(p->lastpt)] - 1); }
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fda0_resPs(const VD& f_ps, PAR *p)
+{ return ddr_f(f_ps,p,0) - (p->inrmax)*(f_ps[0] - 1); }
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fda0_resBe(const VD& f_be, PAR *p)
+{ return ddr_f(f_be,p,0) - (p->inrmax)*f_be[0]; }
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl fda0_resAl(const VD& f_al, PAR *p)
+{ return ddr_f(f_al,p,0) - (p->inrmax)*(f_al[0] - 1); }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // **********************************************************
 // **********************************************************

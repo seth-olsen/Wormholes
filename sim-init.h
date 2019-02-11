@@ -97,14 +97,13 @@ int fields_init(FLDS *f, PAR *p)
     //f->Be[k] = 0;
     f->Ps[k] = 1;
   }
-  for (int k = (p->zeropt) + 1; k < (p->lastpt); ++k) {
+  for (int k = (p->zeropt) + 1; k < (p->npts); ++k) {
     f->Al[k] = 1;
     //f->Be[k] = 0;
     f->Ps[k] = 1;
     f->Xi[k] = ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
     f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
   }
-  apply_bcR_xp(f, p);
 
   f->oldXi = f->Xi;
   f->cnXi = f->Xi;
@@ -116,16 +115,6 @@ int fields_init(FLDS *f, PAR *p)
     f->olderXi = zeros;
     f->olderPi = zeros;
   }
-  
-  /*
-  VD hyp_res_zeros(p->n_hyp * p->npts, 0);
-  VD ell_res_zeros(p->lp_ldb, 0);
-  VD jac_zeros(p->lp_ldab * p->lp_n, 0);
-  // GET THESE ************************************
-  f->res_hyp = hyp_res_zeros;
-  f->res_ell = ell_res_zeros;
-  f->jac = jac_zeros;
-  */
 
   if (!(p->static_metric)) {
     int t0_itn = solve_t0(f, p);
@@ -139,21 +128,28 @@ int fields_init(FLDS *f, PAR *p)
       else { cout << "\nUNDETERMINED ERROR IN T = 0 ELLIPTIC CONSTRAINTS" << endl; }
       return t0_itn;
     }
+    else if (t0_itn == 2*(p->maxit)) {
+      cout << "\nUNDETERMINED ERROR IN T = 0 ELLIPTIC CONSTRAINTS, MAXIT REACHED" << endl;
+      return t0_itn;
+    }
   }
   f->oldAl = f->Al;
   f->cnAl = f->Al;
-  //f->resAl = zeros;
   f->oldBe = f->Be;
   f->cnBe = f->Be;
-  //f->resBe = zeros;
+  
   f->oldPs = f->Ps;
   f->cnPs = f->Ps;
-  //f->resPs = zeros;
+  if (p->psi_hyp) { f->resPs = zeros; }
   if (p->write_ires_abp) {
     f->olderAl = zeros;
     f->olderBe = zeros;
     f->olderPs = zeros;
   }
+  VD ell_res_zeros((p->lp_ldb), 0);
+  VD jac_zeros(((p->lp_ldab)*(p->lp_n)), 0);
+  f->res_ell = ell_res_zeros;
+  f->jac = jac_zeros;
   
   return 0;
 }
@@ -218,9 +214,10 @@ int params_init(PAR *p, int argc, char **argv)
   p->dr = (p->rmax - p->rmin) / ((dbl) p->lastpt);
   p->dt = p->lam * p->dr;
   p->check_diagnostics = p->save_step * p->check_step;
-  for (int k = 0; k < (p->npts); ++k) {
+  p->r[0] = (p->rmin);
+  for (int k = 1; k < (p->npts); ++k) {
     p->r[k] = (p->rmin) + k*(p->dr);
-    p->r[-k] = 2 * (p->r[k]) / (sq(p->r[k]) + (p->lsq));
+    p->r[-k] = (p->r[k]) / (sq(p->r[k]) + (p->lsq));
   }
   if (p->r[p->zeropt] != 0 || p->r[p->lastpt] != p->rmax) {
     cout << "\n***COORDINATE INIT ERROR***\n" << endl;
@@ -234,34 +231,33 @@ int params_init(PAR *p, int argc, char **argv)
   }
   
   // lapack object declaration
-  /*
-  p->lp_n = p->n_ell * p->npts;
+  p->lp_n = (p->n_ell) * (p->npts);
   p->lp_kl = 2;
   p->lp_ku = 2;
   p->lp_nrhs = 1;
-  p->lp_ldab = 2 * p->lp_kl + p->lp_ku + 1;
+  p->lp_ldab = 2*(p->lp_kl) + (p->lp_ku) + 1;
   p->lp_ldb = p->lp_n;
   vector<lapack_int> ipiv_zeros(p->lp_n, 0);
   p->ipiv = ipiv_zeros;
   p->lp_ipiv = &(p->ipiv[0]);
-  */
 
   p->lam2val = 0.5 * (p->lam);
-  //p->lam6val = (p->lam2val) * (p->one_third);
+  p->lam6val = (p->lam2val) * (p->one_third);
   p->drsq = (p->dr) * (p->dr);
   p->indr = 1 / (p->dr);
   p->in2dr = 0.5 * (p->indr);
+  p->in3dr = (p->one_third) * (p->indr);
   p->indrsq = sq(p->indr);
-  //p->neg2indrsq = -2 * (p->indrsq);
+  p->neg2indrsq = -2 * (p->indrsq);
   p->indt = 1 / (p->dt);
   p->inrmax = 1 / (p->rmax);
   // SPECIFIC TERMS
   p->csomm = 0.75*(p->lam) + 0.5*(p->dt)*(p->inrmax);
   p->csomm_rhs = 1 / (1 + (p->csomm));
   p->csomm_old = 1 - (p->csomm);
-  //p->jacRR = 3*(p->in2dr) + (p->inrmax);
-  //p->jacRRm1 = -4 * (p->in2dr);
-  //p->jacRRm2 = (p->in2dr);
+  p->jacRR = 3*(p->in2dr) + (p->inrmax);
+  p->jacRRm1 = -4 * (p->in2dr);
+  p->jacRRm2 = (p->in2dr);
   //p->jacN00 = -3 * (p->in2dr);
   //p->jacN01 = 4 * (p->in2dr);
   //p->jacN02 = -1 * (p->in2dr);

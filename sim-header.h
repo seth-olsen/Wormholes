@@ -24,6 +24,19 @@ typedef vector<dbl> VD;
 typedef map<int, double> MAPID;
 typedef map<int, double> MAPII;
 
+typedef struct bbhutil_params BBHP;
+typedef struct sim_fields FLDS;
+typedef struct sim_writers WRS;
+typedef struct sim_params PAR;
+
+
+
+
+
+
+
+
+
 typedef void (*WR_FN)(const VD&, const VD&, const VD&, const VD&, const VD&,
 		      const VD&, const VD&, const VD&, const VD&, const VD&,
 		      const VD&, const VD&, const VD&, VD&,
