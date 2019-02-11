@@ -54,6 +54,16 @@ struct sim_fields {
   VD cnPi;
   VD resPi;
   VD olderPi;
+  VD Xi2;
+  VD oldXi2;
+  VD cnXi2;
+  VD resXi2;
+  VD olderXi2;
+  VD Pi2;
+  VD oldPi2;
+  VD cnPi2;
+  VD resPi2;
+  VD olderPi2;
   VD res_ell;
   VD jac;
 } ;
@@ -75,6 +85,12 @@ struct sim_writers {
   BBHP p_Pi;
   BBHP p_resPi;
   BBHP p_iresPi;
+  BBHP p_Xi2;
+  BBHP p_resXi2;
+  BBHP p_iresXi2;
+  BBHP p_Pi2;
+  BBHP p_resPi2;
+  BBHP p_iresPi2;
   BBHP p_maspect;
   BBHP p_outnull;
   BBHP p_ricci;
@@ -103,6 +119,9 @@ struct sim_params {
   dbl ic_Dsq = 25.0; // gaussian width
   dbl ic_r0 = 20.0; // gaussian center
   dbl ic_Amp = 0.1; // gaussian amplitude
+  dbl ic2_Dsq = 25.0; // gaussian width
+  dbl ic2_r0 = 20.0; // gaussian center
+  dbl ic2_Amp = 0; // gaussian amplitude
   bool psi_hyp = false; // update psi with hyperbolic evolution eqn after IC?
   bool somm_cond = true; // sommerfeld condition at outer bound?
   bool dspn_bound = false; // dissipate boundary points?
@@ -118,6 +137,7 @@ struct sim_params {
   bool write_maspect = false; // write mass aspect?
   bool write_outnull = false; // write outgoing null expansion?
   bool write_xp = true; // write xi and pi?
+  bool write_xp2 = false; // write xi and pi?
   bool write_abp = true; // write metric fields (alpha, beta, psi)?
   bool write_ires_xp = false; // write ires for xi and pi?
   bool write_ires_abp = false; // write ires for metric variables?

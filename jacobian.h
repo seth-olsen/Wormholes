@@ -22,13 +22,13 @@
 using namespace std;
 
 //  for LAPACKE_dgbsv(): jac[ (kl + ku + 1) + (ldab - 1)*j + i ]  =  jac[ i, j ]
-void set_jacCMabpslow(VD& jac, const VD& f_xi, const VD& f_pi,
+void set_jacCMabpslow(VD& jac, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
 		      const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, MAPID& r,
 		      int npts, int kl, int ku, int ldab);
 void set_jacCMabpfast(VD& jac, const VD& f_xi, const VD& f_pi,
 		      const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, MAPID& r,
 		      int npts, int kl, int ku, int ldab);
-void set_jacCMabslow(VD& jac, const VD& f_xi, const VD& f_pi,
+void set_jacCMabslow(VD& jac, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
 		     const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, MAPID& r,
 		     int npts, int kl, int ku, int ldab);
 inline int jac_ind(int i, int j) { return (4 + i + 6*j); } // (kl + ku + i + (2*kl + ku)*j); } 
@@ -37,10 +37,10 @@ inline int jac_ind(int i, int j) { return (4 + i + 6*j); } // (kl + ku + i + (2*
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl jac_aa(const VD& f_xi, const VD& f_pi, const VD& f_al, const VD& f_be, const VD& f_ps,
+inline dbl jac_aa(const VD& f_pi, const VD& f_pi2, const VD& f_al, const VD& f_be, const VD& f_ps,
 		  PAR *p, int k)
 {
-  return (p->neg2indrsq) + (p->eight_pi)*sq(f_pi[k]) +
+  return (p->neg2indrsq) + (p->eight_pi)*(sq(f_pi[k]) - sq(f_pi[k])) +
     (p->two_thirds)*pw4(f_ps[k])*sq(ddr_c(f_be,p,k) - f_be[k]*(p->r[-k])) / sq(f_al[k]);
 }
 
@@ -66,10 +66,12 @@ inline dbl jac_bb_pm(const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, int
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl jac_pp(const VD& f_xi, const VD& f_pi, const VD& f_al, const VD& f_be, const VD& f_ps,
+inline dbl jac_pp(const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
+		  const VD& f_al, const VD& f_be, const VD& f_ps,
 		  PAR *p, int k)
 {
-  return (p->neg2indrsq) - M_PI*(sq(f_xi[k]) + sq(f_pi[k])) + 0.25*(p->lsq)/sq(r2(p,k)) +
+  return (p->neg2indrsq) + M_PI*(sq(f_xi[k]) + sq(f_pi[k]) - sq(f_xi[k]) - sq(f_pi[k]))
+    + 0.25*(p->lsq)/sq(r2(p,k)) +
     (p->five_twelfths)*pw4(f_ps[k])*sq(ddr_c(f_be,p,k) - f_be[k]*(p->r[-k])) / sq(f_al[k]);
 }
 
@@ -90,7 +92,7 @@ inline dbl jac_pp_pm(const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, int
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void set_jacCMabpslow(VD& jac, const VD& f_xi, const VD& f_pi,
+void set_jacCMabpslow(VD& jac, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
 		      const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
 {
   int j = 0;
@@ -117,9 +119,9 @@ void set_jacCMabpslow(VD& jac, const VD& f_xi, const VD& f_pi,
     jac[jac_ind(jbe,jbe - 1)] = jac_bb_pm(f_al, f_be, f_ps, p, j, -1);
     jac[jac_ind(jps,jps - 1)] = jac_pp_pm(f_al, f_be, f_ps, p, j, -1);
     // ROW j, COL j
-    jac[jac_ind(j,j)] = jac_aa(f_xi, f_pi, f_al, f_be, f_ps, p, j);
+    jac[jac_ind(j,j)] = jac_aa(f_pi, f_pi2, f_al, f_be, f_ps, p, j);
     jac[jac_ind(jbe,jbe)] = jac_bb(f_al, f_be, f_ps, p, j);
-    jac[jac_ind(jps,jps)] = jac_pp(f_xi, f_pi, f_al, f_be, f_ps, p, j);
+    jac[jac_ind(jps,jps)] = jac_pp(f_xi, f_pi, f_xi2, f_pi2, f_al, f_be, f_ps, p, j);
     // ROW j+1, COL j
     jac[jac_ind(j,j + 1)] = jac_aa_pm(f_al, f_be, f_ps, p, j, 1);
     jac[jac_ind(jbe,jbe + 1)] = jac_bb_pm(f_al, f_be, f_ps, p, j, 1);
@@ -143,7 +145,7 @@ void set_jacCMabpslow(VD& jac, const VD& f_xi, const VD& f_pi,
   return;
 }
 
-void set_jacCMabslow(VD& jac, const VD& f_xi, const VD& f_pi,
+void set_jacCMabslow(VD& jac, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
 		     const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
 {
   int j = 0;
@@ -163,7 +165,7 @@ void set_jacCMabslow(VD& jac, const VD& f_xi, const VD& f_pi,
     jac[jac_ind(j,j - 1)] = jac_aa_pm(f_al, f_be, f_ps, p, j, -1);
     jac[jac_ind(jbe,jbe - 1)] = jac_bb_pm(f_al, f_be, f_ps, p, j, -1);
     // ROW j, COL j
-    jac[jac_ind(j,j)] = jac_aa(f_xi, f_pi, f_al, f_be, f_ps, p, j);
+    jac[jac_ind(j,j)] = jac_aa(f_pi, f_pi2, f_al, f_be, f_ps, p, j);
     jac[jac_ind(jbe,jbe)] = jac_bb(f_al, f_be, f_ps, p, j);
     // ROW j+1, COL j
     jac[jac_ind(j,j + 1)] = jac_aa_pm(f_al, f_be, f_ps, p, j, 1);

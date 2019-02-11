@@ -68,6 +68,12 @@ vector<BBHP *> writers_init(WRS *wr, FLDS *f, PAR *p)
       out_vec.push_back(&(wr->p_resPi));
     }
   }
+  if (p->write_xp2) {
+    bbhp_init(&(wr->p_Xi2), p, "Xi2", &(f->Xi2), zeros);
+    bbhp_init(&(wr->p_Pi2), p, "Pi2", &(f->Pi2), zeros);
+    out_vec.push_back(&(wr->p_Xi2));
+    out_vec.push_back(&(wr->p_Pi2));
+  }
   if (p->write_ires_abp) {
     bbhp_init(&(wr->p_iresAl), p, "iresAl", NULL, zeros);
     bbhp_init(&(wr->p_iresBe), p, "iresBe", NULL, zeros);
@@ -88,6 +94,8 @@ int fields_init(FLDS *f, PAR *p)
   VD zeros(p->npts, 0);
   f->Xi = zeros;
   f->Pi = zeros;
+  f->Xi2 = zeros;
+  f->Pi2 = zeros;
   f->Al = zeros;
   f->Be = zeros;
   f->Ps = zeros;
@@ -103,6 +111,8 @@ int fields_init(FLDS *f, PAR *p)
     f->Ps[k] = 1;
     f->Xi[k] = ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
     f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
+    //f->Xi2[k] = ic_xi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
+    //f->Pi2[k] = ic_pi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
   }
 
   f->oldXi = f->Xi;
@@ -111,6 +121,12 @@ int fields_init(FLDS *f, PAR *p)
   f->oldPi = f->Pi;
   f->cnPi = f->Pi;
   f->resPi = zeros;
+  f->oldXi2 = f->Xi2;
+  f->cnXi2 = f->Xi2;
+  f->resXi2 = zeros;
+  f->oldPi2 = f->Pi2;
+  f->cnPi2 = f->Pi2;
+  f->resPi2 = zeros;
   if (p->write_ires_xp) {
     f->olderXi = zeros;
     f->olderPi = zeros;
@@ -163,12 +179,13 @@ int params_init(PAR *p, int argc, char **argv)
       {"-check_step",&(p->check_step)}, {"-resn_factor",&(p->resn_factor)}};
   map<str, dbl *> p_dbl {{"-lam",&(p->lam)}, {"-lsq",&(p->lsq)}, {"-rmin",&(p->rmin)}, {"-rmax",&(p->rmax)},
       {"-dspn",&(p->dspn)}, {"-tol",&(p->tol)}, {"-ell_tol",&(p->ell_tol)}, {"-ell_up_weight",&(p->ell_up_weight)},
-      {"-ic_Dsq",&(p->ic_Dsq)}, {"-ic_r0",&(p->ic_r0)}, {"-ic_Amp",&(p->ic_Amp)}};
+      {"-ic_Dsq",&(p->ic_Dsq)}, {"-ic_r0",&(p->ic_r0)}, {"-ic_Amp",&(p->ic_Amp)},
+      {"-ic2_Dsq",&(p->ic2_Dsq)}, {"-ic2_r0",&(p->ic2_r0)}, {"-ic2_Amp",&(p->ic2_Amp)}};
   map<str, bool *> p_bool { {"-psi_hyp",&(p->psi_hyp)}, {"-static_metric",&(p->static_metric)},
       {"-somm_cond",&(p->somm_cond)}, {"-dspn_bound",&(p->dspn_bound)}, {"-dr3_up",&(p->dr3_up)}, {"-dspn_psi",&(p->dspn_psi)},
       {"-write_res",&(p->write_res)},{"-write_ricci",&(p->write_ricci)}, {"-write_itn",&(p->write_itn)},
       {"-write_mtot",&(p->write_mtot)},{"-write_maspect",&(p->write_maspect)}, {"-write_outnull",&(p->write_outnull)},
-      {"-write_xp",&(p->write_xp)}, {"-write_abp",&(p->write_abp)},
+      {"-write_xp",&(p->write_xp)}, {"-write_xp2",&(p->write_xp2)}, {"-write_abp",&(p->write_abp)},
       {"-write_ires_xp",&(p->write_ires_xp)}, {"-write_ires_abp",&(p->write_ires_abp)},
       {"-clean_hyp",&(p->clean_hyp)}, {"-clean_ell",&(p->clean_ell)}, {"-horizon_search",&(p->horizon_search)}};
   map<str, str> params;
