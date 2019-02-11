@@ -193,7 +193,10 @@ int params_init(PAR *p, int argc, char **argv)
   if (p->psi_hyp) {
     p->n_ell = 2;
     p->n_hyp = 3;
+    p->solver = solve_dynamic_psi_hyp;
   }
+  else if (p->static_metric) { p->solver = solve_static; }
+  else { p->solver = solve_dynamic; }
   // bbhutil parameters for writing data to sdf
   p->rmin = -(p->rmax);
   p->lastwr = p->lastpt / p->save_pt;
@@ -258,14 +261,7 @@ int params_init(PAR *p, int argc, char **argv)
   p->jacRR = 3*(p->in2dr) + (p->inrmax);
   p->jacRRm1 = -4 * (p->in2dr);
   p->jacRRm2 = (p->in2dr);
-  //p->jacN00 = -3 * (p->in2dr);
-  //p->jacN01 = 4 * (p->in2dr);
-  //p->jacN02 = -1 * (p->in2dr);
-  //p->dt_twelve = (p->twelfth) * (p->dt);
-  //p->cpsi_rhs = 1 / (p->jacRR);
-
-  if (p->static_metric) { p->solver = solve_static; }
-  else { p->solver = solve_dynamic; }
+  p->cpsi_rhs = 1 / (p->jacRR);
 
   // PARAMETER DATA OUTPUT
   str param_data = "\nPARAMETERS:\n\n";

@@ -28,9 +28,9 @@ void set_jacCMabpslow(VD& jac, const VD& f_xi, const VD& f_pi,
 void set_jacCMabpfast(VD& jac, const VD& f_xi, const VD& f_pi,
 		      const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, MAPID& r,
 		      int npts, int kl, int ku, int ldab);
-void set_jacCM_ab_slow(VD& jac, const VD& f_xi, const VD& f_pi,
-		       const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, MAPID& r,
-		       int npts, int kl, int ku, int ldab);
+void set_jacCMabslow(VD& jac, const VD& f_xi, const VD& f_pi,
+		     const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, MAPID& r,
+		     int npts, int kl, int ku, int ldab);
 inline int jac_ind(int i, int j) { return (4 + i + 6*j); } // (kl + ku + i + (2*kl + ku)*j); } 
 // ***********************  JACOBIAN FUNCTIONS  ***********************
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,23 +143,22 @@ void set_jacCMabpslow(VD& jac, const VD& f_xi, const VD& f_pi,
   return;
 }
 
-void set_jacCM_ab_slow(VD& jac, const VD& f_xi, const VD& f_pi,
-		       const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
+void set_jacCMabslow(VD& jac, const VD& f_xi, const VD& f_pi,
+		     const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
 {
-  /*
-  int one_past_last = npts - 1;
-  int j = 0, jbe = npts;
+  int j = 0;
+  int jbe = (p->npts);
   // ROW 0, COL 0
-  jac[jac_ind(j,j)] = (p->jacN00);
-  jac[jac_ind(jbe,jbe)] = 1;
+  jac[jac_ind(j,j)] = -(p->jacRR);
+  jac[jac_ind(jbe,jbe)] = -(p->jacRR);
   // ROW 0, COL 1
-  jac[jac_ind(j,j + 1)] = (p->jacN01);
-  jac[jac_ind(jbe,jbe + 1)] = 0;
+  jac[jac_ind(j,j + 1)] = -(p->jacRRm1);
+  jac[jac_ind(jbe,jbe + 1)] = -(p->jacRRm1);
   // ROW 0, COL 2
-  jac[jac_ind(j,j + 2)] = (p->jacN02);
-  jac[jac_ind(jbe,jbe + 2)] = 0;
-  for (j = 1; j < one_past_last; ++j) {
-    jbe = j + npts;
+  jac[jac_ind(j,j + 2)] = -(p->jacRRm2);
+  jac[jac_ind(jbe,jbe + 2)] = -(p->jacRRm2);
+  for (j = 1; j < (p->lastpt); ++j) {
+    ++jbe;
     // ROW j, COL j-1
     jac[jac_ind(j,j - 1)] = jac_aa_pm(f_al, f_be, f_ps, p, j, -1);
     jac[jac_ind(jbe,jbe - 1)] = jac_bb_pm(f_al, f_be, f_ps, p, j, -1);
@@ -170,8 +169,8 @@ void set_jacCM_ab_slow(VD& jac, const VD& f_xi, const VD& f_pi,
     jac[jac_ind(j,j + 1)] = jac_aa_pm(f_al, f_be, f_ps, p, j, 1);
     jac[jac_ind(jbe,jbe + 1)] = jac_bb_pm(f_al, f_be, f_ps, p, j, 1);
   }
-  j = one_past_last;
-  jbe = j + npts;
+  j = (p->lastpt);
+  ++jbe;
   // ROW lastpt, COL lastpt-2
   jac[jac_ind(j,j - 2)] = (p->jacRRm2);
   jac[jac_ind(jbe,jbe - 2)] = (p->jacRRm2);
@@ -181,7 +180,6 @@ void set_jacCM_ab_slow(VD& jac, const VD& f_xi, const VD& f_pi,
   // ROW lastpt, COL lastpt
   jac[jac_ind(j,j)] = (p->jacRR);
   jac[jac_ind(jbe,jbe)] = (p->jacRR);
-  */
   return;
 }
 

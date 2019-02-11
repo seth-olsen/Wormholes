@@ -84,16 +84,16 @@ struct sim_writers {
 
 struct sim_params {
   str outfile = "ellis";
-  int lastpt = 2000;
+  int lastpt = 1200;
   int save_pt = 1;
-  int nsteps = 8000;
+  int nsteps = 2400;
   int save_step = 4;
   int resn_factor = 1;
   int check_step = 10;
   int maxit = 100;
   int norm_type = 0;
   dbl lam = 0.25; // dt/dr
-  dbl rmax = 100;
+  dbl rmax = 60;
   dbl rmin = -rmax;
   dbl lsq = 1;
   dbl dspn = 0.5; // dissipation coefficient
@@ -101,8 +101,8 @@ struct sim_params {
   dbl ell_tol = 0.01*tol;
   dbl ell_up_weight = 0.5;
   dbl ic_Dsq = 25.0; // gaussian width
-  dbl ic_r0 = 50.0; // gaussian center
-  dbl ic_Amp = 1; // gaussian amplitude
+  dbl ic_r0 = 20.0; // gaussian center
+  dbl ic_Amp = 0.1; // gaussian amplitude
   bool psi_hyp = false; // update psi with hyperbolic evolution eqn after IC?
   bool somm_cond = true; // sommerfeld condition at outer bound?
   bool dspn_bound = false; // dissipate boundary points?
@@ -184,7 +184,7 @@ struct sim_params {
   //dbl jacN01 = 4 * in2dr;
   //dbl jacN02 = -1 * in2dr;
   //dbl dt_twelve = twelfth * dt;
-  //dbl cpsi_rhs = 1 / jacRR;
+  dbl cpsi_rhs = 1 / jacRR;
 
 
   int (*solver)(FLDS *, PAR *) = NULL;

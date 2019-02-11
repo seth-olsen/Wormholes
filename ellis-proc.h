@@ -24,10 +24,18 @@ using namespace std;
 // update functions
 void update_xp(FLDS *f, PAR *p);
 dbl get_res_xp(FLDS *f, PAR *p);
+void update_psi_clean(FLDS *f, PAR *p);
+dbl get_res_psi_clean(FLDS *f, PAR *p);
 void get_res_abp_clean(FLDS *f, PAR *p);
 dbl get_res_abp(VD& res_ell, const VD& f_xi, const VD& f_pi,
 		const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p);
-void apply_up_abp(const VD& res_ell, VD& f_al, VD& f_be, VD& f_ps, PAR *p);
+void apply_up_abp(const VD& res_ell, VD& f_al, VD& f_be, VD& f_ps, int npts, dbl eup_weight);
+void set_abp_cn(const VD& old_al, const VD& old_be, const VD& old_ps,
+		const VD& f_al, const VD& f_be, const VD& f_ps,
+		VD& cn_al, VD& cn_be, VD& cn_ps, int npts);
+void apply_up_ab(const VD& res_ell, VD& f_al, VD& f_be, VD& f_ps, int npts, dbl eup_weight);
+void set_ab_cn(const VD& old_al, const VD& old_be, const VD& f_al, const VD& f_be,
+	       VD& cn_al, VD& cn_be, int npts);
 // dissipation functions
 void dissipationNB_xp(const VD& old_xi, const VD& old_pi, VD& f_xi, VD& f_pi,
 		      int one_past_last, dbl dspn);
@@ -83,27 +91,46 @@ dbl get_res_xp(FLDS *f, PAR *p)
   return max(norm_inf(f->resXi), norm_inf(f->resPi));
 }
 
+void update_psi_clean(FLDS *f, PAR *p)
+{
+  f->Ps[0] = fda0_hyp_ps(f->Ps, p);
+  f->cnPs[0] = 0.5 * (f->oldPs[0] + f->Ps[0]);
+  for (int k = 1; k < (p->lastpt); ++k) {
+    f->Ps[k] = fda_hyp_resPs(f->old_ps, f->cnXi, f->cnPi, f->cnAl, f->cnBe, f->cnPs, p, k);
+    f->cnPs[k] = 0.5 * (f->oldPs[k] + f->Ps[k]);
+  }
+  f->Ps[p->lastpt] = fdaR_hyp_ps(f->Ps, p);
+  f->cnPs[p->lastpt] = 0.5 * (f->oldPs[p->lastpt] + f->Ps[p->lastpt]);
+  return;
+}
+
+dbl get_res_psi_clean(FLDS *f, PAR *p)
+{
+  f->resPs[0] = fda0_resPs(f->Ps, p);
+  for (int k = 1; k < (p->lastpt); ++k) {
+    f->resPs[k] = fda_hyp_resPs(f->old_ps, f->Ps, f->cnXi, f->cnPi, f->cnAl, f->cnBe, f->cnPs, p, k);
+  }
+  f->resPs[p->lastpt] = fdaR_resPs(f->Ps, p);
+  return norm_inf(f->resPs);
+}
+
 void get_res_abp_clean(FLDS *f, PAR *p)
 {
   int j = 0;
   int jbe = (p->npts);
-  int jps = jbe + jbe;
+  int jps = 2*jbe;
   f->res_ell[j] = fda0_resAl(f->Al, p);
-  f->res_ell[jbe] = fda0_resBe(f->Be, p);
-  f->res_ell[jps] = fda0_resPs(f->Ps, p);
+  f->res_ell[jbe + j] = fda0_resBe(f->Be, p);
+  f->res_ell[jps + j] = fda0_resPs(f->Ps, p);
   for (j = 1; j < (p->lastpt); ++j) {
-    ++jbe;
-    ++jps;
     f->res_ell[j] = fda_resAl(f->Xi, f->Pi, f->Al, f->Be, f->Ps, p, j);
-    f->res_ell[jbe] = fda_resBe(f->Xi, f->Pi, f->Al, f->Be, f->Ps, p, j);
-    f->res_ell[jps] = fda_resPs(f->Xi, f->Pi, f->Al, f->Be, f->Ps, p, j);
+    f->res_ell[jbe + j] = fda_resBe(f->Xi, f->Pi, f->Al, f->Be, f->Ps, p, j);
+    f->res_ell[jps + j] = fda_resPs(f->Xi, f->Pi, f->Al, f->Be, f->Ps, p, j);
   }
   j = p->lastpt;
-  ++jbe;
-  ++jps;
   f->res_ell[j] = fdaR_resAl(f->Al, p);
-  f->res_ell[jbe] = fdaR_resBe(f->Be, p);
-  f->res_ell[jps] = fdaR_resPs(f->Ps, p);
+  f->res_ell[jbe + j] = fdaR_resBe(f->Be, p);
+  f->res_ell[jps + j] = fdaR_resPs(f->Ps, p);
   return;
 }
 
@@ -126,6 +153,20 @@ dbl get_res_abp(VD& res_ell, const VD& f_xi, const VD& f_pi,
   res_ell[jbe + j] = fdaR_resBe(f_be, p);
   res_ell[jps + j] = fdaR_resPs(f_ps, p);
   return norm_inf(res_ell);
+}
+
+void get_res_ab_clean(FLDS *f, PAR *p)
+{
+  int jbe = (p->npts);
+  f->res_ell[0] = fda0_resAl(f->Al, p);
+  f->res_ell[jbe] = fda0_resBe(f->Be, p);
+  for (int j = 1; j < (p->lastpt); ++j) {
+    f->res_ell[j] = fda_resAl(f->Xi, f->Pi, f->Al, f->Be, f->Ps, p, j);
+    f->res_ell[jbe + j] = fda_resBe(f->Xi, f->Pi, f->Al, f->Be, f->Ps, p, j);
+  }
+  f->res_ell[p->lastpt] = fdaR_resAl(f->Al, p);
+  f->res_ell[jbe + (p->lastpt)] = fdaR_resBe(f->Be, p);
+  return;
 }
 
 void apply_up_abp(const VD& res_ell, VD& f_al, VD& f_be, VD& f_ps, int npts, dbl eup_weight)
@@ -155,6 +196,15 @@ void apply_up_ab(const VD& res_ell, VD& f_al, VD& f_be, VD& f_ps, int npts, dbl 
   for (int j = 0; j < npts; ++j) {
     f_al[j] -= eup_weight*res_ell[j];
     f_be[j] -= eup_weight*res_ell[npts + j];
+  }
+  return;
+}
+void set_ab_cn(const VD& old_al, const VD& old_be, const VD& f_al, const VD& f_be,
+		VD& cn_al, VD& cn_be, int npts)
+{
+  for (int k = 0; k < npts; ++k) {
+    cn_al[k] = 0.5 * (old_al[k] + f_al[k]);
+    cn_be[k] = 0.5 * (old_be[k] + f_be[k]);
   }
   return;
 }

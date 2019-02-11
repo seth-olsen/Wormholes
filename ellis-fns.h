@@ -48,28 +48,28 @@ inline dbl fda_resPi(FLDS *f, PAR *p, int k)
     + (f->cnPi[k])*(p->in3dr)*(d_c(f->cnBe,k) + (f->cnBe[k])*(6*dln_c(f->cnPs,k) + 4*(p->dr)*(p->r[-k])));
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fda_hyp_ps(const VD& old_ps, const VD& cn_xi, const VD& cn_pi, const VD& cn_al,
-		      const VD& cn_be, const VD& cn_ps, PAR *p, int k)
+dbl fda_hyp_ps(const VD& old_ps, const VD& cn_xi, const VD& cn_pi, const VD& cn_al,
+	       const VD& cn_be, const VD& cn_ps, PAR *p, int k)
 {
-  return 0;
+  dbl dt12_part = (p->lam6val) * (0.25*d_c(cn_be,k) + cn_be[k]*(p->dr)*(p->r[-k]));
+  return ( old_ps[k]*(1 + dt12_part) + (p->lam2val)*cn_be[k]*d_c(cn_ps,k) ) / (1 - dt12_part);
 }
-inline dbl fdaR_hyp_ps(const VD& f_ps, PAR *p, int k)
+inline dbl fdaR_hyp_ps(const VD& f_ps, PAR *p)
 {
-  return 0; //r[CPSI_RHS]*( r[INRMAX] - r[JAC_RRM1]*f_ps[k-1] - r[JAC_RRM2]*f_ps[k-2] );
+  return (p->cpsi_rhs)*((p->inrmax) - (p->jacRRm1)*f_ps[(p->lastpt)-1] - (p->jacRRm2)*f_ps[(p->lastpt)-2]);
+}
+inline dbl fda0_hyp_ps(const VD& f_ps, PAR *p)
+{
+  return (p->cpsi_rhs)*((p->inrmax) - (p->jacRRm1)*f_ps[1] - (p->jacRRm2)*f_ps[2]);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl fda_hyp_resPs(const VD& old_ps, const VD& f_ps, const VD& cn_xi, const VD& cn_pi, const VD& cn_al,
 			 const VD& cn_be, const VD& cn_ps, PAR *p, int k)
 {
-  return 0; //r[INDT]*( f_ps[k] - old_ps[k] - r[LAM2VAL]*cn_be[k]*d_c(cn_ps,k)
-  //- r[LAM6VAL]*(0.25*d_c(cn_be,k) + cn_be[k]*r[DRVAL]*r[-k])*(f_ps[k] + old_ps[k]) );
+  return (p->indt)*(f_ps[k] - old_ps[k]) - cn_be[k]*ddr_c(cn_ps,p,k)
+    - cn_ps[k]*(p->one_third)*(0.5*ddr_c(cn_be,p,k) + cn_be[k]*(p->r[-k]));
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl fdaR_hyp_resPs(const VD& f_ps, PAR *p, int k)
-{
-  return 0; //r[JAC_RR]*f_ps[k] + r[JAC_RRM1]*f_ps[k-1] + r[JAC_RRM2]*f_ps[k-2] - r[INRMAX];
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl fda_resPs(const VD& f_xi, const VD& f_pi, const VD& f_al, const VD& f_be, const VD& f_ps,
 		     PAR *p, int k)
