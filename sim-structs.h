@@ -118,7 +118,7 @@ struct sim_params {
   dbl ell_up_weight = 0.5;
   dbl ic_Dsq = 25.0; // gaussian width
   dbl ic_r0 = 20.0; // gaussian center
-  dbl ic_Amp = 0.1; // gaussian amplitude
+  dbl ic_Amp = 0.01; // gaussian amplitude
   dbl ic2_Dsq = 25.0; // gaussian width
   dbl ic2_r0 = 20.0; // gaussian center
   dbl ic2_Amp = 0; // gaussian amplitude
@@ -139,9 +139,9 @@ struct sim_params {
   bool write_xp = true; // write ghost xi and pi?
   bool write_xp2 = false; // write normal xi and pi?
   bool write_abp = true; // write metric fields (alpha, beta, psi)?
-  bool write_ires_xp = false; // write ires for xi and pi?
+  bool write_ires_xp = true; // write ires for xi and pi?
   bool write_ires_xp2 = false;
-  bool write_ires_abp = false; // write ires for metric variables?
+  bool write_ires_abp = true; // write ires for metric variables?
   bool horizon_search = false; // search for apparent horizon after each step?
 
   int n_ell = 3;

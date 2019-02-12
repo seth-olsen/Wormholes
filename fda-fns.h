@@ -44,6 +44,8 @@ inline dbl d2_b(const VD& u, int ind)
 
 inline dbl dlog_c(const VD& u, int ind)
 { return log(u[ind+1] / u[ind-1]); }
+inline dbl ddrlog_c(const VD& u, PAR *p, int ind)
+{ return (p->in2dr) * log(u[ind+1] / u[ind-1]); }
 inline dbl dlog_f(const VD& u, int ind)
 { return -3*log(u[ind]) + 4*log(u[ind+1]) - log(u[ind+2]); }
 inline dbl dlog_b(const VD& u, int ind)

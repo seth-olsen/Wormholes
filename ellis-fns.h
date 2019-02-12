@@ -103,14 +103,14 @@ inline dbl fda_resPs(const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& 
 		     const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, int k)
 {
   return ddr2_c(f_ps,p,k) + M_PI*(sq(f_xi2[k]) + sq(f_pi2[k]) - sq(f_xi[k]) - sq(f_pi[k]))
-    + f_ps[k]*(0.25*(p->lsq)/sq((p->lsq) + sq(p->r[k])) + 2*(p->r[-k])*ddr_c(f_ps,p,k))
+    + f_ps[k]*(0.25*(p->lsq)/sq(r2(p,k)) + 2*(p->r[-k])*ddr_c(f_ps,p,k))
     + (p->twelfth)*pw5(f_ps[k])*sq(ddr_c(f_be,p,k) - (p->r[-k])*f_be[k]) / sq(f_al[k]);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl fda_resBe(const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
 		     const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, int k)
 {
-  return ddr2_c(f_be,p,k) - f_be[k]*(p->lsq)/sq((p->lsq) + sq(p->r[k]))
+  return ddr2_c(f_be,p,k) - f_be[k]*(p->lsq)/sq(r2(p,k))
     + (p->twelve_pi)*f_al[k]*(f_xi2[k]*f_pi2[k] - f_xi[k]*f_pi[k]) / sq(f_ps[k])
     + (ddr_c(f_be,p,k) - (p->r[-k])*f_be[k])*(2*(p->r[-k]) + 6*ddrln_c(f_ps,p,k) - ddrln_c(f_al,p,k));
 }
@@ -165,12 +165,18 @@ inline dbl ic_pi(dbl r, dbl amp, dbl dsq, dbl r0)
 
 inline dbl iresxi_c(FLDS *f, PAR *p, int k)
 { 
-  return 0;
+  return (p->indt)*(1.5*(f->Xi[k]) - 2*(f->oldXi[k]) + 0.5*(f->olderXi[k])) - (p->in2dr) *
+    ((f->Be[k])*d_c(f->Xi,k) + (f->Xi[k])*d_c(f->Be,k) + (f->Al[k])*d_c(f->Pi,k)/sq(f->Ps[k])
+     + ((f->Pi[k])/pw3(f->Ps[k]))*((f->Ps[k])*d_c(f->Al,k) - 2*(f->Al[k])*d_c(f->Ps,k)));
 }
 
 inline dbl irespi_c(FLDS *f, PAR *p, int k)
 {
-  return 0;
+  return (p->indt)*(1.5*(f->Pi[k]) - 2*(f->oldPi[k]) + 0.5*(f->olderPi[k]) +
+		    4*(f->Pi[k])*(1.5*(f->Ps[k]) - 2*(f->oldPs[k]) + 0.5*(f->olderPs[k]))/(f->Ps[k]))
+    - (p->in2dr)*((f->Be[k])*d_c(f->Pi,k) + (f->Pi[k])*d_c(f->Be,k) + (f->Al[k])*d_c(f->Xi,k)/sq(f->Ps[k])
+		  + ((f->Xi[k])/pw3(f->Ps[k]))*((f->Ps[k])*d_c(f->Al,k) - 2*(f->Al[k])*d_c(f->Ps,k)))
+    - ((f->Al[k])*(f->Xi[k])/sq(f->Ps[k]) + (f->Be[k])*(f->Pi[k]))*(4*ddrln_c(f->Ps,p,k) + 2*(p->r[-k]));
 }
 
 void get_ires_xp(WRS *wr, FLDS *f, PAR *p)
@@ -188,12 +194,18 @@ void get_ires_xp(WRS *wr, FLDS *f, PAR *p)
 
 inline dbl iresxi2_c(FLDS *f, PAR *p, int k)
 { 
-  return 0;
+  return (p->indt)*(1.5*(f->Xi2[k]) - 2*(f->oldXi2[k]) + 0.5*(f->olderXi2[k])) - (p->in2dr) *
+    ((f->Be[k])*d_c(f->Xi2,k) + (f->Xi2[k])*d_c(f->Be,k) + (f->Al[k])*d_c(f->Pi2,k)/sq(f->Ps[k])
+     + ((f->Pi2[k])/pw3(f->Ps[k]))*((f->Ps[k])*d_c(f->Al,k) - 2*(f->Al[k])*d_c(f->Ps,k)));
 }
 
 inline dbl irespi2_c(FLDS *f, PAR *p, int k)
 {
-  return 0;
+  return (p->indt)*(1.5*(f->Pi2[k]) - 2*(f->oldPi2[k]) + 0.5*(f->olderPi2[k]) +
+		    4*(f->Pi2[k])*(1.5*(f->Ps[k]) - 2*(f->oldPs[k]) + 0.5*(f->olderPs[k]))/(f->Ps[k]))
+    - (p->in2dr)*((f->Be[k])*d_c(f->Pi2,k) + (f->Pi2[k])*d_c(f->Be,k) + (f->Al[k])*d_c(f->Xi2,k)/sq(f->Ps[k])
+		  + ((f->Xi2[k])/pw3(f->Ps[k]))*((f->Ps[k])*d_c(f->Al,k) - 2*(f->Al[k])*d_c(f->Ps,k)))
+    - ((f->Al[k])*(f->Xi2[k])/sq(f->Ps[k]) + (f->Be[k])*(f->Pi2[k]))*(4*ddrln_c(f->Ps,p,k) + 2*(p->r[-k]));
 }
 
 void get_ires_xp2(WRS *wr, FLDS *f, PAR *p)
@@ -210,23 +222,29 @@ void get_ires_xp2(WRS *wr, FLDS *f, PAR *p)
 }
 
 inline dbl irespsihyp_c(FLDS *f, PAR *p, int k)
-{ return 0; }
+{
+  return fda_resPs(f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p, k);
+}
 
 inline dbl irespsi_c(FLDS *f, PAR *p, int k)
 {
-  return (f->Ps[k+1] - f->Ps[k-1]) * (p->in2dr);
-    //d2_c(f->Ps,k) + sq(dr)*f->Ps[k]*M_PI*(sq(f->Xi[k]) + sq(f->Pi[k])) + dr*d_c(f->Ps,k)/r
-    //+ pw5(f->Ps[k])*sq(r*d_urinv_c(f->Be,k,dr,r)) / (48*sq(f->Al[k]));
+  return fda_hyp_resPs(f->oldPs, f->Ps, f->cnAl, f->cnBe, f->cnPs, p, k);
 }
 
 inline dbl iresbeta_c(FLDS *f, PAR *p, int k)
 {
-  return (f->Be[k+1] - f->Be[k-1]) * (p->in2dr);
+  return  ddr2_c(f->Be,p,k) - f->Be[k]*(p->lsq)/sq(r2(p,k))
+    + (p->twelve_pi)*(f->Al[k])*(f->Xi2[k]*f->Pi2[k] - f->Xi[k]*f->Pi[k]) / sq(f->Ps[k])
+    + sqrt(r2(p,k))*((f->Be[k+1])/(p->r[k+1]) - (f->Be[k-1])/(p->r[k-1]))*
+    (2*(p->r[-k]) + 6*ddrlog_c(f->Ps,p,k) - ddrlog_c(f->Al,p,k));
 }
 
 inline dbl iresalpha_c(FLDS *f, PAR *p, int k)
 {
-  return (f->Al[k+1] - f->Al[k-1]) * (p->in2dr);
+  return ddr2_c(f->Al,p,k) + (p->eight_pi)*(f->Al[k])*(sq(f->Pi[k]) - sq(f->Pi2[k]))
+    + (p->indr)*d_c(f->Al,k)*((p->r[-k]) + ddrlog_c(f->Ps,p,k))
+    - ((p->in2dr)*(p->in3dr)*r2(p,k)*pw4(f->Ps[k])/(f->Al[k])) *
+    sq((f->Be[k+1])/(p->r[k+1]) - (f->Be[k-1])/(p->r[k-1]));
 }
 
 
