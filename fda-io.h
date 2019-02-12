@@ -80,6 +80,22 @@ void read_step(const vector<char *>& files, int times[], const vector<dbl *>& fi
 void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
 {
   // write ires
+  if (p->write_ires_abp) {
+    get_ires_abp(wr, f, p);
+    write_sdf(&(wr->p_iresAl), p->t);
+    write_sdf(&(wr->p_iresBe), p->t);
+    write_sdf(&(wr->p_iresPs), p->t);
+  }
+  if (p->write_ires_xp) {
+    get_ires_xp(wr, f, p);
+    write_sdf(&(wr->p_iresXi), p->t);
+    write_sdf(&(wr->p_iresPi), p->t);
+  }
+  if (p->write_ires_xp2) {
+    get_ires_xp2(wr, f, p);
+    write_sdf(&(wr->p_iresXi2), p->t);
+    write_sdf(&(wr->p_iresPi2), p->t);
+  }
   // write ricci
   if (p->write_ricci) {
     get_ricci((wr->p_ricci).wr_field, f->Xi, f->Pi, f->Ps, p->inds);
