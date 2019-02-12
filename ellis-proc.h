@@ -24,6 +24,8 @@ using namespace std;
 // update functions
 void update_xp(FLDS *f, PAR *p);
 dbl get_res_xp(FLDS *f, PAR *p);
+void update_xp2(FLDS *f, PAR *p);
+dbl get_res_xp2(FLDS *f, PAR *p);
 void update_psi_clean(FLDS *f, PAR *p);
 dbl get_res_psi_clean(FLDS *f, PAR *p);
 void get_res_abp_clean(FLDS *f, PAR *p);

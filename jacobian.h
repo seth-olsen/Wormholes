@@ -25,9 +25,6 @@ using namespace std;
 void set_jacCMabpslow(VD& jac, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
 		      const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, MAPID& r,
 		      int npts, int kl, int ku, int ldab);
-void set_jacCMabpfast(VD& jac, const VD& f_xi, const VD& f_pi,
-		      const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, MAPID& r,
-		      int npts, int kl, int ku, int ldab);
 void set_jacCMabslow(VD& jac, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
 		     const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, MAPID& r,
 		     int npts, int kl, int ku, int ldab);
@@ -40,7 +37,7 @@ inline int jac_ind(int i, int j) { return (4 + i + 6*j); } // (kl + ku + i + (2*
 inline dbl jac_aa(const VD& f_pi, const VD& f_pi2, const VD& f_al, const VD& f_be, const VD& f_ps,
 		  PAR *p, int k)
 {
-  return (p->neg2indrsq) + (p->eight_pi)*(sq(f_pi[k]) - sq(f_pi[k])) +
+  return (p->neg2indrsq) + (p->eight_pi)*(sq(f_pi[k]) - sq(f_pi2[k])) +
     (p->two_thirds)*pw4(f_ps[k])*sq(ddr_c(f_be,p,k) - f_be[k]*(p->r[-k])) / sq(f_al[k]);
 }
 
@@ -70,7 +67,7 @@ inline dbl jac_pp(const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_p
 		  const VD& f_al, const VD& f_be, const VD& f_ps,
 		  PAR *p, int k)
 {
-  return (p->neg2indrsq) + M_PI*(sq(f_xi[k]) + sq(f_pi[k]) - sq(f_xi[k]) - sq(f_pi[k]))
+  return (p->neg2indrsq) + M_PI*(sq(f_xi2[k]) + sq(f_pi2[k]) - sq(f_xi[k]) - sq(f_pi[k]))
     + 0.25*(p->lsq)/sq(r2(p,k)) +
     (p->five_twelfths)*pw4(f_ps[k])*sq(ddr_c(f_be,p,k) - f_be[k]*(p->r[-k])) / sq(f_al[k]);
 }
@@ -145,7 +142,7 @@ void set_jacCMabpslow(VD& jac, const VD& f_xi, const VD& f_pi, const VD& f_xi2, 
   return;
 }
 
-void set_jacCMabslow(VD& jac, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
+void set_jacCMabslow(VD& jac, const VD& f_pi, const VD& f_pi2,
 		     const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
 {
   int j = 0;

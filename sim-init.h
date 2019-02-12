@@ -73,6 +73,12 @@ vector<BBHP *> writers_init(WRS *wr, FLDS *f, PAR *p)
     bbhp_init(&(wr->p_Pi2), p, "Pi2", &(f->Pi2), zeros);
     out_vec.push_back(&(wr->p_Xi2));
     out_vec.push_back(&(wr->p_Pi2));
+    if (p->write_res) {
+      bbhp_init(&(wr->p_resXi2), p, "ResXi2", &(f->resXi2), zeros);
+      bbhp_init(&(wr->p_resPi2), p, "ResPi2", &(f->resPi2), zeros);
+      out_vec.push_back(&(wr->p_resXi2));
+      out_vec.push_back(&(wr->p_resPi2));
+    }
   }
   if (p->write_ires_abp) {
     bbhp_init(&(wr->p_iresAl), p, "iresAl", NULL, zeros);
@@ -82,6 +88,10 @@ vector<BBHP *> writers_init(WRS *wr, FLDS *f, PAR *p)
   if (p->write_ires_xp) {
     bbhp_init(&(wr->p_iresXi), p, "iresXi", NULL, zeros);
     bbhp_init(&(wr->p_iresPi), p, "iresPi", NULL, zeros);
+  }
+  if (p->write_ires_xp2) {
+    bbhp_init(&(wr->p_iresXi2), p, "iresXi2", NULL, zeros);
+    bbhp_init(&(wr->p_iresPi2), p, "iresPi2", NULL, zeros);
   }
   if (p->write_maspect) { bbhp_init(&(wr->p_maspect), p, "maspect", NULL, zeros); }
   if (p->write_outnull) { bbhp_init(&(wr->p_outnull), p, "outnull", NULL, zeros); }
@@ -121,15 +131,19 @@ int fields_init(FLDS *f, PAR *p)
   f->oldPi = f->Pi;
   f->cnPi = f->Pi;
   f->resPi = zeros;
+  if (p->write_ires_xp) {
+    f->olderXi = zeros;
+    f->olderPi = zeros;
+  }
   f->oldXi2 = f->Xi2;
   f->cnXi2 = f->Xi2;
   f->resXi2 = zeros;
   f->oldPi2 = f->Pi2;
   f->cnPi2 = f->Pi2;
   f->resPi2 = zeros;
-  if (p->write_ires_xp) {
-    f->olderXi = zeros;
-    f->olderPi = zeros;
+  if (p->write_ires_xp2) {
+    f->olderXi2 = zeros;
+    f->olderPi2 = zeros;
   }
 
   if (!(p->static_metric)) {
@@ -158,8 +172,8 @@ int fields_init(FLDS *f, PAR *p)
   f->cnPs = f->Ps;
   if (p->psi_hyp) { f->resPs = zeros; }
   if (p->write_ires_abp) {
-    f->olderAl = zeros;
-    f->olderBe = zeros;
+    //f->olderAl = zeros;
+    //f->olderBe = zeros;
     f->olderPs = zeros;
   }
   VD ell_res_zeros((p->lp_ldb), 0);
@@ -186,7 +200,7 @@ int params_init(PAR *p, int argc, char **argv)
       {"-write_res",&(p->write_res)},{"-write_ricci",&(p->write_ricci)}, {"-write_itn",&(p->write_itn)},
       {"-write_mtot",&(p->write_mtot)},{"-write_maspect",&(p->write_maspect)}, {"-write_outnull",&(p->write_outnull)},
       {"-write_xp",&(p->write_xp)}, {"-write_xp2",&(p->write_xp2)}, {"-write_abp",&(p->write_abp)},
-      {"-write_ires_xp",&(p->write_ires_xp)}, {"-write_ires_abp",&(p->write_ires_abp)},
+      {"-write_ires_xp",&(p->write_ires_xp)}, {"-write_ires_xp2",&(p->write_ires_xp2)}, {"-write_ires_abp",&(p->write_ires_abp)},
       {"-clean_hyp",&(p->clean_hyp)}, {"-clean_ell",&(p->clean_ell)}, {"-horizon_search",&(p->horizon_search)}};
   map<str, str> params;
   param_collect(argv, argc, params);
@@ -207,13 +221,30 @@ int params_init(PAR *p, int argc, char **argv)
   if (p->horizon_search) { cout << "\nsearching for horizon..." << endl; }
   //************************************************************************
   //********************SETTING PARAMS FROM OLD PROGRAM*********************
-  if (p->psi_hyp) {
-    p->n_ell = 2;
-    p->n_hyp = 3;
-    p->solver = solve_dynamic_psi_hyp;
+  if (p->ic2_Amp == 0) {
+    if (p->psi_hyp) {
+      p->n_ell = 2;
+      p->solver = solve_dynamic_psi_hyp;
+    }
+    else if (p->static_metric) { p->solver = solve_static; }
+    else { p->solver = solve_dynamic; }
   }
-  else if (p->static_metric) { p->solver = solve_static; }
-  else { p->solver = solve_dynamic; }
+  else if (p->ic_Amp == 0) {
+    if (p->psi_hyp) {
+      p->n_ell = 2;
+      p->solver = solve2_dynamic_psi_hyp;
+    }
+    else if (p->static_metric) { p->solver = solve2_static; }
+    else { p->solver = solve2_dynamic; }
+  }
+  else {
+    if (p->psi_hyp) {
+      p->n_ell = 2;
+      p->solver = solveAll_dynamic_psi_hyp;
+    }
+    else if (p->static_metric) { p->solver = solveAll_static; }
+    else { p->solver = solveAll_dynamic; }
+  }
   // bbhutil parameters for writing data to sdf
   p->rmin = -(p->rmax);
   p->lastwr = p->lastpt / p->save_pt;

@@ -163,71 +163,111 @@ inline dbl ic_pi(dbl r, dbl amp, dbl dsq, dbl r0)
 
 // ******** IRES FUNCTIONS *************************
 
-// *****IMPORTANT NOTE:************
-// anything with sq(psi) or /sq() may be wrong
-// had to replace sqin and did so in a rush and not sure now if the replacements were right
-
-
-// centered ires_f1 = f1 - ires_c(f1, f2, k, c1, d1, c2, d2)
-//                   - oldf1 - ires_c(oldf1, oldf2, k, c1, d1, c2, d2)
-inline dbl iresxi_c(const VD& older_xi, const VD& old_xi, const VD& old_pi, const VD& old_al, const VD& old_be,
-		    const VD& old_ps, const VD& f_xi, int k, dbl lam, dbl al_ps2)
+inline dbl iresxi_c(FLDS *f, PAR *p, int k)
 { 
   return 0;
 }
 
-inline dbl irespi_c(const VD& older_pi, const VD& old_xi, const VD& old_pi, const VD& old_al, const VD& old_be,
-		    const VD& old_ps, const VD& f_pi, int k, dbl lam, dbl dr, dbl r, dbl al_ps2, dbl lam6_part)
+inline dbl irespi_c(FLDS *f, PAR *p, int k)
 {
   return 0;
 }
 
-inline dbl irespsihyp_c(const VD& older_ps, const VD& old_ps, const VD& f_ps, int k, dbl lam6_part)
+void get_ires_xp(WRS *wr, FLDS *f, PAR *p)
+{
+  (wr->p_iresXi).wr_field[0] = sommerfeldres_f(f->oldXi, f->Xi, p, 0);
+  (wr->p_iresPi).wr_field[0] = sommerfeldres_f(f->oldPi, f->Pi, p, 0);
+  for (int k = 1; k < p->lastwr; ++k) {
+    (wr->p_iresXi).wr_field[k] = iresxi_c(f, p, (p->inds[k]).second);
+    (wr->p_iresPi).wr_field[k] = irespi_c(f, p, (p->inds[k]).second);
+  }
+  (wr->p_iresXi).wr_field[p->lastwr] = sommerfeldres(f->oldXi, f->Xi, p, p->lastpt);
+  (wr->p_iresPi).wr_field[p->lastwr] = sommerfeldres(f->oldPi, f->Pi, p, p->lastpt);
+  return;
+}
+
+inline dbl iresxi2_c(FLDS *f, PAR *p, int k)
+{ 
+  return 0;
+}
+
+inline dbl irespi2_c(FLDS *f, PAR *p, int k)
+{
+  return 0;
+}
+
+void get_ires_xp2(WRS *wr, FLDS *f, PAR *p)
+{
+  (wr->p_iresXi2).wr_field[0] = sommerfeldres_f(f->oldXi2, f->Xi2, p, 0);
+  (wr->p_iresPi2).wr_field[0] = sommerfeldres_f(f->oldPi2, f->Pi2, p, 0);
+  for (int k = 1; k < p->lastwr; ++k) {
+    (wr->p_iresXi2).wr_field[k] = iresxi2_c(f, p, (p->inds[k]).second);
+    (wr->p_iresPi2).wr_field[k] = irespi2_c(f, p, (p->inds[k]).second);
+  }
+  (wr->p_iresXi2).wr_field[p->lastwr] = sommerfeldres(f->oldXi2, f->Xi2, p, p->lastpt);
+  (wr->p_iresPi2).wr_field[p->lastwr] = sommerfeldres(f->oldPi2, f->Pi2, p, p->lastpt);
+  return;
+}
+
+inline dbl irespsihyp_c(FLDS *f, PAR *p, int k)
 { return 0; }
 
-inline dbl irespsi_c(const VD& xi, const VD& pi,
-		     const VD& alpha, const VD& beta,
-		     const VD& psi, int k, dbl lam, dbl dr, dbl r)
+inline dbl irespsi_c(FLDS *f, PAR *p, int k)
 {
-  return (psi[k+1] - psi[k-1]) / (2*dr);
-    //d2_c(psi,k) + sq(dr)*psi[k]*M_PI*(sq(xi[k]) + sq(pi[k])) + dr*d_c(psi,k)/r
-    //+ pw5(psi[k])*sq(r*d_urinv_c(beta,k,dr,r)) / (48*sq(alpha[k]));
+  return (f->Ps[k+1] - f->Ps[k-1]) * (p->in2dr);
+    //d2_c(f->Ps,k) + sq(dr)*f->Ps[k]*M_PI*(sq(f->Xi[k]) + sq(f->Pi[k])) + dr*d_c(f->Ps,k)/r
+    //+ pw5(f->Ps[k])*sq(r*d_urinv_c(f->Be,k,dr,r)) / (48*sq(f->Al[k]));
 }
 
-inline dbl iresbeta_c(const VD& xi, const VD& pi,
-		      const VD& alpha, const VD& beta,
-		      const VD& psi, int k, dbl lam, dbl dr, dbl r)
+inline dbl iresbeta_c(FLDS *f, PAR *p, int k)
 {
-  return (beta[k+1] - beta[k-1]) / (2*dr);
+  return (f->Be[k+1] - f->Be[k-1]) * (p->in2dr);
 }
 
-inline dbl iresalpha_c(const VD& xi, const VD& pi,
-		       const VD& alpha, const VD& beta,
-		       const VD& psi, int k, dbl lam, dbl dr, dbl r)
+inline dbl iresalpha_c(FLDS *f, PAR *p, int k)
 {
-  return (alpha[k+1] - alpha[k-1]) / (2*dr);
+  return (f->Al[k+1] - f->Al[k-1]) * (p->in2dr);
 }
 
 
-inline dbl irespsi_f(const VD& xi, const VD& pi,
-		     const VD& alpha, const VD& beta,
-		     const VD& psi, int k, dbl lam, dbl dr, dbl r)
+inline dbl irespsi_f(FLDS *f, PAR *p, int k)
 {
-  return (-3*psi[k] + 4*psi[k+1] - psi[k+2]) / (2*dr);
+  return (-3*f->Ps[k] + 4*f->Ps[k+1] - f->Ps[k+2]) * (p->in2dr);
 }
 
-inline dbl iresbeta_f(const VD& xi, const VD& pi,
-		      const VD& alpha, const VD& beta,
-		      const VD& psi, int k, dbl lam, dbl dr, dbl r)
+inline dbl iresbeta_f(FLDS *f, PAR *p, int k)
 {
-  return (-3*beta[k] + 4*beta[k+1] - beta[k+2]) / (2*dr);
+  return (-3*f->Be[k] + 4*f->Be[k+1] - f->Be[k+2]) * (p->in2dr);
 }
 
-inline dbl iresalpha_f(const VD& xi, const VD& pi,
-		       const VD& alpha, const VD& beta,
-		       const VD& psi, int k, dbl lam, dbl dr, dbl r)
+inline dbl iresalpha_f(FLDS *f, PAR *p, int k)
 {
-  return (-3*alpha[k] + 4*alpha[k+1] - alpha[k+2]) / (2*dr);
+  return (-3*f->Al[k] + 4*f->Al[k+1] - f->Al[k+2]) * (p->in2dr);
+}
+
+void get_ires_abp(WRS *wr, FLDS *f, PAR *p)
+{
+  (wr->p_iresAl).wr_field[0] = fda0_resAl(f->Al, p);
+  (wr->p_iresBe).wr_field[0] = fda0_resBe(f->Be, p);
+  (wr->p_iresPs).wr_field[0] = fda0_resPs(f->Ps, p);
+  if (p->psi_hyp) {
+    for (int k = 1; k < p->lastwr; ++k) {
+      (wr->p_iresAl).wr_field[k] = iresalpha_c(f, p, (p->inds[k]).second);
+      (wr->p_iresBe).wr_field[k] = iresbeta_c(f, p, (p->inds[k]).second);
+      (wr->p_iresPs).wr_field[k] = irespsihyp_c(f, p, (p->inds[k]).second);
+    }
+  }
+  else {
+    for (int k = 1; k < p->lastwr; ++k) {
+      (wr->p_iresAl).wr_field[k] = iresalpha_c(f, p, (p->inds[k]).second);
+      (wr->p_iresBe).wr_field[k] = iresbeta_c(f, p, (p->inds[k]).second);
+      (wr->p_iresPs).wr_field[k] = irespsi_c(f, p, (p->inds[k]).second);
+    }
+  }
+  (wr->p_iresAl).wr_field[p->lastwr] = fdaR_resAl(f->Al, p);
+  (wr->p_iresBe).wr_field[p->lastwr] = fdaR_resBe(f->Be, p);
+  (wr->p_iresPs).wr_field[p->lastwr] = fdaR_resPs(f->Ps, p);
+  return;
 }
 
 // *********************************************

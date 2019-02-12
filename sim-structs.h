@@ -127,24 +127,24 @@ struct sim_params {
   bool dspn_bound = false; // dissipate boundary points?
   bool dspn_psi = false; // dissipate psi (only activated if psi_hyp=true)?
   bool dr3_up = false; // update pi with d/dr^3 scheme?
-  bool static_metric = false; // ignore scalar field's effect on metric?
+  bool static_metric = false; // ignore dynamics of metric?
   bool clean_hyp = false; // use clean hyperbolic update functions (slower)?
   bool clean_ell = false; // use clean hyperbolic update functions (slower)?
   bool write_res = false; // write residuals?
   bool write_ricci = false; // write ricci?
-  bool write_itn = false; // write itn counts?
+  bool write_itn = false; // write iteration counts?
   bool write_mtot = false; // write total mass?
   bool write_maspect = false; // write mass aspect?
   bool write_outnull = false; // write outgoing null expansion?
-  bool write_xp = true; // write xi and pi?
-  bool write_xp2 = false; // write xi and pi?
+  bool write_xp = true; // write ghost xi and pi?
+  bool write_xp2 = false; // write normal xi and pi?
   bool write_abp = true; // write metric fields (alpha, beta, psi)?
   bool write_ires_xp = false; // write ires for xi and pi?
+  bool write_ires_xp2 = false;
   bool write_ires_abp = false; // write ires for metric variables?
   bool horizon_search = false; // search for apparent horizon after each step?
 
   int n_ell = 3;
-  int n_hyp = 2;
 
   int lastwr = lastpt/save_pt;
   int wr_shape = lastwr + 1;
