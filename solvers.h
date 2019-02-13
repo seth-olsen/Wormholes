@@ -62,15 +62,12 @@ int fields_step(FLDS *f, PAR *p, int i)
     cout << endl << i << "\n\nSTEP EXIT CODE " << itn << endl;
     cout << "\n\nSTEP EXIT ITN " << p->exit_itn << endl;
     cout << "\nt = " << p->t << endl;
-    /*
     int horizon_code = search_for_horizon(f->Al, f->Be, f->Ps, p);
     if (horizon_code) {
       record_horizon(p, f->Ps, horizon_code, p->exit_itn, i);
       return horizon_code;
     }
-    else { return -(p->maxit); }
-    */
-    return itn;
+    else { return itn; }
   }
   p->t += p->dt;
   return 0;
@@ -379,8 +376,8 @@ int solve_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << "res = " << res << endl;
 	p->exit_itn = itn;
 	if (res < (p->tol)) {
-	  //if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -1; }
-	  res = 0;
+	  if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -1; }
+	  else { res = 0; }
 	}
 	else { return -1; }
       }
@@ -416,8 +413,8 @@ int solve_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << "res = " << res << endl;
 	p->exit_itn = itn;
         if (res < (p->tol)) {
-	  //if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -4; }
-	  res = 0;
+	  if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -4; }
+	  else { res = 0; }
 	}
         else { return -4; }
       }
@@ -432,8 +429,8 @@ int solve_dynamic_psi_hyp(FLDS *f, PAR *p)
       cout << endl << "FULL solver STUCK at t = " << (p->t) << "\nres = " << res << endl;
       p->exit_itn = itn;
       if (get_res_psi_clean(f, p) < (p->tol)) {
-	//if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
-	res = get_res_xp(f, p);
+	if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
+	else { res = get_res_xp(f, p); }
       }
       else { return -5; }
     }
@@ -461,8 +458,8 @@ int solve2_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << "res = " << res << endl;
 	p->exit_itn = itn;
 	if (res < (p->tol)) {
-	  //if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -1; }
-	  res = 0;
+	  if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -1; }
+	  else { res = 0; }
 	}
 	else { return -1; }
       }
@@ -498,8 +495,8 @@ int solve2_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << "res = " << res << endl;
 	p->exit_itn = itn;
         if (res < (p->tol)) {
-	  //if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -4; }
-	  res = 0;
+	  if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -4; }
+	  else { res = 0; }
 	}
         else { return -4; }
       }
@@ -514,8 +511,8 @@ int solve2_dynamic_psi_hyp(FLDS *f, PAR *p)
       cout << endl << "FULL solver STUCK at t = " << (p->t) << "\nres = " << res << endl;
       p->exit_itn = itn;
       if (get_res_psi_clean(f, p) < (p->tol)) {
-	//if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
-	res = get_res_xp2(f, p);
+	if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
+	else { res = get_res_xp2(f, p); }
       }
       else { return -5; }
     }
@@ -543,8 +540,8 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << "res = " << res << endl;
 	p->exit_itn = itn;
 	if (res < (p->tol)) {
-	  //if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -1; }
-	  res = 0;
+	  if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -1; }
+	  else { res = 0; }
 	}
 	else { return -1; }
       }
@@ -591,8 +588,8 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << "res = " << res << endl;
 	p->exit_itn = itn;
         if (res < (p->tol)) {
-	  //if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -4; }
-	  res = 0;
+	  if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -4; }
+	  else { res = 0; }
 	}
         else { return -4; }
       }
@@ -609,9 +606,11 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
       cout << endl << "FULL solver STUCK at t = " << (p->t) << "\nres = " << res << endl;
       p->exit_itn = itn;
       if (get_res_psi_clean(f, p) < (p->tol)) {
-	//if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
-        res = get_res_xp(f, p);
-	if (res < (p->tol)) { res = get_res_xp2(f, p); }
+	if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
+        else {
+	  res = get_res_xp(f, p);
+	  if (res < (p->tol)) { res = get_res_xp2(f, p); }
+	}
       }
       else { return -5; }
     }

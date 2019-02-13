@@ -319,6 +319,35 @@ inline void get_maspect(VD& maspect, const VD& f_al, const VD& f_be, const VD& f
   maspect[p->lastwr] = mass_aspectR(f_al, f_be, f_ps, p, p->lastpt);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl half_outgoing_null(const VD& alpha, const VD& beta,
+			      const VD& psi, PAR *p, int k)
+{
+  return (ddr_c(beta,p,k) - (p->r[-k])*beta[k])/(3*alpha[k])
+    + ((p->r[-k]) + (p->indr)*dln_c(psi,k))/sq(psi[k]); 
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl half_outgoing_null_rev(const VD& alpha, const VD& beta,
+				  const VD& psi, PAR *p, int k)
+{
+  return (ddr_c(beta,p,k) - (p->r[-k])*beta[k])/(3*alpha[k])
+    - ((p->r[-k]) + (p->indr)*dln_c(psi,k))/sq(psi[k]);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl half_outgoing_null0(const VD& alpha, const VD& beta,
+			       const VD& psi, PAR *p)
+{
+  return (ddr_f(beta,p,0) + beta[0]*(p->r[-(p->lastpt)]))/(3*alpha[0])
+    - ((p->indr)*dln_f(psi,0) - (p->r[-(p->lastpt)]))/sq(psi[0]);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl half_outgoing_nullR(const VD& alpha, const VD& beta,
+			       const VD& psi, PAR *p, int k)
+{
+  return (ddr_b(beta,p,k) - (p->r[-k])*beta[k])/(3*alpha[k])
+    + ((p->r[-k]) + (p->indr)*dln_b(psi,k))/sq(psi[k]);
+    
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl outgoing_null(const VD& alpha, const VD& beta,
 			 const VD& psi, PAR *p, int k)
 {
@@ -326,10 +355,17 @@ inline dbl outgoing_null(const VD& alpha, const VD& beta,
     + (ddr_c(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k]);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl outgoing_null_rev(const VD& alpha, const VD& beta,
+			 const VD& psi, PAR *p, int k)
+{
+  return (ddr_c(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k])
+    - (1 + (p->indr)*dln_c(psi,k)/(p->r[-k]))/sq(psi[k]);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl outgoing_null0(const VD& alpha, const VD& beta,
 			  const VD& psi, PAR *p)
 {
-  return (1 - (p->indr)*dln_f(psi,0)/(p->r[-(p->lastpt)]))/sq(psi[0])
+  return ((p->indr)*dln_f(psi,0)/(p->r[-(p->lastpt)]) - 1)/sq(psi[0])
     - (ddr_f(beta,p,0)/(p->r[-(p->lastpt)]) + beta[0])/(3*alpha[0]);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -343,7 +379,7 @@ inline dbl outgoing_nullR(const VD& alpha, const VD& beta,
 inline void get_outnull(VD& outnull, const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p) {
   outnull[0] = outgoing_null0(f_al, f_be, f_ps, p);
   for (int k = 1; k < p->zerowr; ++k) {
-    outnull[k] = outgoing_null(f_al, f_be, f_ps, p, (p->inds[k]).second);
+    outnull[k] = outgoing_null_rev(f_al, f_be, f_ps, p, (p->inds[k]).second);
   }
   for (int k = (p->zerowr) + 1; k < p->lastwr; ++k) {
     outnull[k] = outgoing_null(f_al, f_be, f_ps, p, (p->inds[k]).second);
@@ -364,10 +400,15 @@ void get_ricci(VD& ricci, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const
 // HORIZON SEARCH
 int search_for_horizon(const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
 {
-  if (outgoing_nullR(f_al, f_be, f_ps, p, p->lastpt) <= 0) { return p->lastpt; }
   int k = p->lastpt;
-  while (--k > 0) { if (outgoing_null(f_al, f_be, f_ps, p, k) <= 0) { return k; } }
-  if (outgoing_null0(f_al, f_be, f_ps, p) <= 0) { return p->npts; }
+  if (half_outgoing_nullR(f_al, f_be, f_ps, p, p->lastpt) <= 0) { return k; }
+  while (--k > p->zeropt) {
+    if (half_outgoing_null(f_al, f_be, f_ps, p, k) <= 0) { return k; }
+  }
+  while (--k > 0) {
+    if (half_outgoing_null_rev(f_al, f_be, f_ps, p, k) <= 0) { return k; }
+  }
+  if (half_outgoing_null0(f_al, f_be, f_ps, p) <= 0) { return p->npts; }
   return 0;
 }
 
