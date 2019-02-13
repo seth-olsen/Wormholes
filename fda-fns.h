@@ -53,6 +53,10 @@ inline dbl dlog_b(const VD& u, int ind)
 
 inline dbl dln_c(const VD& u, int ind)
 { return ((u[ind+1] - u[ind-1]) / u[ind]); }
+inline dbl dln_b(const VD& u, int ind)
+{ return ((3*u[ind] - 4*u[ind-1] + u[ind-2]) / u[ind]); }
+inline dbl dln_f(const VD& u, int ind)
+{ return ((-3*u[ind] + 4*u[ind+1] - u[ind+2]) / u[ind]); }
 inline dbl ddrln_c(const VD& u, PAR *p, int ind)
 { return ((p->in2dr) * (u[ind+1] - u[ind-1]) / u[ind]); }
 

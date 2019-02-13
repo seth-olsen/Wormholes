@@ -294,15 +294,26 @@ void get_ires_abp(WRS *wr, FLDS *f, PAR *p)
 // *********************************************
 inline dbl mass_aspect(const VD& alpha, const VD& beta, const VD& psi, PAR *p, int k)
 {
-  return 0;
+  return 0.5*sqrt(r2(p,k))*sq(psi[k]) *
+    ( 1 + r2(p,k)*( sq(sq(psi[k])*(ddr_c(beta,p,k) - (p->r[-k])*beta[k])/(3*alpha[k]))
+		    - sq((p->r[-k]) + (p->indr)*dln_c(psi,k)) ) );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl mass_aspectR(const VD& alpha, const VD& beta, const VD& psi, PAR *p, int k)
 {
-  return 0;
+  return 0.5*sqrt(r2(p,k))*sq(psi[k]) *
+    ( 1 + r2(p,k)*( sq(sq(psi[k])*(ddr_b(beta,p,k) - (p->r[-k])*beta[k])/(3*alpha[k]))
+		    - sq((p->r[-k]) + (p->indr)*dln_b(psi,k)) ) );
+}
+inline dbl mass_aspect0(const VD& alpha, const VD& beta, const VD& psi, PAR *p, int k)
+{
+  return 0.5*sqrt(r2(p,k))*sq(psi[k]) *
+    ( 1 + r2(p,k)*( sq(sq(psi[k])*(ddr_f(beta,p,k) - (p->r[-k])*beta[k])/(3*alpha[k]))
+		    - sq((p->r[-k]) + (p->indr)*dln_f(psi,k)) ) );
 }
 inline void get_maspect(VD& maspect, const VD& f_al, const VD& f_be, const VD& f_ps,
 			PAR *p, int i_last, int i_save) {
+  maspect[0] = mass_aspect0(f_al, f_be, f_ps, p, 0);
   int s = i_save;
   for (int k = 1; k < i_last; ++k) {
     maspect[k] = mass_aspect(f_al, f_be, f_ps, p, s);
