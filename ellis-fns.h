@@ -325,19 +325,22 @@ inline void get_maspect(VD& maspect, const VD& f_al, const VD& f_be, const VD& f
 inline dbl outgoing_null(const VD& alpha, const VD& beta,
 			 const VD& psi, PAR *p, int k)
 {
-  return 0;
+  return (ddr_c(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k]) +
+    (1 + (p->indr)*dln_c(psi,k)/(p->r[-k]))/sq(psi[k]);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl outgoing_null_f(const VD& alpha, const VD& beta,
 			   const VD& psi, PAR *p, int k)
 {
-  return 0;
+  return (ddr_f(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k]) +
+    (1 + (p->indr)*dln_f(psi,k)/(p->r[-k]))/sq(psi[k]);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl outgoing_null_b(const VD& alpha, const VD& beta,
 			   const VD& psi, PAR *p, int k)
 {
-  return 0;
+  return (ddr_b(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k]) +
+    (1 + (p->indr)*dln_b(psi,k)/(p->r[-k]))/sq(psi[k]);
 }
 inline void get_outnull(VD& outnull, const VD& f_al, const VD& f_be, const VD& f_ps,
 			PAR *p, int i_last, int i_save) {
@@ -350,13 +353,14 @@ inline void get_outnull(VD& outnull, const VD& f_al, const VD& f_be, const VD& f
   outnull[i_last] = outgoing_null_b(f_al, f_be, f_ps, p, s);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl sRicci(const VD& f_xi, const VD& f_pi, const VD& f_ps, int k)
+inline dbl sRicci(const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2, const VD& f_ps, int k)
 {
-  return (sq(f_xi[k]) - sq(f_pi[k])) / pw4(f_ps[k]);
+  return (sq(f_xi[k]) - sq(f_pi[k]) - sq(f_xi2[k]) + sq(f_pi2[k])) / pw4(f_ps[k]);
 }
-void get_ricci(VD& ricci, const VD& f_xi, const VD& f_pi, const VD& f_ps, const vector< pair<int,int> >& indices)
+void get_ricci(VD& ricci, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
+	       const VD& f_ps, const vector< pair<int,int> >& indices)
 {
-  for (auto k : indices) { ricci[k.first] = sRicci(f_xi, f_pi, f_ps, k.second); }
+  for (auto k : indices) { ricci[k.first] = sRicci(f_xi, f_pi, f_xi2, f_pi2, f_ps, k.second); }
 }
 ////////////////////////////////////////////////////////////////////////////////////
 // HORIZON SEARCH

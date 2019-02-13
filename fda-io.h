@@ -98,7 +98,7 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
   }
   // write ricci
   if (p->write_ricci) {
-    get_ricci((wr->p_ricci).wr_field, f->Xi, f->Pi, f->Ps, p->inds);
+    get_ricci((wr->p_ricci).wr_field, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Ps, p->inds);
     write_sdf(&(wr->p_ricci), p->t);
   }
   // write outnull
