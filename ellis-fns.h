@@ -236,7 +236,7 @@ inline dbl iresbeta_c(FLDS *f, PAR *p, int k)
 {
   return  ddr2_c(f->Be,p,k) - f->Be[k]*(p->lsq)/sq(r2(p,k))
     + (p->twelve_pi)*(f->Al[k])*(f->Xi2[k]*f->Pi2[k] - f->Xi[k]*f->Pi[k]) / sq(f->Ps[k])
-    + sqrt(r2(p,k))*((f->Be[k+1])/sqrt(r2(p,k+1)) - (f->Be[k-1])/sqrt(r2(p,k+1)))*
+    + sqrt(r2(p,k))*((f->Be[k+1])/sqrt(r2(p,k+1)) - (f->Be[k-1])/sqrt(r2(p,k-1)))*
     (2*(p->r[-k]) + 6*ddrlog_c(f->Ps,p,k) - ddrlog_c(f->Al,p,k));
 }
 
@@ -245,7 +245,7 @@ inline dbl iresalpha_c(FLDS *f, PAR *p, int k)
   return ddr2_c(f->Al,p,k) + (p->eight_pi)*(f->Al[k])*(sq(f->Pi[k]) - sq(f->Pi2[k]))
     + (p->indr)*d_c(f->Al,k)*((p->r[-k]) + ddrlog_c(f->Ps,p,k))
     - ((p->in2dr)*(p->in3dr)*r2(p,k)*pw4(f->Ps[k])/(f->Al[k])) *
-    sq((f->Be[k+1])/sqrt(r2(p,k+1)) - (f->Be[k-1])/sqrt(r2(p,k+1)));
+    sq((f->Be[k+1])/sqrt(r2(p,k+1)) - (f->Be[k-1])/sqrt(r2(p,k-1)));
 }
 
 
