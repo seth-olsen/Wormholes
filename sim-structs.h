@@ -122,7 +122,7 @@ struct sim_params {
   dbl ic2_Dsq = 25.0; // gaussian width
   dbl ic2_r0 = 20.0; // gaussian center
   dbl ic2_Amp = 0; // gaussian amplitude
-  bool psi_hyp = false; // update psi with hyperbolic evolution eqn after IC?
+  bool psi_hyp = true; // update psi with hyperbolic evolution eqn after IC?
   bool somm_cond = true; // sommerfeld condition at outer bound?
   bool dspn_bound = false; // dissipate boundary points?
   bool dspn_psi = false; // dissipate psi (only activated if psi_hyp=true)?
@@ -134,11 +134,11 @@ struct sim_params {
   bool write_ricci = false; // write ricci?
   bool write_itn = false; // write iteration counts?
   bool write_mtot = false; // write total mass?
-  bool write_maspect = false; // write mass aspect?
-  bool write_outnull = false; // write outgoing null expansion?
-  bool write_xp = false; // write ghost xi and pi?
+  bool write_maspect = true; // write mass aspect?
+  bool write_outnull = true; // write outgoing null expansion?
+  bool write_xp = true; // write ghost xi and pi?
   bool write_xp2 = false; // write normal xi and pi?
-  bool write_abp = false; // write metric fields (alpha, beta, psi)?
+  bool write_abp = true; // write metric fields (alpha, beta, psi)?
   bool write_ires_xp = true; // write ires for xi and pi?
   bool write_ires_xp2 = false;
   bool write_ires_abp = true; // write ires for metric variables?

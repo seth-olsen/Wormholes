@@ -234,8 +234,8 @@ inline dbl irespsi_c(FLDS *f, PAR *p, int k)
 
 inline dbl iresbeta_c(FLDS *f, PAR *p, int k)
 {
-  return  ddr2_c(f->Be,p,k) - f->Be[k]*(p->lsq)/sq(r2(p,k))
-    + (p->twelve_pi)*(f->Al[k])*(f->Xi2[k]*f->Pi2[k] - f->Xi[k]*f->Pi[k]) / sq(f->Ps[k])
+  return  ddr2_c(f->Be,p,k) - (f->Be[k])*(p->lsq)/sq(r2(p,k))
+    + (p->twelve_pi)*(f->Al[k])*((f->Xi2[k])*(f->Pi2[k]) - (f->Xi[k])*(f->Pi[k])) / sq(f->Ps[k])
     + sqrt(r2(p,k))*((f->Be[k+1])/sqrt(r2(p,k+1)) - (f->Be[k-1])/sqrt(r2(p,k-1)))*
     (2*(p->r[-k]) + 6*ddrlog_c(f->Ps,p,k) - ddrlog_c(f->Al,p,k));
 }
@@ -311,15 +311,12 @@ inline dbl mass_aspect0(const VD& alpha, const VD& beta, const VD& psi, PAR *p, 
     ( 1 + r2(p,k)*( sq(sq(psi[k])*(ddr_f(beta,p,k) - (p->r[-k])*beta[k])/(3*alpha[k]))
 		    - sq((p->r[-k]) + (p->indr)*dln_f(psi,k)) ) );
 }
-inline void get_maspect(VD& maspect, const VD& f_al, const VD& f_be, const VD& f_ps,
-			PAR *p, int i_last, int i_save) {
+inline void get_maspect(VD& maspect, const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p) {
   maspect[0] = mass_aspect0(f_al, f_be, f_ps, p, 0);
-  int s = i_save;
-  for (int k = 1; k < i_last; ++k) {
-    maspect[k] = mass_aspect(f_al, f_be, f_ps, p, s);
-    s += i_save;
+  for (int k = 1; k < p->lastwr; ++k) {
+    maspect[k] = mass_aspect(f_al, f_be, f_ps, p, (p->inds[k]).second);
   }
-  maspect[i_last] = mass_aspectR(f_al, f_be, f_ps, p, s);
+  maspect[p->lastwr] = mass_aspectR(f_al, f_be, f_ps, p, p->lastpt);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl outgoing_null(const VD& alpha, const VD& beta,
@@ -342,15 +339,15 @@ inline dbl outgoing_null_b(const VD& alpha, const VD& beta,
   return (ddr_b(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k]) +
     (1 + (p->indr)*dln_b(psi,k)/(p->r[-k]))/sq(psi[k]);
 }
-inline void get_outnull(VD& outnull, const VD& f_al, const VD& f_be, const VD& f_ps,
-			PAR *p, int i_last, int i_save) {
+inline void get_outnull(VD& outnull, const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p) {
   outnull[0] = outgoing_null_f(f_al, f_be, f_ps, p, 0);
-  int s = i_save;
-  for (int k = 1; k < i_last; ++k) {
-    outnull[k] = outgoing_null(f_al, f_be, f_ps, p, s);
-    s += i_save;
+  for (int k = 1; k < p->zerowr; ++k) {
+    outnull[k] = outgoing_null(f_al, f_be, f_ps, p, (p->inds[k]).second);
   }
-  outnull[i_last] = outgoing_null_b(f_al, f_be, f_ps, p, s);
+  for (int k = (p->zerowr) + 1; k < p->lastwr; ++k) {
+    outnull[k] = outgoing_null(f_al, f_be, f_ps, p, (p->inds[k]).second);
+  }
+  outnull[p->lastwr] = outgoing_null_b(f_al, f_be, f_ps, p, p->lastpt);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl sRicci(const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2, const VD& f_ps, int k)

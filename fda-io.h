@@ -103,14 +103,12 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
   }
   // write outnull
   if (p->write_outnull) {
-    get_outnull((wr->p_outnull).wr_field, f->Al, f->Be, f->Ps,
-		p, p->lastwr, p->save_pt);
+    get_outnull((wr->p_outnull).wr_field, f->Al, f->Be, f->Ps, p);
     write_sdf(&(wr->p_outnull), p->t);
   }
   // write maspect
   if (p->write_maspect) {
-    get_maspect((wr->p_maspect).wr_field, f->Al, f->Be, f->Ps,
-		p, p->lastwr, p->save_pt);
+    get_maspect((wr->p_maspect).wr_field, f->Al, f->Be, f->Ps, p);
     write_sdf(&(wr->p_maspect), p->t);
   }
   return;
