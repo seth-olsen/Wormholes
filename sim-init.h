@@ -270,6 +270,7 @@ int params_init(PAR *p, int argc, char **argv)
     p->r[k] = (p->rmin) + k*(p->dr);
     p->r[-k] = (p->r[k]) / (sq(p->r[k]) + (p->lsq));
   }
+  // IMPORTANT: to get x/r^2 at r[0] = xmin use -r[-lastpt] for r[-0]
   if (p->r[p->zeropt] != 0 || p->r[p->lastpt] != p->rmax) {
     cout << "\n***COORDINATE INIT ERROR***\n" << endl;
   }

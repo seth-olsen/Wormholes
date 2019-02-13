@@ -305,14 +305,14 @@ inline dbl mass_aspectR(const VD& alpha, const VD& beta, const VD& psi, PAR *p, 
     ( 1 + r2(p,k)*( sq(sq(psi[k])*(ddr_b(beta,p,k) - (p->r[-k])*beta[k])/(3*alpha[k]))
 		    - sq((p->r[-k]) + (p->indr)*dln_b(psi,k)) ) );
 }
-inline dbl mass_aspect0(const VD& alpha, const VD& beta, const VD& psi, PAR *p, int k)
+inline dbl mass_aspect0(const VD& alpha, const VD& beta, const VD& psi, PAR *p)
 {
-  return 0.5*sqrt(r2(p,k))*sq(psi[k]) *
-    ( 1 + r2(p,k)*( sq(sq(psi[k])*(ddr_f(beta,p,k) - (p->r[-k])*beta[k])/(3*alpha[k]))
-		    - sq((p->r[-k]) + (p->indr)*dln_f(psi,k)) ) );
+  return 0.5*sqrt(r2(p,0))*sq(psi[0]) *
+    ( 1 + r2(p,0)*( sq(sq(psi[0])*(ddr_f(beta,p,0) + (p->r[-(p->lastpt)])*beta[0])/(3*alpha[0]))
+		    - sq((p->indr)*dln_f(psi,0) - (p->r[-(p->lastpt)])) ) );
 }
 inline void get_maspect(VD& maspect, const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p) {
-  maspect[0] = mass_aspect0(f_al, f_be, f_ps, p, 0);
+  maspect[0] = mass_aspect0(f_al, f_be, f_ps, p);
   for (int k = 1; k < p->lastwr; ++k) {
     maspect[k] = mass_aspect(f_al, f_be, f_ps, p, (p->inds[k]).second);
   }
@@ -322,32 +322,33 @@ inline void get_maspect(VD& maspect, const VD& f_al, const VD& f_be, const VD& f
 inline dbl outgoing_null(const VD& alpha, const VD& beta,
 			 const VD& psi, PAR *p, int k)
 {
-  return (ddr_c(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k]) +
-    (1 + (p->indr)*dln_c(psi,k)/(p->r[-k]))/sq(psi[k]);
+  return (1 + (p->indr)*dln_c(psi,k)/(p->r[-k]))/sq(psi[k])
+    + (ddr_c(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k]);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl outgoing_null_f(const VD& alpha, const VD& beta,
-			   const VD& psi, PAR *p, int k)
+inline dbl outgoing_null0(const VD& alpha, const VD& beta,
+			  const VD& psi, PAR *p)
 {
-  return (ddr_f(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k]) +
-    (1 + (p->indr)*dln_f(psi,k)/(p->r[-k]))/sq(psi[k]);
+  return (1 - (p->indr)*dln_f(psi,0)/(p->r[-(p->lastpt)]))/sq(psi[0])
+    - (ddr_f(beta,p,0)/(p->r[-(p->lastpt)]) + beta[0])/(3*alpha[0]);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl outgoing_null_b(const VD& alpha, const VD& beta,
-			   const VD& psi, PAR *p, int k)
+inline dbl outgoing_nullR(const VD& alpha, const VD& beta,
+			  const VD& psi, PAR *p, int k)
 {
-  return (ddr_b(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k]) +
-    (1 + (p->indr)*dln_b(psi,k)/(p->r[-k]))/sq(psi[k]);
+  return (1 + (p->indr)*dln_b(psi,k)/(p->r[-k]))/sq(psi[k])
+    + (ddr_b(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k]);
+    
 }
 inline void get_outnull(VD& outnull, const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p) {
-  outnull[0] = outgoing_null_f(f_al, f_be, f_ps, p, 0);
+  outnull[0] = outgoing_null0(f_al, f_be, f_ps, p);
   for (int k = 1; k < p->zerowr; ++k) {
     outnull[k] = outgoing_null(f_al, f_be, f_ps, p, (p->inds[k]).second);
   }
   for (int k = (p->zerowr) + 1; k < p->lastwr; ++k) {
     outnull[k] = outgoing_null(f_al, f_be, f_ps, p, (p->inds[k]).second);
   }
-  outnull[p->lastwr] = outgoing_null_b(f_al, f_be, f_ps, p, p->lastpt);
+  outnull[p->lastwr] = outgoing_nullR(f_al, f_be, f_ps, p, p->lastpt);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl sRicci(const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2, const VD& f_ps, int k)
@@ -363,10 +364,10 @@ void get_ricci(VD& ricci, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const
 // HORIZON SEARCH
 int search_for_horizon(const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
 {
-  if (outgoing_null_b(f_al, f_be, f_ps, p, p->lastpt) <= 0) { return p->lastpt; }
+  if (outgoing_nullR(f_al, f_be, f_ps, p, p->lastpt) <= 0) { return p->lastpt; }
   int k = p->lastpt;
   while (--k > 0) { if (outgoing_null(f_al, f_be, f_ps, p, k) <= 0) { return k; } }
-  if (outgoing_null_f(f_al, f_be, f_ps, p, 0) <= 0) { return p->npts; }
+  if (outgoing_null0(f_al, f_be, f_ps, p) <= 0) { return p->npts; }
   return 0;
 }
 

@@ -141,7 +141,7 @@ struct sim_params {
   bool write_abp = false; // write metric fields (alpha, beta, psi)?
   bool write_ires_xp = false; // write ires for xi and pi?
   bool write_ires_xp2 = false;
-  bool write_ires_abp = true; // write ires for metric variables?
+  bool write_ires_abp = false; // write ires for metric variables?
   bool horizon_search = false; // search for apparent horizon after each step?
 
   int n_ell = 3;
