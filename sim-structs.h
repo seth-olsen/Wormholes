@@ -105,7 +105,7 @@ struct sim_params {
   int nsteps = 2400;
   int save_step = 4;
   int resn_factor = 1;
-  int check_step = 10;
+  int check_step = 1;
   int maxit = 100;
   int norm_type = 0;
   dbl lam = 0.25; // dt/dr
@@ -136,9 +136,9 @@ struct sim_params {
   bool write_mtot = false; // write total mass?
   bool write_maspect = false; // write mass aspect?
   bool write_outnull = false; // write outgoing null expansion?
-  bool write_xp = true; // write ghost xi and pi?
+  bool write_xp = false; // write ghost xi and pi?
   bool write_xp2 = false; // write normal xi and pi?
-  bool write_abp = true; // write metric fields (alpha, beta, psi)?
+  bool write_abp = false; // write metric fields (alpha, beta, psi)?
   bool write_ires_xp = true; // write ires for xi and pi?
   bool write_ires_xp2 = false;
   bool write_ires_abp = true; // write ires for metric variables?
