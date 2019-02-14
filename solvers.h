@@ -46,12 +46,18 @@ int fields_step(FLDS *f, PAR *p, int i)
     f->olderXi = f->oldXi;
     f->olderPi = f->oldPi;
   }
+  if (p->write_ires_xp2) {
+    f->olderXi2 = f->oldXi2;
+    f->olderPi2 = f->oldPi2;
+  }
   if (p->write_ires_abp) { f->olderPs = f->oldPs; }
   f->oldAl = f->Al;  f->cnAl = f->Al;  
   f->oldBe = f->Be;  f->cnBe = f->Be;
   f->oldPs = f->Ps;  f->cnPs = f->Ps;
   f->oldXi = f->Xi;  f->cnXi = f->Xi;
   f->oldPi = f->Pi;  f->cnPi = f->Pi;
+  f->oldXi2 = f->Xi2;  f->cnXi2 = f->Xi2;
+  f->oldPi2 = f->Pi2;  f->cnPi2 = f->Pi2;
 
 
   int itn = (*(p->solver))(f, p);
