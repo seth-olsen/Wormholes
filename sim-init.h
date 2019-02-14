@@ -186,42 +186,21 @@ int fields_init(FLDS *f, PAR *p)
 
 int params_init(PAR *p, int argc, char **argv)
 {
-  map<str, str *> p_str {{"-outfile",&(p->outfile)}};
-  map<str, int *> p_int {{"-lastpt",&(p->lastpt)}, {"-save_pt",&(p->save_pt)},
-      {"-nsteps",&(p->nsteps)}, {"-save_step",&(p->save_step)},
-      {"-norm_type",&(p->norm_type)}, {"-maxit",&(p->maxit)},
-      {"-check_step",&(p->check_step)}, {"-resn_factor",&(p->resn_factor)}};
-  map<str, dbl *> p_dbl {{"-lam",&(p->lam)}, {"-lsq",&(p->lsq)}, {"-rmin",&(p->rmin)}, {"-rmax",&(p->rmax)},
-      {"-dspn",&(p->dspn)}, {"-tol",&(p->tol)}, {"-ell_tol",&(p->ell_tol)}, {"-ell_up_weight",&(p->ell_up_weight)},
-      {"-ic_Dsq",&(p->ic_Dsq)}, {"-ic_r0",&(p->ic_r0)}, {"-ic_Amp",&(p->ic_Amp)},
-      {"-ic2_Dsq",&(p->ic2_Dsq)}, {"-ic2_r0",&(p->ic2_r0)}, {"-ic2_Amp",&(p->ic2_Amp)}};
-  map<str, bool *> p_bool { {"-psi_hyp",&(p->psi_hyp)}, {"-static_metric",&(p->static_metric)},
-      {"-somm_cond",&(p->somm_cond)}, {"-dspn_bound",&(p->dspn_bound)}, {"-dr3_up",&(p->dr3_up)}, {"-dspn_psi",&(p->dspn_psi)},
-      {"-write_res",&(p->write_res)},{"-write_ricci",&(p->write_ricci)}, {"-write_itn",&(p->write_itn)},
-      {"-write_mtot",&(p->write_mtot)},{"-write_maspect",&(p->write_maspect)}, {"-write_outnull",&(p->write_outnull)},
-      {"-write_xp",&(p->write_xp)}, {"-write_xp2",&(p->write_xp2)}, {"-write_abp",&(p->write_abp)},
-      {"-write_ires_xp",&(p->write_ires_xp)}, {"-write_ires_xp2",&(p->write_ires_xp2)}, {"-write_ires_abp",&(p->write_ires_abp)},
-      {"-clean_hyp",&(p->clean_hyp)}, {"-clean_ell",&(p->clean_ell)}, {"-horizon_search",&(p->horizon_search)}};
+  map<str, str *> p_str { {"-outfile", &(p->outfile)} };
+  map<str, int *> p_int = get_p_int(p);
+  map<str, dbl *> p_dbl = get_p_dbl(p);
+  map<str, bool *> p_bool = get_p_bool(p);
   map<str, str> params;
   if (argc > 1) { param_collect(argv, argc, params); }
   else { file_param_collect("ellis-parameters.txt", params); }
   param_set(params, p_str, p_int, p_dbl, p_bool);
-  
-  // *****************************************CHECKS**********************
   // check that grid size (lastpt = npts-1) is divisible by save_pt 
   if (((p->lastpt) % (2*(p->save_pt))) != 0) {
     cout << "ERROR: save_pt = " << p->save_pt << " entered for grid size " << p->lastpt << endl;
     p->save_pt -= ((p->lastpt) % (2*(p->save_pt)));
     cout << "--> corrected: save_pt = " << p->save_pt << endl;
   }
-  // check that p->norm_type is valid
-  if (p->norm_type < 0 || p->norm_type > 2) {
-    cout << "ERROR: norm_type=" << p->save_pt << " not valid -> using inf-norm" << endl;
-    p->norm_type = 0;
-  }
-  if (p->horizon_search) { cout << "\nsearching for horizon..." << endl; }
-  //************************************************************************
-  //********************SETTING PARAMS FROM OLD PROGRAM*********************
+  // set SOLVER
   if (p->ic2_Amp == 0) {
     if (p->psi_hyp) {
       p->n_ell = 2;
@@ -246,8 +225,9 @@ int params_init(PAR *p, int argc, char **argv)
     else if (p->static_metric) { p->solver = solveAll_static; }
     else { p->solver = solveAll_dynamic; }
   }
-  // bbhutil parameters for writing data to sdf
+  // ***set rmin because can't set negative numbers with user input***
   p->rmin = -(p->rmax);
+  // bbhutil parameters for writing data to sdf
   p->lastwr = p->lastpt / p->save_pt;
   p->wr_shape = p->lastwr + 1;
   p->zerowr = p->lastwr / 2;
@@ -281,8 +261,7 @@ int params_init(PAR *p, int argc, char **argv)
   }
   if ((p->inds[p->lastwr]).second != p->lastpt || (p->inds[p->zerowr]).second != p->zeropt) {
     cout << "\n***INDEX INIT ERROR***\n" << endl;
-  }
-  
+  }  
   // lapack object declaration
   p->lp_n = (p->n_ell) * (p->npts);
   p->lp_kl = 2;
@@ -293,7 +272,7 @@ int params_init(PAR *p, int argc, char **argv)
   vector<lapack_int> ipiv_zeros(p->lp_n, 0);
   p->ipiv = ipiv_zeros;
   p->lp_ipiv = &(p->ipiv[0]);
-
+  // frequently used
   p->lam2val = 0.5 * (p->lam);
   p->lam6val = (p->lam2val) * (p->one_third);
   p->drsq = (p->dr) * (p->dr);
@@ -304,7 +283,7 @@ int params_init(PAR *p, int argc, char **argv)
   p->neg2indrsq = -2 * (p->indrsq);
   p->indt = 1 / (p->dt);
   p->inrmax = 1 / (p->rmax);
-  // SPECIFIC TERMS
+  // specific terms
   p->csomm = 0.75*(p->lam) + 0.5*(p->dt)*(p->inrmax);
   p->csomm_rhs = 1 / (1 + (p->csomm));
   p->csomm_old = 1 - (p->csomm);
@@ -312,8 +291,7 @@ int params_init(PAR *p, int argc, char **argv)
   p->jacRRm1 = -4 * (p->in2dr);
   p->jacRRm2 = (p->in2dr);
   p->cpsi_rhs = 1 / (p->jacRR);
-
-  // PARAMETER DATA OUTPUT
+  // parameter data output
   str param_data = get_param_string(p_str, p_int, p_dbl, p_bool);
   ofstream specs;
   str specs_name = p->outfile + ".txt";

@@ -126,7 +126,6 @@ struct sim_params {
   bool somm_cond = true; // sommerfeld condition at outer bound?
   bool dspn_bound = false; // dissipate boundary points?
   bool dspn_psi = false; // dissipate psi (only activated if psi_hyp=true)?
-  bool dr3_up = false; // update pi with d/dr^3 scheme?
   bool static_metric = false; // ignore dynamics of metric?
   bool clean_hyp = false; // use clean hyperbolic update functions (slower)?
   bool clean_ell = false; // use clean hyperbolic update functions (slower)?

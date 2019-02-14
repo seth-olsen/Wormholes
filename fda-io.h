@@ -41,13 +41,48 @@ inline void write_bbhp(BBHP *bp, PAR *p)
   gft_out_bbox(bp->file, p->t, bp->shape, bp->rank, bp->coords, bp->data);
 }
 
-inline void write_bbhp_vec(vector<BBHP *>& bp_vec, PAR *p) {
+inline void write_bbhp_vec(vector<BBHP *>& bp_vec, PAR *p)
+{
   for (BBHP *bp : bp_vec) { write_bbhp(bp, p); }
 }
 
-VD make_vector(int len, dbl val) {
+VD make_vector(int len, dbl val)
+{
   VD new_vec(len, val);
   return new_vec;
+}
+
+map<str, int *> get_p_int(PAR *p)
+{
+  map<str, int *> p_int {{"-lastpt",&(p->lastpt)}, {"-save_pt",&(p->save_pt)},
+   {"-nsteps",&(p->nsteps)}, {"-save_step",&(p->save_step)},
+   {"-norm_type",&(p->norm_type)}, {"-maxit",&(p->maxit)},
+   {"-check_step",&(p->check_step)}, {"-resn_factor",&(p->resn_factor)}};
+  return p_int;
+}
+map<str, dbl *> get_p_dbl(PAR *p)
+{
+  map<str, dbl *> p_dbl {{"-lam",&(p->lam)}, {"-ell_up_weight",&(p->ell_up_weight)},
+   {"-rmin",&(p->rmin)}, {"-rmax",&(p->rmax)}, {"-dspn",&(p->dspn)},
+   {"-tol",&(p->tol)}, {"-ell_tol",&(p->ell_tol)}, {"-lsq",&(p->lsq)},
+   {"-ic_Dsq",&(p->ic_Dsq)}, {"-ic_r0",&(p->ic_r0)}, {"-ic_Amp",&(p->ic_Amp)},
+   {"-ic2_Dsq",&(p->ic2_Dsq)}, {"-ic2_r0",&(p->ic2_r0)}, {"-ic2_Amp",&(p->ic2_Amp)}};
+  return p_dbl;
+}
+
+map<str, bool *> get_p_bool(PAR *p)
+{
+  map<str, bool *> p_bool { {"-psi_hyp",&(p->psi_hyp)}, {"-dspn_psi",&(p->dspn_psi)},
+   {"-dspn_bound",&(p->dspn_bound)}, {"-static_metric",&(p->static_metric)},
+   {"-somm_cond",&(p->somm_cond)}, {"-horizon_search",&(p->horizon_search)},
+   {"-write_res",&(p->write_res)}, {"-write_ricci",&(p->write_ricci)},
+   {"-write_itn",&(p->write_itn)}, {"-write_mtot",&(p->write_mtot)},
+   {"-write_maspect",&(p->write_maspect)}, {"-write_outnull",&(p->write_outnull)},
+   {"-write_xp",&(p->write_xp)}, {"-write_ires_xp",&(p->write_ires_xp)},
+   {"-write_abp",&(p->write_abp)}, {"-write_ires_abp",&(p->write_ires_abp)},
+   {"-write_xp2",&(p->write_xp2)}, {"-write_ires_xp2",&(p->write_ires_xp2)},
+   {"-clean_hyp",&(p->clean_hyp)}, {"-clean_ell",&(p->clean_ell)}};
+  return p_bool;
 }
 
 void param_collect(char **source, int num, map<str, str>& dest) {
