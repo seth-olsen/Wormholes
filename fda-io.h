@@ -58,12 +58,17 @@ void param_collect(char **source, int num, map<str, str>& dest) {
   }
 }
 
-void file_param_collect(char **source, int num, map<str, str>& dest) {
-  for (int arg = 1; arg < num; ++arg) {
-    if (source[arg][0] == '-') {
-      dest[source[arg]] = source[arg+1];
+void file_param_collect(str filename, map<str, str>& dest) {
+  vector<str> source;
+  str entry;
+  ifstream p_file(filename);
+  if (p_file.is_open()) {
+    while (getline(p_file, entry)) { source.push_back(entry); }
+    for (unsigned int arg = 0; arg < source.size(); ++arg) {
+      if (source[arg][0] == '-') { dest[source[arg]] = source[arg+1]; }
     }
   }
+  else { cout << "\n***UNABLE TO OPEN PARAMETER FILE***\n" << endl; }
 }
 
 void param_set(map<str, str>& p_all, map<str, str *>& p_str,
@@ -144,6 +149,32 @@ void get_wr_f(const VD& f, VD& wr, int wr_shape, int save_pt)
   return;
 }
 */
+
+str get_param_string(map<str, str *>& p_str, map<str, int *>& p_int,
+		     map<str, dbl *>& p_dbl, map<str, bool *>& p_bool)
+{
+  str param_string = "\nPARAMETERS:\n\n";
+  for (pair<str, str *> param : p_str) {
+    str spaces = (((param.first).size() < 8) ? "\t\t\t=   " : "\t\t=   ");
+    param_string += param.first + spaces + *(param.second) + "\n";
+  }
+  param_string += "\n";
+  for (pair<str, int *> param : p_int) {
+    str spaces = (((param.first).size() < 8) ? "\t\t\t=   " : "\t\t=   ");
+    param_string += param.first + spaces + to_string(*(param.second)) + "\n";
+  }
+  param_string += "\n";
+  for (pair<str, dbl *> param : p_dbl) {
+    str spaces = (((param.first).size() < 8) ? "\t\t\t=   " : "\t\t=   ");
+    param_string += param.first + spaces + to_string(*(param.second)) + "\n";
+  }
+  param_string += "\n";
+  for (pair<str, bool *> param : p_bool) {
+    str spaces = (((param.first).size() < 8) ? "\t\t\t=   " : "\t\t=   ");
+    param_string += param.first + spaces + bool_to_str(*(param.second)) + "\n";
+  }
+  return param_string;
+}
 
 void record_horizon(PAR *p, const VD& f_ps, int ind, int itn, int t_itn)
 {

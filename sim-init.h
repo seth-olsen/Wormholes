@@ -203,7 +203,8 @@ int params_init(PAR *p, int argc, char **argv)
       {"-write_ires_xp",&(p->write_ires_xp)}, {"-write_ires_xp2",&(p->write_ires_xp2)}, {"-write_ires_abp",&(p->write_ires_abp)},
       {"-clean_hyp",&(p->clean_hyp)}, {"-clean_ell",&(p->clean_ell)}, {"-horizon_search",&(p->horizon_search)}};
   map<str, str> params;
-  param_collect(argv, argc, params);
+  if (argc > 1) { param_collect(argv, argc, params); }
+  else { file_param_collect("ellis-parameters.txt", params); }
   param_set(params, p_str, p_int, p_dbl, p_bool);
   
   // *****************************************CHECKS**********************
@@ -313,22 +314,7 @@ int params_init(PAR *p, int argc, char **argv)
   p->cpsi_rhs = 1 / (p->jacRR);
 
   // PARAMETER DATA OUTPUT
-  str param_data = "\nPARAMETERS:\n\n";
-  for (pair<str, str *> param : p_str) {
-    param_data += param.first + "\t\t=   " + *(param.second) + "\n";
-  }
-  param_data += "\n";
-  for (pair<str, int *> param : p_int) {
-    param_data += param.first + "\t\t=   " + to_string(*(param.second)) + "\n";
-  }
-  param_data += "\n";
-  for (pair<str, dbl *> param : p_dbl) {
-    param_data += param.first + "\t\t=   " + to_string(*(param.second)) + "\n";
-  }
-  param_data += "\n";
-  for (pair<str, bool *> param : p_bool) {
-    param_data += param.first + "\t\t=   " + bool_to_str(*(param.second)) + "\n";
-  }
+  str param_data = get_param_string(p_str, p_int, p_dbl, p_bool);
   ofstream specs;
   str specs_name = p->outfile + ".txt";
   specs.open(specs_name, ofstream::out);

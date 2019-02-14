@@ -1,11 +1,11 @@
 -outfile
-ellis
+test
 -lastpt
 1200
 -save_pt
 1
 -nsteps
-2400
+10
 -save_step
 4
 -resn_factor
