@@ -58,6 +58,14 @@ void param_collect(char **source, int num, map<str, str>& dest) {
   }
 }
 
+void file_param_collect(char **source, int num, map<str, str>& dest) {
+  for (int arg = 1; arg < num; ++arg) {
+    if (source[arg][0] == '-') {
+      dest[source[arg]] = source[arg+1];
+    }
+  }
+}
+
 void param_set(map<str, str>& p_all, map<str, str *>& p_str,
 	       map<str, int *>& p_int, map<str, dbl *>& p_dbl,
 	       map<str, bool *>& p_bool) {
