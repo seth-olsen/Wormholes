@@ -46,8 +46,10 @@ int main(int argc, char **argv)
   // coarse simulation parameters
   str outfile = "ellis";
   str outname = "0";
-  str pre1 = "Xi", pre2 = "Pi", pre3 = "0", pre4 = "0", pre5 = "0",
-    pre6 = "0", pre7 = "0", pre8 = "0", pre9 = "0", pre10 = "0";
+  str pre1 = "Xi2", pre2 = "Pi2", pre3 = "0", pre4 = "0", pre5 = "0",
+    pre6 = "0", pre7 = "0", pre8 = "0", pre9 = "0", pre10 = "0",
+    pre11 = "0", pre12 = "0", pre13 = "0", pre14 = "0", pre15 = "0",
+    pre16 = "0", pre17 = "0", pre18 = "0";
   int lastpt = 2000; // grid size
   int save_pt = 1; // write only every (save_pt)th grid point
   int nsteps = 8000; // time steps
@@ -76,20 +78,22 @@ int main(int argc, char **argv)
   int resn2 = 4*resn0; // 4h, 2h, and h
 
   // get parameters from command line
-  map<str, str *> p_str {{"-outfile",&outfile}, {"-pre1",&pre1},
-      {"-pre2",&pre2}, {"-pre3",&pre3}, {"-pre4",&pre4}, {"-pre5",&pre5},
-      {"-pre6",&pre6}, {"-pre7",&pre7}, {"-pre8",&pre8}, {"-pre9",&pre9},
-      {"-pre10",&pre10}, {"-hold_const",&hold_const}, {"-outname",&outname}};
+  map<str, str *> p_str {{"-outfile",&outfile}, {"-outname",&outname},
+   {"-pre1",&pre1}, {"-pre2",&pre2}, {"-pre3",&pre3}, {"-pre4",&pre4},
+   {"-pre5",&pre5}, {"-pre6",&pre6}, {"-pre7",&pre7}, {"-pre8",&pre8},
+   {"-pre9",&pre9}, {"-pre10",&pre10}, {"-pre11",&pre11}, {"-pre12",&pre12},
+   {"-pre13",&pre13}, {"-pre14",&pre14}, {"-pre15",&pre15}, {"-pre16",&pre16},
+   {"-pre17",&pre17}, {"-pre18",&pre18}, {"-hold_const",&hold_const}};
   map<str, int *> p_int {{"-lastpt",&lastpt}, {"-save_pt", &save_pt},
-      {"-nsteps", &nsteps}, {"-save_step",&save_step}, {"-maxit",&maxit},
-      {"-resn0", &resn0}, {"-resn1", &resn1}, {"-resn2", &resn2}};
+   {"-nsteps", &nsteps}, {"-save_step",&save_step}, {"-maxit",&maxit},
+   {"-resn0", &resn0}, {"-resn1", &resn1}, {"-resn2", &resn2}};
   map<str, dbl *> p_dbl {{"-lam",&lam}, {"-r2m",&r2m}, {"-rmin",&rmin},
-      {"-rmax",&rmax}, {"-dspn",&dspn}, {"-tol",&tol}, {"-ic_Dsq",&ic_Dsq},
-      {"-ic_r0",&ic_r0}, {"-ic_Amp",&ic_Amp}, {"-ell_tol",&ell_tol}};
+   {"-rmax",&rmax}, {"-dspn",&dspn}, {"-tol",&tol}, {"-ic_Dsq",&ic_Dsq},
+   {"-ic_r0",&ic_r0}, {"-ic_Amp",&ic_Amp}, {"-ell_tol",&ell_tol}};
   map<str, bool *> p_bool {
-      {"-sommerfeld",&sommerfeld}, {"-dspn_bound",&dspn_bound},
-      {"-same_times",&same_times}, {"-same_grids",&same_grids},
-      {"-psi_hyp",&psi_hyp}};
+   {"-sommerfeld",&sommerfeld}, {"-dspn_bound",&dspn_bound},
+   {"-same_times",&same_times}, {"-same_grids",&same_grids},
+   {"-psi_hyp",&psi_hyp}};
   map<str, str> params;
   param_collect(argv, argc, params);
   param_set(params, p_str, p_int, p_dbl, p_bool);
@@ -104,6 +108,14 @@ int main(int argc, char **argv)
   if (pre8 != "0") { prefixes.push_back(pre8); }
   if (pre9 != "0") { prefixes.push_back(pre9); }
   if (pre10 != "0") { prefixes.push_back(pre10); }
+  if (pre11 != "0") { prefixes.push_back(pre11); }
+  if (pre12 != "0") { prefixes.push_back(pre12); }
+  if (pre13 != "0") { prefixes.push_back(pre13); }
+  if (pre14 != "0") { prefixes.push_back(pre14); }
+  if (pre15 != "0") { prefixes.push_back(pre15); }
+  if (pre16 != "0") { prefixes.push_back(pre16); }
+  if (pre17 != "0") { prefixes.push_back(pre17); }
+  if (pre18 != "0") { prefixes.push_back(pre18); }
   int nwr = prefixes.size();
 
   // derived parameters from coarse file
