@@ -50,24 +50,24 @@ int main(int argc, char **argv)
     pre6 = "0", pre7 = "0", pre8 = "0", pre9 = "0", pre10 = "0",
     pre11 = "0", pre12 = "0", pre13 = "0", pre14 = "0", pre15 = "0",
     pre16 = "0", pre17 = "0", pre18 = "0";
-  int lastpt = 2000; // grid size
+  int lastpt = 1200; // grid size
   int save_pt = 1; // write only every (save_pt)th grid point
-  int nsteps = 8000; // time steps
+  int nsteps = 2400; // time steps
   int save_step = 4; // write only every (save_step)th time step
   dbl lam = 0.25; // dt/dr
   dbl r2m = 0;
-  dbl rmax = 100;
+  dbl rmax = 60;
   dbl rmin = -rmax;
   dbl dspn = 0.5; // dissipation coefficient
-  dbl tol = 0.000000000001; // iterative method tolerance
+  dbl tol = 0.0000000001; // iterative method tolerance
   dbl ell_tol = 0.01*tol;
   int maxit = 100; // max iterations for debugging
   dbl ic_Dsq = 25.0; // gaussian width
-  dbl ic_r0 = 50.0; // gaussian center
-  dbl ic_Amp = 1; // gaussian amplitude
+  dbl ic_r0 = 20.0; // gaussian center
+  dbl ic_Amp = 0.01; // gaussian amplitude
   bool sommerfeld = true; // sommerfeld condition at outer bound?
   bool dspn_bound = false; // dissipate boundary points?
-  bool psi_hyp = false; // psi evolved with hyperbolic eom?
+  bool psi_hyp = true; // psi evolved with hyperbolic eom?
   // variable to hold constant across resolutions
   str hold_const = "lambda"; // "lambda", "dt", or "dr"
   bool same_times = true;

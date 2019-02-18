@@ -128,6 +128,7 @@ void read_step(const vector<char *>& files, int times[], const vector<dbl *>& fi
 void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
 {
   // write ires
+  /*
   if (p->write_ires_abp) {
     get_ires_abp(wr, f, p);
     write_sdf(&(wr->p_iresAl), p->t);
@@ -149,6 +150,7 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
     get_ricci((wr->p_ricci).wr_field, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Ps, p->inds);
     write_sdf(&(wr->p_ricci), p->t);
   }
+  */
   // write outnull
   if (p->write_outnull) {
     get_outnull((wr->p_outnull).wr_field, f->Al, f->Be, f->Ps, p);
@@ -159,6 +161,24 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
     get_maspect((wr->p_maspect).wr_field, f->Al, f->Be, f->Ps, p);
     write_sdf(&(wr->p_maspect), p->t);
   }
+  // ******************************************************************
+  // EINSTEIN EQUATION RESIDUALS
+  if ((p->write_ires_abp) && (p->write_ires_xp) && (p->write_ires_xp2)) {
+    get_ires_EE((wr->p_iresAl).wr_field, (wr->p_iresBe).wr_field,
+		(wr->p_iresPs).wr_field, (wr->p_ricci).wr_field,
+		f->oldestPs,
+		f->olderXi, f->olderPi, f->olderXi2, f->olderPi2,
+		f->olderAl, f->olderBe, f->olderPs,
+		f->oldXi, f->oldPi, f->oldXi2, f->oldPi2,
+		f->oldAl, f->oldBe, f->oldPs,
+		f->Xi, f->Pi, f->Xi2, f->Pi2,
+		f->Al, f->Be, f->Ps, p);
+    write_sdf(&(wr->p_iresAl), p->t); // einstein tt residual
+    write_sdf(&(wr->p_iresBe), p->t); // einstein tr residual
+    write_sdf(&(wr->p_iresPs), p->t); // einstein rr residual
+    write_sdf(&(wr->p_ricci), p->t);  // einstein thth residual
+  }
+  // ******************************************************************
   return;
 }
 

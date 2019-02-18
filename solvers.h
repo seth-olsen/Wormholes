@@ -50,7 +50,13 @@ int fields_step(FLDS *f, PAR *p, int i)
     f->olderXi2 = f->oldXi2;
     f->olderPi2 = f->oldPi2;
   }
-  if (p->write_ires_abp) { f->olderPs = f->oldPs; }
+  if (p->write_ires_abp) {
+    f->oldestPs = f->olderPs;
+    
+    f->olderAl = f->oldAl;
+    f->olderBe = f->oldBe;
+    f->olderPs = f->oldPs;
+  }
   f->oldAl = f->Al;  f->cnAl = f->Al;  
   f->oldBe = f->Be;  f->cnBe = f->Be;
   f->oldPs = f->Ps;  f->cnPs = f->Ps;

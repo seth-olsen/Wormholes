@@ -44,6 +44,7 @@ struct sim_fields {
   VD cnPs;
   VD resPs;
   VD olderPs;
+  VD oldestPs;
   VD Xi;
   VD oldXi;
   VD cnXi;

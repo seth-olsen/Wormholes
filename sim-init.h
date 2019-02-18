@@ -172,9 +172,10 @@ int fields_init(FLDS *f, PAR *p)
   f->cnPs = f->Ps;
   if (p->psi_hyp) { f->resPs = zeros; }
   if (p->write_ires_abp) {
-    //f->olderAl = zeros;
-    //f->olderBe = zeros;
+    f->olderAl = zeros;
+    f->olderBe = zeros;
     f->olderPs = zeros;
+    f->oldestPs = zeros;
   }
   VD ell_res_zeros((p->lp_ldb), 0);
   VD jac_zeros(((p->lp_ldab)*(p->lp_n)), 0);
