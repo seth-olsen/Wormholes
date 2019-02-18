@@ -181,8 +181,9 @@ struct sim_params {
   //dbl four_thirds = 2 * two_thirds;
   dbl twelfth = 0.25 * one_third;
   dbl five_twelfths = 5 * twelfth;
-  dbl eight_pi = 8 * M_PI;
-  dbl twelve_pi = 1.5 * eight_pi;
+  dbl four_pi = 4 * M_PI;
+  dbl eight_pi = 2 * four_pi;
+  dbl twelve_pi = 3 * four_pi;
   dbl lam2val = 0.5 * lam;
   dbl lam6val = lam2val * one_third;
   dbl drsq = dr * dr;

@@ -420,7 +420,7 @@ dbl iresEEtt(dbl dt2ps, dbl dx2al, dbl dx2be, dbl dx2ps,
 	     dbl dtal, dbl dtbe, dbl dtps,
 	     dbl dxal, dbl dxbe, dbl dxps,
 	     dbl xi, dbl pi, dbl xi2, dbl pi2,
-	     dbl al, dbl be, dbl ps, dbl x, dbl xsq, dbl lsq)
+	     dbl al, dbl be, dbl ps, dbl x, dbl xsq, dbl lsq, dbl four_pi)
 {
   return (-4*pow(dtps,2))/pow(ps,2) - (4*dt2ps)/ps + (4*dtps*(al*(dtal + 
 be*dxal) - pow(be,2)*pow(ps,3)*(-2*dtps + 2*be*dxps +			
@@ -448,7 +448,8 @@ xsq))) + (lsq + xsq)*(18*pow(dtps,2)*(lsq + xsq) - 2*(-3*dt2ps +
 pow(dxbe,2)*(lsq + xsq) - dxdtbe*(lsq + xsq))) + be*(lsq + 
 xsq)*(-36*dtps*dxps*(lsq + xsq) + pow(ps,2)*(4*x*dxbe + dx2be*(lsq + 
 xsq)) + 2*ps*(-8*x*dtps - 6*dxdtps*(lsq + xsq) + 7*dxbe*dxps*(lsq + 
-xsq))))))/(pow(al,3)*pow(ps,5)*pow(lsq + xsq,2));
+xsq))))))/(pow(al,3)*pow(ps,5)*pow(lsq + xsq,2))
+    + four_pi*(sq(be*xi + al*pi/sq(ps)) + sq(be*pi + al*xi/sq(ps)));
 }
 
 dbl iresEEtr(dbl dt2ps, dbl dx2al, dbl dx2be, dbl dx2ps,
@@ -456,7 +457,7 @@ dbl iresEEtr(dbl dt2ps, dbl dx2al, dbl dx2be, dbl dx2ps,
 	     dbl dtal, dbl dtbe, dbl dtps,
 	     dbl dxal, dbl dxbe, dbl dxps,
 	     dbl xi, dbl pi, dbl xi2, dbl pi2,
-	     dbl al, dbl be, dbl ps, dbl x, dbl xsq, dbl lsq)
+	     dbl al, dbl be, dbl ps, dbl x, dbl xsq, dbl lsq, dbl four_pi)
 {
   return (4*pow(al,2)*dtps*dxal*ps*pow(lsq + xsq,2) + 2*be*(-dtal + 
 be*dxal)*pow(ps,5)*(lsq + xsq)*(-2*dtps*(lsq + xsq) + be*(x*ps + 
@@ -468,7 +469,8 @@ pow(be,2)*(8*pow(dxps,2)*pow(lsq + xsq,2) + pow(ps,2)*(2*lsq + xsq) +
 4*ps*(lsq + xsq)*(3*x*dxps + dx2ps*(lsq + xsq))) + 2*be*(lsq + 
 xsq)*(x*dxbe*pow(ps,2) - 8*dtps*dxps*(lsq + xsq) + 2*ps*(-3*x*dtps - 
 2*dxdtps*(lsq + xsq) + dxbe*dxps*(lsq + 
-xsq)))))/(pow(al,3)*pow(ps,2)*pow(lsq + xsq,2));
+xsq)))))/(pow(al,3)*pow(ps,2)*pow(lsq + xsq,2))
+    + four_pi*(be*(sq(xi) + sq(pi)) + 2*al*xi*pi/sq(ps));
 }
 
 dbl iresEErr(dbl dt2ps, dbl dx2al, dbl dx2be, dbl dx2ps,
@@ -476,7 +478,7 @@ dbl iresEErr(dbl dt2ps, dbl dx2al, dbl dx2be, dbl dx2ps,
 	     dbl dtal, dbl dtbe, dbl dtps,
 	     dbl dxal, dbl dxbe, dbl dxps,
 	     dbl xi, dbl pi, dbl xi2, dbl pi2,
-	     dbl al, dbl be, dbl ps, dbl x, dbl xsq, dbl lsq)
+	     dbl al, dbl be, dbl ps, dbl x, dbl xsq, dbl lsq, dbl four_pi)
 {
   return (2*pow(al,2)*dxal*ps*(lsq + xsq)*(x*ps + 2*dxps*(lsq + xsq)) + 
 pow(al,3)*(-(lsq*pow(ps,2)) + 4*x*dxps*ps*(lsq + xsq) + 
@@ -488,7 +490,8 @@ pow(be,2)*(8*pow(dxps,2)*pow(lsq + xsq,2) + pow(ps,2)*(2*lsq + xsq) +
 4*ps*(lsq + xsq)*(3*x*dxps + dx2ps*(lsq + xsq))) + 2*be*(lsq + 
 xsq)*(x*dxbe*pow(ps,2) - 8*dtps*dxps*(lsq + xsq) + 2*ps*(-3*x*dtps - 
 2*dxdtps*(lsq + xsq) + dxbe*dxps*(lsq + 
-xsq)))))/(pow(al,3)*pow(ps,2)*pow(lsq + xsq,2));
+xsq)))))/(pow(al,3)*pow(ps,2)*pow(lsq + xsq,2))
+    + four_pi*(sq(xi) + sq(pi));
 }
 
 dbl iresEEthth(dbl dt2ps, dbl dx2al, dbl dx2be, dbl dx2ps,
@@ -496,7 +499,7 @@ dbl iresEEthth(dbl dt2ps, dbl dx2al, dbl dx2be, dbl dx2ps,
 	       dbl dtal, dbl dtbe, dbl dtps,
 	       dbl dxal, dbl dxbe, dbl dxps,
 	       dbl xi, dbl pi, dbl xi2, dbl pi2,
-	       dbl al, dbl be, dbl ps, dbl x, dbl xsq, dbl lsq)
+	       dbl al, dbl be, dbl ps, dbl x, dbl xsq, dbl lsq, dbl four_pi)
 {
   return lsq/(lsq + xsq) - (2*pow(dxps,2)*(lsq + xsq))/pow(ps,2) + (x*dxal + 
 dx2al*(lsq + xsq))/al + (2*(x*dxps + dx2ps*(lsq + xsq)))/ps + ((-dtal 
@@ -509,7 +512,8 @@ xsq)*(8*pow(dtps,2)*(lsq + xsq) - 2*(-2*dt2ps + 3*dtps*dxbe +
 + xsq) - dxdtbe*(lsq + xsq))) + be*(lsq + xsq)*(-16*dtps*dxps*(lsq + 
 xsq) + pow(ps,2)*(2*x*dxbe + dx2be*(lsq + xsq)) + 2*ps*(-3*x*dtps - 
 4*dxdtps*(lsq + xsq) + 5*dxbe*dxps*(lsq + xsq)))))/(pow(al,2)*(lsq + 
-xsq));
+xsq))
+    - four_pi*(lsq + xsq)*(sq(xi) - sq(pi));
 }
 
 inline void get_ires_EE(VD& wr_tt, VD& wr_tr, VD& wr_rr, VD& wr_thth, const VD& ooops,
@@ -543,16 +547,16 @@ inline void get_ires_EE(VD& wr_tt, VD& wr_tr, VD& wr_rr, VD& wr_thth, const VD& 
     al = nal[k]; be = nbe[k]; ps = nps[k];
     wr_tt[k] = iresEEtt(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
 			dtal, dtbe, dtps, dxal, dxbe, dxps,
-			xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq);
+			xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
     wr_tr[k] = iresEEtt(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
 			dtal, dtbe, dtps, dxal, dxbe, dxps,
-			xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq);
+			xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
     wr_rr[k] = iresEEtt(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
 			dtal, dtbe, dtps, dxal, dxbe, dxps,
-			xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq);
+			xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
     wr_thth[k] = iresEEtt(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
 			  dtal, dtbe, dtps, dxal, dxbe, dxps,
-			  xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq);
+			  xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
   }
 }
 
