@@ -127,30 +127,49 @@ void read_step(const vector<char *>& files, int times[], const vector<dbl *>& fi
 
 void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
 {
+  /*
+  if ((p->write_outnull) && (p->write_maspect) && (p->write_ires_xp)) {
+    int npts = (p->npts);
+    VD res_0(3*npts, 0);
+    dbl res = get_res_abp(res_0, f->Xi, f->Pi, f->Xi2, f->Pi2,
+			  f->Al, f->Be, f->Ps, p);
+    cout << p->t << " res = " << res << endl;
+    for (int k = 0; k < p->wr_shape; ++k) {
+      (wr->p_maspect).wr_field[k] = res_0[(p->inds[k]).second];
+      (wr->p_outnull).wr_field[k] = res_0[npts + (p->inds[k]).second];
+      (wr->p_iresPi).wr_field[k] = res_0[2*npts + (p->inds[k]).second];
+    }
+    write_sdf(&(wr->p_maspect), p->t);
+    write_sdf(&(wr->p_outnull), p->t);
+    write_sdf(&(wr->p_iresPi), p->t);
+  }
+  */
   // write ires
+  
   if (p->write_ires_xp) {
     get_ires_xp(wr, f, p);
     write_sdf(&(wr->p_iresXi), p->t);
     write_sdf(&(wr->p_iresPi), p->t);
   }
+  /*
   if (p->write_ires_xp2) {
     get_ires_xp2(wr, f, p);
     write_sdf(&(wr->p_iresXi2), p->t);
     write_sdf(&(wr->p_iresPi2), p->t);
   }
-  /*
+  */
   if (p->write_ires_abp) {
     get_ires_abp(wr, f, p);
     write_sdf(&(wr->p_iresAl), p->t);
     write_sdf(&(wr->p_iresBe), p->t);
     write_sdf(&(wr->p_iresPs), p->t);
   }
+  /*
   // write ricci
   if (p->write_ricci) {
     get_ricci((wr->p_ricci).wr_field, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Ps, p->inds);
     write_sdf(&(wr->p_ricci), p->t);
   }
-  */
   // write outnull
   if (p->write_outnull) {
     get_outnull((wr->p_outnull).wr_field, f->Al, f->Be, f->Ps, p);
@@ -161,11 +180,13 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
     get_maspect((wr->p_maspect).wr_field, f->Al, f->Be, f->Ps, p);
     write_sdf(&(wr->p_maspect), p->t);
   }
+  */
   // ******************************************************************
   // EINSTEIN EQUATION RESIDUALS
-  if ((p->write_ires_abp) && (p->write_ires_xp) && (p->write_ires_xp2)) {
-    get_ires_EE((wr->p_iresAl).wr_field, (wr->p_iresBe).wr_field,
-		(wr->p_iresPs).wr_field, (wr->p_ricci).wr_field,
+  if ((p->write_ires_abp) && (p->write_ires_xp) && (p->write_ires_xp2)
+      && (p->write_outnull) && (p->write_ricci)) {
+    get_ires_EE((wr->p_iresPi2).wr_field, (wr->p_outnull).wr_field,
+		(wr->p_iresXi2).wr_field, (wr->p_ricci).wr_field,
 		f->oldestPs,
 		f->olderXi, f->olderPi, f->olderXi2, f->olderPi2,
 		f->olderAl, f->olderBe, f->olderPs,
@@ -173,9 +194,9 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
 		f->oldAl, f->oldBe, f->oldPs,
 		f->Xi, f->Pi, f->Xi2, f->Pi2,
 		f->Al, f->Be, f->Ps, p);
-    write_sdf(&(wr->p_iresAl), p->t); // einstein tt residual
-    write_sdf(&(wr->p_iresBe), p->t); // einstein tr residual
-    write_sdf(&(wr->p_iresPs), p->t); // einstein rr residual
+    write_sdf(&(wr->p_iresPi2), p->t); // einstein tt residual
+    write_sdf(&(wr->p_outnull), p->t); // einstein tr residual
+    write_sdf(&(wr->p_iresXi2), p->t); // einstein rr residual
     write_sdf(&(wr->p_ricci), p->t);  // einstein thth residual
   }
   // ******************************************************************

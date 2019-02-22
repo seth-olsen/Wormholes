@@ -11,9 +11,12 @@ LDFLAGS	 	 = -Wall ${DEBUG}
 LDLIBS		 = -lbbhutil -L$(LIBDIR_LAPACK) -llapacke -llapack -lblas -L$(LGFORTRAN_PATH) -lgfortran -lm
 LOCDIR		 = home/seth/research/simulations
 
-
 ellis-sim: ellis-sim.o
 	-${CXX} -o ellis ellis-sim.o ${LDLIBS}
+	rm -f ellis-sim.o
+
+ellis-sim2: ellis-sim.o
+	-${CXX} -o ellis2 ellis-sim.o ${LDLIBS}
 	rm -f ellis-sim.o
 
 ellis-sim.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp

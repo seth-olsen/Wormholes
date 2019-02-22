@@ -545,19 +545,21 @@ inline void get_ires_EE(VD& wr_tt, VD& wr_tr, VD& wr_rr, VD& wr_thth, const VD& 
     dxal = ddr_c(nal, p, k); dxbe = ddr_c(nbe, p, k); dxps = ddr_c(nps, p, k);
     xi = nxi[k]; pi = npi[k]; xi2 = nxi2[k]; pi2 = npi2[k];
     al = nal[k]; be = nbe[k]; ps = nps[k];
-    wr_tt[k] = iresEEtt(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
+    
+    wr_tt[j] = iresEEtt(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
 			dtal, dtbe, dtps, dxal, dxbe, dxps,
 			xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
-    wr_tr[k] = iresEEtt(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
+    wr_tr[j] = iresEEtr(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
 			dtal, dtbe, dtps, dxal, dxbe, dxps,
 			xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
-    wr_rr[k] = iresEEtt(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
+    wr_rr[j] = iresEErr(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
 			dtal, dtbe, dtps, dxal, dxbe, dxps,
 			xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
-    wr_thth[k] = iresEEtt(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
-			  dtal, dtbe, dtps, dxal, dxbe, dxps,
-			  xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
+    wr_thth[j] = iresEEthth(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
+			    dtal, dtbe, dtps, dxal, dxbe, dxps,
+			    xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
   }
+  return;
 }
 
 #endif

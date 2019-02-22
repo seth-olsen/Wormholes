@@ -110,19 +110,24 @@ int fields_init(FLDS *f, PAR *p)
   f->Be = zeros;
   f->Ps = zeros;
   // PUT INITIAL CONDITIONS
+  /*
   for (int k = 0; k < (p->zeropt) + 1; ++k) {
     f->Al[k] = 1;
     //f->Be[k] = 0;
     f->Ps[k] = 1;
   }
-  for (int k = (p->zeropt) + 1; k < (p->npts); ++k) {
+  int k = (p->zeropt) + 1
+  */
+  dbl amp0 = (p->ic_Amp)*sqrt((p->lsq)/(p->four_pi));
+  for (int k = 0; k < (p->npts); ++k) {
     f->Al[k] = 1;
     //f->Be[k] = 0;
     f->Ps[k] = 1;
-    f->Xi[k] = ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
-    f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
-    f->Xi2[k] = ic_xi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
-    f->Pi2[k] = ic_pi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
+    f->Xi[k] = amp0 / (sq(p->r[k]) + (p->lsq));
+    //f->Xi[k] = ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
+    //f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
+    //f->Xi2[k] = ic_xi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
+    //f->Pi2[k] = ic_pi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
   }
 
   f->oldXi = f->Xi;
@@ -132,8 +137,8 @@ int fields_init(FLDS *f, PAR *p)
   f->cnPi = f->Pi;
   f->resPi = zeros;
   if (p->write_ires_xp) {
-    f->olderXi = zeros;
-    f->olderPi = zeros;
+    f->olderXi = f->Xi;
+    f->olderPi = f->Pi;
   }
   f->oldXi2 = f->Xi2;
   f->cnXi2 = f->Xi2;
@@ -142,8 +147,8 @@ int fields_init(FLDS *f, PAR *p)
   f->cnPi2 = f->Pi2;
   f->resPi2 = zeros;
   if (p->write_ires_xp2) {
-    f->olderXi2 = zeros;
-    f->olderPi2 = zeros;
+    f->olderXi2 = f->Xi2;
+    f->olderPi2 = f->Pi2;
   }
 
   if (!(p->static_metric)) {
@@ -172,10 +177,10 @@ int fields_init(FLDS *f, PAR *p)
   f->cnPs = f->Ps;
   if (p->psi_hyp) { f->resPs = zeros; }
   if (p->write_ires_abp) {
-    f->olderAl = zeros;
-    f->olderBe = zeros;
-    f->olderPs = zeros;
-    f->oldestPs = zeros;
+    f->olderAl = f->Al;
+    f->olderBe = f->Be;
+    f->olderPs = f->Ps;
+    f->oldestPs = f->Ps;
   }
   VD ell_res_zeros((p->lp_ldb), 0);
   VD jac_zeros(((p->lp_ldab)*(p->lp_n)), 0);
@@ -202,6 +207,7 @@ int params_init(PAR *p, int argc, char **argv)
     cout << "--> corrected: save_pt = " << p->save_pt << endl;
   }
   // set SOLVER
+  /*
   if (p->ic2_Amp == 0) {
     if (p->psi_hyp) {
       p->n_ell = 2;
@@ -226,6 +232,13 @@ int params_init(PAR *p, int argc, char **argv)
     else if (p->static_metric) { p->solver = solveAll_static; }
     else { p->solver = solveAll_dynamic; }
   }
+  */
+  if (p->psi_hyp) {
+    p->n_ell = 2;
+    p->solver = solve_dynamic_psi_hyp;
+  }
+  else if (p->static_metric) { p->solver = solve_static; }
+  else { p->solver = solve_dynamic; }
   // ***set rmin because can't set negative numbers with user input***
   p->rmin = -(p->rmax);
   // bbhutil parameters for writing data to sdf

@@ -87,8 +87,8 @@ int fields_step(FLDS *f, PAR *p, int i)
 
 int solve_static(FLDS *f, PAR *p)
 {
-  update_xp(f, p);
   int itn = 1;
+  update_xp(f, p);
   dbl res = get_res_xp(f, p);
   while (res > p->tol) {
     update_xp(f, p);
