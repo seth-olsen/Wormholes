@@ -16,7 +16,6 @@
 #include "fda-fns.h"
 #include "ellis-fns.h"
 #include "jacobian.h"
-//#include "ellis-clean.h"
 #include "ellis-proc.h"
 #include "solvers.h"
 #include "sim-header.h"
@@ -116,16 +115,18 @@ int fields_init(FLDS *f, PAR *p)
     //f->Be[k] = 0;
     f->Ps[k] = 1;
   }
-  int k = (p->zeropt) + 1
+  int k = 
   */
-  dbl amp0 = (p->ic_Amp)*sqrt((p->lsq)/(p->four_pi));
+  dbl amp0 = sqrt((p->lsq)/(p->four_pi));
   for (int k = 0; k < (p->npts); ++k) {
     f->Al[k] = 1;
     //f->Be[k] = 0;
     f->Ps[k] = 1;
-    f->Xi[k] = amp0 / (sq(p->r[k]) + (p->lsq));
-    //f->Xi[k] = ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
-    //f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
+    f->Xi[k] = (amp0 / (sq(p->r[k]) + (p->lsq)));
+  }
+  for (int k = (p->zeropt) + 1; k < (p->npts); ++k) {
+    f->Xi[k] += ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
+    if (!(p->clean_hyp)) { f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0); }
     //f->Xi2[k] = ic_xi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
     //f->Pi2[k] = ic_pi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
   }
@@ -153,20 +154,7 @@ int fields_init(FLDS *f, PAR *p)
 
   if (!(p->static_metric)) {
     int t0_itn = solve_t0(f, p);
-    if (t0_itn < 0) {
-      if (t0_itn > -(p->npts)) {
-	record_horizon(p, f->Ps, -t0_itn, 0, 0);
-      }
-      else if (t0_itn == -(p->npts)) {
-	record_horizon(p, f->Ps, 0, 0, 0);
-      }
-      else { cout << "\nUNDETERMINED ERROR IN T = 0 ELLIPTIC CONSTRAINTS" << endl; }
-      return t0_itn;
-    }
-    else if (t0_itn == 2*(p->maxit)) {
-      cout << "\nUNDETERMINED ERROR IN T = 0 ELLIPTIC CONSTRAINTS, MAXIT REACHED" << endl;
-      return t0_itn;
-    }
+    if (t0_itn < 0) { return t0_itn; }
   }
   f->oldAl = f->Al;
   f->cnAl = f->Al;
@@ -233,11 +221,11 @@ int params_init(PAR *p, int argc, char **argv)
     else { p->solver = solveAll_dynamic; }
   }
   */
-  if (p->psi_hyp) {
+  if (p->static_metric) { p->solver = solve_static; }
+  else if (p->psi_hyp) {
     p->n_ell = 2;
     p->solver = solve_dynamic_psi_hyp;
   }
-  else if (p->static_metric) { p->solver = solve_static; }
   else { p->solver = solve_dynamic; }
   // ***set rmin because can't set negative numbers with user input***
   p->rmin = -(p->rmax);

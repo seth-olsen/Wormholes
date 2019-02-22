@@ -12,7 +12,7 @@ LDLIBS		 = -lbbhutil -L$(LIBDIR_LAPACK) -llapacke -llapack -lblas -L$(LGFORTRAN_
 LOCDIR		 = home/seth/research/simulations
 
 ellis-sim: ellis-sim.o
-	-${CXX} -o ellis ellis-sim.o ${LDLIBS}
+	-${CXX} -o sim ellis-sim.o ${LDLIBS}
 	rm -f ellis-sim.o
 
 ellis-sim2: ellis-sim.o

@@ -3,6 +3,8 @@ ell
 -resn_factor
 16
 -ic_Amp
+0.001
+-clean_hyp
 1
 -ic_Dsq
 25.0
@@ -45,7 +47,7 @@ ell
 -save_step
 1
 -maxit
-200
+100
 -rmax
 60
 -lsq
@@ -68,8 +70,6 @@ ell
 0
 -dspn_psi
 0
--clean_hyp
-0
 -clean_ell
 0
 -write_res
@@ -81,4 +81,4 @@ ell
 -horizon_search
 0
 -static_metric
-0
+1

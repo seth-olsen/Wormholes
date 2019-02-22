@@ -128,7 +128,7 @@ struct sim_params {
   bool dspn_bound = false; // dissipate boundary points?
   bool dspn_psi = false; // dissipate psi (only activated if psi_hyp=true)?
   bool static_metric = false; // ignore dynamics of metric?
-  bool clean_hyp = false; // use clean hyperbolic update functions (slower)?
+  bool clean_hyp = true; // zero initial data for pi?
   bool clean_ell = false; // use clean hyperbolic update functions (slower)?
   bool write_res = false; // write residuals?
   bool write_ricci = false; // write ricci?

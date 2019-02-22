@@ -16,7 +16,6 @@
 #include "sim-structs.h"
 #include "ellis-fns.h"
 #include "jacobian.h"
-//#include "ellis-clean.h"
 #include "lapacke.h"
 
 using namespace std;
@@ -26,12 +25,13 @@ void update_xp(FLDS *f, PAR *p);
 dbl get_res_xp(FLDS *f, PAR *p);
 void update_xp2(FLDS *f, PAR *p);
 dbl get_res_xp2(FLDS *f, PAR *p);
-void update_psi_clean(FLDS *f, PAR *p);
-dbl get_res_psi_clean(FLDS *f, PAR *p);
-void get_res_abp_clean(FLDS *f, PAR *p);
-dbl get_res_abp(VD& res_ell, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
-		const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p);
+void update_psi(FLDS *f, PAR *p);
+dbl get_res_psi(FLDS *f, PAR *p);
+dbl get_res_abp(FLDS *f, PAR *p);
+
 void apply_up_abp(const VD& res_ell, VD& f_al, VD& f_be, VD& f_ps, int npts, dbl eup_weight);
+dbl get_res_ab(FLDS *f, PAR *p);
+void apply_up_ab(const VD& res_ell, VD& f_al, VD& f_be, int npts, dbl eup_weight);
 void set_abp_cn(const VD& old_al, const VD& old_be, const VD& old_ps,
 		const VD& f_al, const VD& f_be, const VD& f_ps,
 		VD& cn_al, VD& cn_be, VD& cn_ps, int npts);
@@ -136,7 +136,7 @@ dbl get_res_xp2(FLDS *f, PAR *p)
   return max(norm_inf(f->resXi2), norm_inf(f->resPi2));
 }
 
-void update_psi_clean(FLDS *f, PAR *p)
+void update_psi(FLDS *f, PAR *p)
 {
   f->Ps[0] = fda0_hyp_ps(f->Ps, p);
   f->cnPs[0] = 0.5 * (f->oldPs[0] + f->Ps[0]);
@@ -149,7 +149,7 @@ void update_psi_clean(FLDS *f, PAR *p)
   return;
 }
 
-dbl get_res_psi_clean(FLDS *f, PAR *p)
+dbl get_res_psi(FLDS *f, PAR *p)
 {
   f->resPs[0] = fda0_resPs(f->Ps, p);
   for (int k = 1; k < (p->lastpt); ++k) {
@@ -159,7 +159,7 @@ dbl get_res_psi_clean(FLDS *f, PAR *p)
   return norm_inf(f->resPs);
 }
 
-void get_res_abp_clean(FLDS *f, PAR *p)
+dbl get_res_abp(FLDS *f, PAR *p)
 {
   int j = 0;
   int jbe = (p->npts);
@@ -176,31 +176,10 @@ void get_res_abp_clean(FLDS *f, PAR *p)
   f->res_ell[j] = fdaR_resAl(f->Al, p);
   f->res_ell[jbe + j] = fdaR_resBe(f->Be, p);
   f->res_ell[jps + j] = fdaR_resPs(f->Ps, p);
-  return;
+  return norm_inf(f->res_ell);
 }
 
-dbl get_res_abp(VD& res_ell, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
-		const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
-{
-  int j = 0;
-  int jbe = (p->npts);
-  int jps = 2*jbe;
-  res_ell[j] = fda0_resAl(f_al, p);
-  res_ell[jbe + j] = fda0_resBe(f_be, p);
-  res_ell[jps + j] = fda0_resPs(f_ps, p);
-  for (j = 1; j < (p->lastpt); ++j) {
-    res_ell[j] = fda_resAl(f_xi, f_pi, f_xi2, f_pi2, f_al, f_be, f_ps, p, j);
-    res_ell[jbe + j] = fda_resBe(f_xi, f_pi, f_xi2, f_pi2, f_al, f_be, f_ps, p, j);
-    res_ell[jps + j] = fda_resPs(f_xi, f_pi, f_xi2, f_pi2, f_al, f_be, f_ps, p, j);
-  }
-  j = p->lastpt;
-  res_ell[j] = fdaR_resAl(f_al, p);
-  res_ell[jbe + j] = fdaR_resBe(f_be, p);
-  res_ell[jps + j] = fdaR_resPs(f_ps, p);
-  return norm_inf(res_ell);
-}
-
-dbl get_res_ab_clean(FLDS *f, PAR *p)
+dbl get_res_ab(FLDS *f, PAR *p)
 {
   int jbe = (p->npts);
   f->res_ell[0] = fda0_resAl(f->Al, p);

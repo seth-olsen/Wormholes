@@ -18,16 +18,8 @@
 #include "fda-fns.h"
 #include "ellis-fns.h"
 #include "ellis-proc.h"
-//#include "ellis-clean.h"
 
 using namespace std;
-
-typedef int (*SOLVER)(VD& , VD& , VD& , VD& , VD& ,
-		      VD& , VD& , VD& , VD& , VD& ,
-		      VD& , VD& , VD& , VD& , VD& ,
-		      VD& , VD& , const VD& , MAPID& ,
-		      int , int , int ,
-		      int , int , int , int , int , vector<int>& , int);
 
 int solve_static(FLDS *f, PAR *p);
 int solve2_static(FLDS *f, PAR *p);
@@ -76,7 +68,8 @@ int fields_step(FLDS *f, PAR *p, int i)
     cout << "\nt = " << p->t << endl;
     int horizon_code = search_for_horizon(f->Al, f->Be, f->Ps, p);
     if (horizon_code) {
-      record_horizon(p, f->Ps, horizon_code, p->exit_itn, i);
+      if (horizon_code == (p->npts)) { record_horizon(p, f->Ps, 0, p->exit_itn, i); }
+      else { record_horizon(p, f->Ps, horizon_code, p->exit_itn, i); }
       return horizon_code;
     }
     else { return itn; }
@@ -146,23 +139,28 @@ int solve_t0(FLDS *f, PAR *p)
   int ell_maxit = (p->maxit) * 10;
 
   int ell_itn = 0;
-  dbl res = get_res_abp(res_0, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
+  dbl res = get_res_abp(f, p);
   while (res > (p->ell_tol)) {
     VD jac(ldab*N_0, 0);
-    set_jacCMabpslow(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
+    set_jacCM_abp(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
     info = LAPACKE_dgbsv(LAPACK_COL_MAJOR, N_0, kl, ku, nrhs,
 			 &jac[0], ldab, &ipiv_0[0], &res_0[0], ldb_0);
-    if (info != 0) { cout << ell_itn << "\nERROR: cannot solve initial elliptics\ninfo = " << info << endl; }
-    
+    if (info != 0) { cout << ell_itn << "\nERROR: cannot solve t0\ninfo = " << info << endl; }
     apply_up_abp(res_0, f->Al, f->Be, f->Ps, p->npts, p->ell_up_weight);
-    res = get_res_abp(res_0, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
-    
+    res = get_res_abp(f, p);    
     if (++ell_itn > ell_maxit) {
       cout << "\nt = 0\nitn = " << ell_itn << "\nres = " << res << endl;
-      int horizon_found = search_for_horizon(f->Al, f->Be, f->Ps, p);
-      if (horizon_found) { return -horizon_found; }
-      else if (res < p->tol) { return 0; }
-      else { return 2*(p->maxit); }
+      int horizon_code = search_for_horizon(f->Al, f->Be, f->Ps, p);
+      if (horizon_code) {
+	if (horizon_code == (p->npts)) { record_horizon(p, f->Ps, 0, 0, 0); }
+	else { record_horizon(p, f->Ps, horizon_code, 0, 0); }
+	return -1;
+      }
+      else if (res < (p->tol)) { return 0; }
+      else {
+	cout << "\nUNDETERMINED ERROR IN T = 0 ELLIPTIC CONSTRAINTS" << endl;
+	return -2;
+      }
     }
   }
   return ell_itn;
@@ -187,10 +185,10 @@ int solve_dynamic(FLDS *f, PAR *p)
         return -2;
       }
     }    
-    get_res_abp(f->res_ell, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
+    get_res_abp(f, p);
     while (res > (p->ell_tol)) {
       jac = f->jac;
-      set_jacCMabpslow(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
+      set_jacCM_abp(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
       info = LAPACKE_dgbsv(LAPACK_COL_MAJOR, p->lp_n, p->lp_kl, p->lp_ku, p->lp_nrhs,
 			   &jac[0], p->lp_ldab, p->lp_ipiv, &(f->res_ell[0]), p->lp_ldb);
       if (info != 0) {
@@ -200,7 +198,7 @@ int solve_dynamic(FLDS *f, PAR *p)
 	return -3;
       }
       apply_up_abp(f->res_ell, f->Al, f->Be, f->Ps, p->npts, p->ell_up_weight);
-      res = get_res_abp(f->res_ell, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
+      res = get_res_abp(f, p);
       if (++ell_itn > p->maxit) {
 	cout << endl << "ELLIPTIC solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
@@ -250,10 +248,10 @@ int solve2_dynamic(FLDS *f, PAR *p)
         return -2;
       }
     }    
-    get_res_abp(f->res_ell, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
+    get_res_abp(f, p);
     while (res > (p->ell_tol)) {
       jac = f->jac;
-      set_jacCMabpslow(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
+      set_jacCM_abp(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
       info = LAPACKE_dgbsv(LAPACK_COL_MAJOR, p->lp_n, p->lp_kl, p->lp_ku, p->lp_nrhs,
 			   &jac[0], p->lp_ldab, p->lp_ipiv, &(f->res_ell[0]), p->lp_ldb);
       if (info != 0) {
@@ -263,7 +261,7 @@ int solve2_dynamic(FLDS *f, PAR *p)
 	return -3;
       }
       apply_up_abp(f->res_ell, f->Al, f->Be, f->Ps, p->npts, p->ell_up_weight);
-      res = get_res_abp(f->res_ell, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
+      res = get_res_abp(f, p);
       if (++ell_itn > p->maxit) {
 	cout << endl << "ELLIPTIC solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
@@ -324,10 +322,10 @@ int solveAll_dynamic(FLDS *f, PAR *p)
         return -2;
       }
     }
-    get_res_abp(f->res_ell, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
+    get_res_abp(f, p);
     while (res > (p->ell_tol)) {
       jac = f->jac;
-      set_jacCMabpslow(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
+      set_jacCM_abp(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
       info = LAPACKE_dgbsv(LAPACK_COL_MAJOR, p->lp_n, p->lp_kl, p->lp_ku, p->lp_nrhs,
 			   &jac[0], p->lp_ldab, p->lp_ipiv, &(f->res_ell[0]), p->lp_ldb);
       if (info != 0) {
@@ -337,7 +335,7 @@ int solveAll_dynamic(FLDS *f, PAR *p)
 	return -3;
       }
       apply_up_abp(f->res_ell, f->Al, f->Be, f->Ps, p->npts, p->ell_up_weight);
-      res = get_res_abp(f->res_ell, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
+      res = get_res_abp(f, p);
       if (++ell_itn > p->maxit) {
 	cout << endl << "ELLIPTIC solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
@@ -381,8 +379,8 @@ int solve_dynamic_psi_hyp(FLDS *f, PAR *p)
   while (res > (p->tol)) {
     hyp_itn = 0; ell_itn = 0;
     while (res > (p->ell_tol)) {
-      update_psi_clean(f, p);      
-      res = get_res_psi_clean(f, p);
+      update_psi(f, p);      
+      res = get_res_psi(f, p);
       if (++hyp_itn > p->maxit) {
 	cout << endl << "PSI hyperbolic solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
@@ -406,10 +404,10 @@ int solve_dynamic_psi_hyp(FLDS *f, PAR *p)
         return -2;
       }
     }
-    res = get_res_ab_clean(f, p);
+    res = get_res_ab(f, p);
     while (res > (p->ell_tol)) {
       jac = f->jac;
-      set_jacCMabslow(jac, f->Pi, f->Pi2, f->Al, f->Be, f->Ps, p);
+      set_jacCM_ab(jac, f->Pi, f->Pi2, f->Al, f->Be, f->Ps, p);
       info = LAPACKE_dgbsv(LAPACK_COL_MAJOR, p->lp_n, p->lp_kl, p->lp_ku, p->lp_nrhs,
 			   &jac[0], p->lp_ldab, p->lp_ipiv, &(f->res_ell[0]), p->lp_ldb);
       if (info != 0) {
@@ -419,7 +417,7 @@ int solve_dynamic_psi_hyp(FLDS *f, PAR *p)
 	return -3;
       }
       apply_up_ab(f->res_ell, f->Al, f->Be, p->npts, p->ell_up_weight);
-      res = get_res_ab_clean(f, p);
+      res = get_res_ab(f, p);
       if (++ell_itn > p->maxit) {
 	cout << endl << "ELLIPTIC solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
@@ -432,7 +430,7 @@ int solve_dynamic_psi_hyp(FLDS *f, PAR *p)
       }
     }
     set_ab_cn(f->oldAl, f->oldBe, f->Al, f->Be, f->cnAl, f->cnBe, p->npts);
-    res = get_res_psi_clean(f, p);
+    res = get_res_psi(f, p);
     if (res < (p->ell_tol)) {
       res = get_res_xp(f, p);
     }
@@ -440,7 +438,7 @@ int solve_dynamic_psi_hyp(FLDS *f, PAR *p)
     if (++itn > p->maxit) {
       cout << endl << "FULL solver STUCK at t = " << (p->t) << "\nres = " << res << endl;
       p->exit_itn = itn;
-      if (get_res_psi_clean(f, p) < (p->tol)) {
+      if (get_res_psi(f, p) < (p->tol)) {
 	if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
 	else { res = get_res_xp(f, p); }
       }
@@ -463,8 +461,8 @@ int solve2_dynamic_psi_hyp(FLDS *f, PAR *p)
   while (res > (p->tol)) {
     hyp_itn = 0; ell_itn = 0;
     while (res > (p->ell_tol)) {
-      update_psi_clean(f, p);      
-      res = get_res_psi_clean(f, p);
+      update_psi(f, p);      
+      res = get_res_psi(f, p);
       if (++hyp_itn > p->maxit) {
 	cout << endl << "PSI hyperbolic solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
@@ -488,10 +486,10 @@ int solve2_dynamic_psi_hyp(FLDS *f, PAR *p)
         return -2;
       }
     }
-    res = get_res_ab_clean(f, p);
+    res = get_res_ab(f, p);
     while (res > (p->ell_tol)) {
       jac = f->jac;
-      set_jacCMabslow(jac, f->Pi, f->Pi2, f->Al, f->Be, f->Ps, p);
+      set_jacCM_ab(jac, f->Pi, f->Pi2, f->Al, f->Be, f->Ps, p);
       info = LAPACKE_dgbsv(LAPACK_COL_MAJOR, p->lp_n, p->lp_kl, p->lp_ku, p->lp_nrhs,
 			   &jac[0], p->lp_ldab, p->lp_ipiv, &(f->res_ell[0]), p->lp_ldb);
       if (info != 0) {
@@ -501,7 +499,7 @@ int solve2_dynamic_psi_hyp(FLDS *f, PAR *p)
 	return -3;
       }
       apply_up_ab(f->res_ell, f->Al, f->Be, p->npts, p->ell_up_weight);
-      res = get_res_ab_clean(f, p);
+      res = get_res_ab(f, p);
       if (++ell_itn > p->maxit) {
 	cout << endl << "ELLIPTIC solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
@@ -514,7 +512,7 @@ int solve2_dynamic_psi_hyp(FLDS *f, PAR *p)
       }
     }
     set_ab_cn(f->oldAl, f->oldBe, f->Al, f->Be, f->cnAl, f->cnBe, p->npts);
-    res = get_res_psi_clean(f, p);
+    res = get_res_psi(f, p);
     if (res < (p->ell_tol)) {
       res = get_res_xp2(f, p);
     }
@@ -522,7 +520,7 @@ int solve2_dynamic_psi_hyp(FLDS *f, PAR *p)
     if (++itn > p->maxit) {
       cout << endl << "FULL solver STUCK at t = " << (p->t) << "\nres = " << res << endl;
       p->exit_itn = itn;
-      if (get_res_psi_clean(f, p) < (p->tol)) {
+      if (get_res_psi(f, p) < (p->tol)) {
 	if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
 	else { res = get_res_xp2(f, p); }
       }
@@ -545,8 +543,8 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
   while (res > (p->tol)) {
     hyp_itn = 0; ell_itn = 0;
     while (res > (p->ell_tol)) {
-      update_psi_clean(f, p);      
-      res = get_res_psi_clean(f, p);
+      update_psi(f, p);      
+      res = get_res_psi(f, p);
       if (++hyp_itn > p->maxit) {
 	cout << endl << "PSI hyperbolic solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
@@ -581,10 +579,10 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
         return -2;
       }
     }
-    res = get_res_ab_clean(f, p);
+    res = get_res_ab(f, p);
     while (res > (p->ell_tol)) {
       jac = f->jac;
-      set_jacCMabslow(jac, f->Pi, f->Pi2, f->Al, f->Be, f->Ps, p);
+      set_jacCM_ab(jac, f->Pi, f->Pi2, f->Al, f->Be, f->Ps, p);
       info = LAPACKE_dgbsv(LAPACK_COL_MAJOR, p->lp_n, p->lp_kl, p->lp_ku, p->lp_nrhs,
 			   &jac[0], p->lp_ldab, p->lp_ipiv, &(f->res_ell[0]), p->lp_ldb);
       if (info != 0) {
@@ -594,7 +592,7 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
 	return -3;
       }
       apply_up_ab(f->res_ell, f->Al, f->Be, p->npts, p->ell_up_weight);
-      res = get_res_ab_clean(f, p);
+      res = get_res_ab(f, p);
       if (++ell_itn > p->maxit) {
 	cout << endl << "ELLIPTIC solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
@@ -607,7 +605,7 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
       }
     }
     set_ab_cn(f->oldAl, f->oldBe, f->Al, f->Be, f->cnAl, f->cnBe, p->npts);
-    res = get_res_psi_clean(f, p);
+    res = get_res_psi(f, p);
     if (res < (p->ell_tol)) {
       res = get_res_xp(f, p);
       if (res < (p->tol)) { res = get_res_xp2(f, p); }
@@ -617,7 +615,7 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
     if (++itn > p->maxit) {
       cout << endl << "FULL solver STUCK at t = " << (p->t) << "\nres = " << res << endl;
       p->exit_itn = itn;
-      if (get_res_psi_clean(f, p) < (p->tol)) {
+      if (get_res_psi(f, p) < (p->tol)) {
 	if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
         else {
 	  res = get_res_xp(f, p);
