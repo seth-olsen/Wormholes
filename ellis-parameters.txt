@@ -1,11 +1,11 @@
 -outfile
-ell
+stat
 -resn_factor
-16
+4
 -ic_Amp
-0.001
+0.1
 -clean_hyp
-1
+0
 -ic_Dsq
 25.0
 -ic_r0
@@ -43,7 +43,7 @@ ell
 -save_pt
 1
 -nsteps
-600
+1200
 -save_step
 1
 -maxit
