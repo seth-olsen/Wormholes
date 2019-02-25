@@ -195,16 +195,11 @@ struct sim_params {
   dbl indt = 1 / dt;
   dbl inrmax = 1 / rmax;
   // SPECIFIC TERMS
-  dbl csomm = 0.75*lam + 0.5*dt*inrmax;
-  dbl csomm_rhs = 1 / (1 + csomm);
-  dbl csomm_old = 1 - csomm;
+  dbl csomm_old = 1 - 0.75*lam - 0.5*dt*inrmax;
+  dbl csomm_rhs = 1 / (2 - csomm_old);
   dbl jacRR = 3*in2dr + inrmax;
   dbl jacRRm1 = -4 * in2dr;
   dbl jacRRm2 = in2dr;
-  //dbl jacN00 = -3 * in2dr;
-  //dbl jacN01 = 4 * in2dr;
-  //dbl jacN02 = -1 * in2dr;
-  //dbl dt_twelve = twelfth * dt;
   dbl cpsi_rhs = 1 / jacRR;
 
 

@@ -286,9 +286,8 @@ int params_init(PAR *p, int argc, char **argv)
   p->indt = 1 / (p->dt);
   p->inrmax = 1 / (p->rmax);
   // specific terms
-  p->csomm = 0.75*(p->lam) + 0.5*(p->dt)*(p->inrmax);
-  p->csomm_rhs = 1 / (1 + (p->csomm));
-  p->csomm_old = 1 - (p->csomm);
+  p->csomm_old = 1 - 0.75*(p->lam) - 0.5*(p->dt)*(p->inrmax);
+  p->csomm_rhs = 1 / (2 - (p->csomm_old));
   p->jacRR = 3*(p->in2dr) + (p->inrmax);
   p->jacRRm1 = -4 * (p->in2dr);
   p->jacRRm2 = (p->in2dr);

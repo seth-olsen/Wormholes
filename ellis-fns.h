@@ -102,8 +102,8 @@ inline dbl fda_hyp_resPs(const VD& old_ps, const VD& f_ps, const VD& cn_al,
 inline dbl fda_resPs(const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
 		     const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, int k)
 {
-  return ddr2_c(f_ps,p,k) + M_PI*(sq(f_xi2[k]) + sq(f_pi2[k]) - sq(f_xi[k]) - sq(f_pi[k]))
-    + f_ps[k]*(0.25*(p->lsq)/sq(r2(p,k)) + 2*(p->r[-k])*ddr_c(f_ps,p,k))
+  return ddr2_c(f_ps,p,k) + 2*(p->r[-k])*ddr_c(f_ps,p,k) + f_ps[k] *
+    (0.25*(p->lsq)/sq(r2(p,k)) + M_PI*(sq(f_xi2[k]) + sq(f_pi2[k]) - sq(f_xi[k]) - sq(f_pi[k])))
     + (p->twelfth)*pw5(f_ps[k])*sq(ddr_c(f_be,p,k) - (p->r[-k])*f_be[k]) / sq(f_al[k]);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
