@@ -520,7 +520,7 @@ inline void get_EE_adm(WRS *wr, FLDS *f, PAR *p)
 {
   dbl dt2ps; dbl dx2al; dbl dx2be; dbl dx2ps; dbl dxdtbe; dbl dxdtps;
   dbl dtal; dbl dtbe; dbl dtps; dbl dxal; dbl dxbe; dbl dxps;
-  dbl xi; dbl pi; dbl xi2; dbl pi2; dbl al; dbl be; dbl ps;
+  dbl xi; dbl pi; /*dbl xi2; dbl pi2;*/ dbl al; dbl be; dbl ps;
   dbl x; dbl xsq; dbl lsq = p->lsq;
   int k;
   for (int j = 1; j < p->lastwr; ++j) {
@@ -539,7 +539,7 @@ inline void get_EE_adm(WRS *wr, FLDS *f, PAR *p)
     dtbe = (p->indt)*(1.5*(f->Be[k]) - 2*(f->oldBe[k]) + 0.5*(f->olderBe[k]));
     dtps = (p->indt)*(1.5*(f->Ps[k]) - 2*(f->oldPs[k]) + 0.5*(f->olderPs[k]));
     dxal = ddr_c(f->Al, p, k); dxbe = ddr_c(f->Be, p, k); dxps = ddr_c(f->Ps, p, k);
-    xi = f->Xi[k]; pi = f->Pi[k]; xi2 = f->Xi2[k]; pi2 = f->Pi2[k];
+    xi = f->Xi[k]; pi = f->Pi[k]; //xi2 = f->Xi2[k]; pi2 = f->Pi2[k];
     al = f->Al[k]; be = f->Be[k]; ps = f->Ps[k];
 
     (wr->p_EEtt).wr_field[j] = (-4*pow(dtps,2))/pow(ps,2) - (4*dt2ps)/ps + (4*dtps*(al*(dtal + 
@@ -569,7 +569,7 @@ pow(dxbe,2)*(lsq + xsq) - dxdtbe*(lsq + xsq))) + be*(lsq +
 xsq)*(-36*dtps*dxps*(lsq + xsq) + pow(ps,2)*(4*x*dxbe + dx2be*(lsq + 
 xsq)) + 2*ps*(-8*x*dtps - 6*dxdtps*(lsq + xsq) + 7*dxbe*dxps*(lsq + 
 xsq))))))/(pow(al,3)*pow(ps,5)*pow(lsq + xsq,2))
-    + four_pi*(sq(be*xi + al*pi/sq(ps)) + sq(be*pi + al*xi/sq(ps)));
+    + (p->four_pi)*(sq(be*xi + al*pi/sq(ps)) + sq(be*pi + al*xi/sq(ps)));
     
     (wr->p_EEtx).wr_field[j] = (4*pow(al,2)*dtps*dxal*ps*pow(lsq + xsq,2) + 2*be*(-dtal + 
 be*dxal)*pow(ps,5)*(lsq + xsq)*(-2*dtps*(lsq + xsq) + be*(x*ps + 
@@ -582,7 +582,7 @@ pow(be,2)*(8*pow(dxps,2)*pow(lsq + xsq,2) + pow(ps,2)*(2*lsq + xsq) +
 xsq)*(x*dxbe*pow(ps,2) - 8*dtps*dxps*(lsq + xsq) + 2*ps*(-3*x*dtps - 
 2*dxdtps*(lsq + xsq) + dxbe*dxps*(lsq + 
 xsq)))))/(pow(al,3)*pow(ps,2)*pow(lsq + xsq,2))
-    + four_pi*(be*(sq(xi) + sq(pi)) + 2*al*xi*pi/sq(ps));
+    + (p->four_pi)*(be*(sq(xi) + sq(pi)) + 2*al*xi*pi/sq(ps));
     
     (wr->p_EExx).wr_field[j] = (2*pow(al,2)*dxal*ps*(lsq + xsq)*(x*ps + 2*dxps*(lsq + xsq)) + 
 pow(al,3)*(-(lsq*pow(ps,2)) + 4*x*dxps*ps*(lsq + xsq) + 
@@ -595,7 +595,7 @@ pow(be,2)*(8*pow(dxps,2)*pow(lsq + xsq,2) + pow(ps,2)*(2*lsq + xsq) +
 xsq)*(x*dxbe*pow(ps,2) - 8*dtps*dxps*(lsq + xsq) + 2*ps*(-3*x*dtps - 
 2*dxdtps*(lsq + xsq) + dxbe*dxps*(lsq + 
 xsq)))))/(pow(al,3)*pow(ps,2)*pow(lsq + xsq,2))
-    + four_pi*(sq(xi) + sq(pi));
+    + (p->four_pi)*(sq(xi) + sq(pi));
     
     (wr->p_EEhh).wr_field[j] = lsq/(lsq + xsq) - (2*pow(dxps,2)*(lsq + xsq))/pow(ps,2) + (x*dxal + 
 dx2al*(lsq + xsq))/al + (2*(x*dxps + dx2ps*(lsq + xsq)))/ps + ((-dtal 
@@ -609,7 +609,7 @@ xsq)*(8*pow(dtps,2)*(lsq + xsq) - 2*(-2*dt2ps + 3*dtps*dxbe +
 xsq) + pow(ps,2)*(2*x*dxbe + dx2be*(lsq + xsq)) + 2*ps*(-3*x*dtps - 
 4*dxdtps*(lsq + xsq) + 5*dxbe*dxps*(lsq + xsq)))))/(pow(al,2)*(lsq + 
 xsq))
-    + four_pi*(lsq + xsq)*(sq(pi) - sq(xi));
+    + (p->four_pi)*(lsq + xsq)*(sq(pi) - sq(xi));
 
     /*
     wr->EEtt[j] = iresEEtt(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
@@ -626,13 +626,37 @@ xsq))
 			     xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
     */
 
-    (wr->p_hamiltonian).wr_field[j] = 0;
+    (wr->p_hamiltonian).wr_field[j] =
+      ((p->eight_pi)*ps*(pow(pi,2) + pow(xi,2)) + (-2*pow(al,2)*(lsq*ps + 4*(lsq +
+xsq)*(2*x*dxps + dx2ps*(lsq + xsq))) + 2*pow(ps,3)*(-2*dtps*(lsq +
+xsq) + be*(x*ps + 2*dxps*(lsq + xsq)))*(2*(-3*dtps + dxbe*ps)*(lsq +
+xsq) + be*(x*ps + 6*dxps*(lsq + xsq))))/(pow(al,2)*pow(lsq +
+xsq,2)))/pow(ps,5);
 
-    (wr->p_momentum).wr_field[j] = 0;
+    (wr->p_momentum).wr_field[j] =
+      (-(p->eight_pi)*pi*xi + (2*dxal*ps*(lsq + xsq)*(-2*dtps*(lsq + xsq) +
+be*(x*ps + 2*dxps*(lsq + xsq))) - 2*al*(2*(dtps*dxps -
+dxdtps*ps)*pow(lsq + xsq,2) + be*(lsq*pow(ps,2) -
+2*pow(dxps,2)*pow(lsq + xsq,2) + 2*ps*(lsq + xsq)*(x*dxps +
+dx2ps*(lsq + xsq)))))/(pow(al,2)*pow(lsq + xsq,2)))/pow(ps,2);
 
-    (wr->p_kext).wr_field[j] = 0;
+    (wr->p_kext).wr_field[j] =
+      ((-6*dtps + dxbe*ps)*(lsq + xsq) + 2*be*(x*ps + 3*dxps*(lsq + xsq)))
+      /(al*ps*(lsq + xsq));
 
-    (wr->p_dtkext).wr_field[j] = 0;
+    (wr->p_dtkext).wr_field[j] =
+      -((pow(al,2)*(lsq + xsq)*(2*dxal*dxps*(lsq + xsq) + ps*(2*x*dxal +
+dx2al*(lsq + xsq))) + al*ps*((p->eight_pi)*pow(al,2)*pow(pi,2)*pow(lsq +
+xsq,2) - pow(ps,2)*pow(-2*dtps + 2*be*dxps + dxbe*ps,2)*pow(lsq +
+xsq,2) - 2*pow(ps,2)*pow(-2*dtps*(lsq + xsq) + be*(x*ps + 2*dxps*(lsq
++ xsq)),2)) + be*pow(ps,3)*(2*x*al*ps*((-6*dtps + dxbe*ps)*(lsq +
+xsq) + 2*be*(x*ps + 3*dxps*(lsq + xsq))) + al*dxps*(lsq +
+xsq)*((-6*dtps + dxbe*ps)*(lsq + xsq) + 2*be*(x*ps + 3*dxps*(lsq +
+xsq))) + dxal*ps*(lsq + xsq)*((-6*dtps + dxbe*ps)*(lsq + xsq) +
+2*be*(x*ps + 3*dxps*(lsq + xsq))) - al*ps*(lsq + xsq)*(2*x*(-6*dtps +
+dxbe*ps) + (-6*dxdtps + dxbe*dxps + dx2be*ps)*(lsq + xsq) +
+2*be*(7*x*dxps + ps + 3*dx2ps*(lsq + xsq)) + 2*dxbe*(x*ps +
+3*dxps*(lsq + xsq)))))/(pow(al,2)*pow(ps,5)*pow(lsq + xsq,2)));
   }
   return;
 }

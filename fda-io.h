@@ -173,7 +173,6 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
     get_maspect((wr->p_maspect).wr_field, f->Al, f->Be, f->Ps, p);
     write_sdf(&(wr->p_maspect), p->t);
   }
-  */
   // ******************************************************************
   // EINSTEIN EQUATION RESIDUALS
   if (p->write_mtot) {
