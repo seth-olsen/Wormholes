@@ -32,12 +32,12 @@ struct sim_fields {
   VD Al;
   VD oldAl;
   VD cnAl;
-  VD resAl;
+  //VD resAl;
   VD olderAl;
   VD Be;
   VD oldBe;
   VD cnBe;
-  VD resBe;
+  //VD resBe;
   VD olderBe; 
   VD Ps;
   VD oldPs;
@@ -95,6 +95,14 @@ struct sim_writers {
   BBHP p_maspect;
   BBHP p_outnull;
   BBHP p_ricci;
+  BBHP p_EEtt;
+  BBHP p_EEtx;
+  BBHP p_EExx;
+  BBHP p_EEhh;
+  BBHP p_momentum;
+  BBHP p_hamiltonian;
+  BBHP p_kext;
+  BBHP p_dtkext;
 } ;
 
 
@@ -133,15 +141,15 @@ struct sim_params {
   bool write_res = false; // write residuals?
   bool write_ricci = false; // write ricci?
   bool write_itn = false; // write iteration counts?
-  bool write_mtot = false; // write total mass?
-  bool write_maspect = true; // write mass aspect?
-  bool write_outnull = true; // write outgoing null expansion?
-  bool write_xp = false; // write ghost xi and pi?
-  bool write_xp2 = true; // write normal xi and pi?
+  bool write_mtot = true; // total diagnostics?
+  bool write_maspect = false; // write mass aspect?
+  bool write_outnull = false; // write outgoing null expansion?
+  bool write_xp = true; // write ghost xi and pi?
+  bool write_xp2 = false; // write normal xi and pi?
   bool write_abp = true; // write metric fields (alpha, beta, psi)?
   bool write_ires_xp = false; // write ires for xi and pi?
-  bool write_ires_xp2 = true;
-  bool write_ires_abp = true; // write ires for metric variables?
+  bool write_ires_xp2 = false;
+  bool write_ires_abp = false; // write ires for metric variables?
   bool horizon_search = false; // search for apparent horizon after each step?
 
   int n_ell = 3;

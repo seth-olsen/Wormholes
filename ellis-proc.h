@@ -28,6 +28,7 @@ dbl get_res_xp2(FLDS *f, PAR *p);
 void update_psi(FLDS *f, PAR *p);
 dbl get_res_psi(FLDS *f, PAR *p);
 dbl get_res_abp(FLDS *f, PAR *p);
+dbl get_res_abp_t0(VD& res_ell, FLDS *f, PAR *p);
 
 void apply_up_abp(const VD& res_ell, VD& f_al, VD& f_be, VD& f_ps, int npts, dbl eup_weight);
 dbl get_res_ab(FLDS *f, PAR *p);
@@ -177,6 +178,26 @@ dbl get_res_abp(FLDS *f, PAR *p)
   f->res_ell[jbe + j] = fdaR_resBe(f->Be, p);
   f->res_ell[jps + j] = fdaR_resPs(f->Ps, p);
   return norm_inf(f->res_ell);
+}
+
+dbl get_res_abp_t0(VD& res_ell, FLDS *f, PAR *p)
+{
+  int j = 0;
+  int jbe = (p->npts);
+  int jps = 2*jbe;
+  res_ell[j] = fda0_resAl(f->Al, p);
+  res_ell[jbe + j] = fda0_resBe(f->Be, p);
+  res_ell[jps + j] = fda0_resPs(f->Ps, p);
+  for (j = 1; j < (p->lastpt); ++j) {
+    res_ell[j] = fda_resAl(f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p, j);
+    res_ell[jbe + j] = fda_resBe(f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p, j);
+    res_ell[jps + j] = fda_resPs(f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p, j);
+  }
+  j = p->lastpt;
+  res_ell[j] = fdaR_resAl(f->Al, p);
+  res_ell[jbe + j] = fdaR_resBe(f->Be, p);
+  res_ell[jps + j] = fdaR_resPs(f->Ps, p);
+  return norm_inf(res_ell);
 }
 
 dbl get_res_ab(FLDS *f, PAR *p)

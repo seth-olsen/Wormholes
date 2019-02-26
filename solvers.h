@@ -42,7 +42,7 @@ int fields_step(FLDS *f, PAR *p, int i)
     f->olderXi2 = f->oldXi2;
     f->olderPi2 = f->oldPi2;
   }
-  if (p->write_ires_abp) {
+  if (p->write_ires_abp || p->write_mtot) {
     f->oldestPs = f->olderPs;
     
     f->olderAl = f->oldAl;
@@ -139,7 +139,7 @@ int solve_t0(FLDS *f, PAR *p)
   int ell_maxit = (p->maxit) * 10;
 
   int ell_itn = 0;
-  dbl res = get_res_abp(f, p);
+  dbl res = get_res_abp_t0(res_0, f, p);
   while (res > (p->ell_tol)) {
     VD jac(ldab*N_0, 0);
     set_jacCM_abp(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
@@ -147,7 +147,7 @@ int solve_t0(FLDS *f, PAR *p)
 			 &jac[0], ldab, &ipiv_0[0], &res_0[0], ldb_0);
     if (info != 0) { cout << ell_itn << "\nERROR: cannot solve t0\ninfo = " << info << endl; }
     apply_up_abp(res_0, f->Al, f->Be, f->Ps, p->npts, p->ell_up_weight);
-    res = get_res_abp(f, p);    
+    res = get_res_abp_t0(res_0, f, p);    
     if (++ell_itn > ell_maxit) {
       cout << "\nt = 0\nitn = " << ell_itn << "\nres = " << res << endl;
       int horizon_code = search_for_horizon(f->Al, f->Be, f->Ps, p);
@@ -185,7 +185,7 @@ int solve_dynamic(FLDS *f, PAR *p)
         return -2;
       }
     }    
-    get_res_abp(f, p);
+    res = get_res_abp(f, p);
     while (res > (p->ell_tol)) {
       jac = f->jac;
       set_jacCM_abp(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
@@ -248,7 +248,7 @@ int solve2_dynamic(FLDS *f, PAR *p)
         return -2;
       }
     }    
-    get_res_abp(f, p);
+    res = get_res_abp(f, p);
     while (res > (p->ell_tol)) {
       jac = f->jac;
       set_jacCM_abp(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
@@ -322,7 +322,7 @@ int solveAll_dynamic(FLDS *f, PAR *p)
         return -2;
       }
     }
-    get_res_abp(f, p);
+    res = get_res_abp(f, p);
     while (res > (p->ell_tol)) {
       jac = f->jac;
       set_jacCM_abp(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);

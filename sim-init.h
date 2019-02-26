@@ -47,12 +47,9 @@ vector<BBHP *> writers_init(WRS *wr, FLDS *f, PAR *p)
     out_vec.push_back(&(wr->p_Be));
     out_vec.push_back(&(wr->p_Ps));
     if (p->write_res) {
-      bbhp_init(&(wr->p_resAl), p, "ResAl", &(f->resAl), zeros);
-      bbhp_init(&(wr->p_resBe), p, "ResBe", &(f->resBe), zeros);
-      bbhp_init(&(wr->p_resPs), p, "ResPs", &(f->resPs), zeros);
-      out_vec.push_back(&(wr->p_resAl));
-      out_vec.push_back(&(wr->p_resBe));
-      out_vec.push_back(&(wr->p_resPs));
+      bbhp_init(&(wr->p_resAl), p, "ResAl", NULL, zeros);
+      bbhp_init(&(wr->p_resBe), p, "ResBe", NULL, zeros);
+      bbhp_init(&(wr->p_resPs), p, "ResPs", NULL, zeros);
     }
   }
   if (p->write_xp) {
@@ -95,6 +92,16 @@ vector<BBHP *> writers_init(WRS *wr, FLDS *f, PAR *p)
   if (p->write_maspect) { bbhp_init(&(wr->p_maspect), p, "maspect", NULL, zeros); }
   if (p->write_outnull) { bbhp_init(&(wr->p_outnull), p, "outnull", NULL, zeros); }
   if (p->write_ricci) { bbhp_init(&(wr->p_ricci), p, "ricci", NULL, zeros); }
+  if (p->write_mtot) {
+    bbhp_init(&(wr->p_EEtt), p, "EEtt", NULL, zeros);
+    bbhp_init(&(wr->p_EEtx), p, "EEtx", NULL, zeros);
+    bbhp_init(&(wr->p_EExx), p, "EExx", NULL, zeros);
+    bbhp_init(&(wr->p_EEhh), p, "EEhh", NULL, zeros);
+    bbhp_init(&(wr->p_hamiltonian), p, "cHamiltonian", NULL, zeros);
+    bbhp_init(&(wr->p_momentum), p, "cMomentum", NULL, zeros);
+    bbhp_init(&(wr->p_kext), p, "cKext", NULL, zeros);
+    bbhp_init(&(wr->p_dtkext), p, "cDtKext", NULL, zeros);
+  }
   return out_vec;
 }
 
@@ -109,14 +116,6 @@ int fields_init(FLDS *f, PAR *p)
   f->Be = zeros;
   f->Ps = zeros;
   // PUT INITIAL CONDITIONS
-  /*
-  for (int k = 0; k < (p->zeropt) + 1; ++k) {
-    f->Al[k] = 1;
-    //f->Be[k] = 0;
-    f->Ps[k] = 1;
-  }
-  int k = 
-  */
   dbl amp0 = sqrt((p->lsq)/(p->four_pi));
   for (int k = 0; k < (p->npts); ++k) {
     f->Al[k] = 1;
@@ -164,7 +163,7 @@ int fields_init(FLDS *f, PAR *p)
   f->oldPs = f->Ps;
   f->cnPs = f->Ps;
   if (p->psi_hyp) { f->resPs = zeros; }
-  if (p->write_ires_abp) {
+  if (p->write_ires_abp || p->write_mtot) {
     f->olderAl = f->Al;
     f->olderBe = f->Be;
     f->olderPs = f->Ps;

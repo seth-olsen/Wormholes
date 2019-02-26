@@ -51,8 +51,8 @@ inline dbl jac_aa_pm(const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, int
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl jac_bb(const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, int k)
 {
-  return (p->neg2indrsq) - (p->lsq)/sq(r2(p,k))
-    - (p->r[-k])*(2*(p->r[-k]) + 6*ddrln_c(f_ps,p,k) - ddrln_c(f_al,p,k));
+  return (p->neg2indrsq) - 1/r2(p,k)
+    - (p->r[-k])*(p->r[-k] + 6*ddrln_c(f_ps,p,k) - ddrln_c(f_al,p,k));
 }
 
 inline dbl jac_bb_pm(const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p, int k, int p_m)
