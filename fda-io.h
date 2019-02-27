@@ -131,7 +131,7 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
     int npts = (p->npts);
     VD res_0(3*npts, 0);
     dbl res = get_res_abp_t0(res_0, f, p);
-    if (res > p->ell_tol) { cout << p->t << " res = " << res << endl; }
+    if (res > p->dt) { cout << p->t << " res = " << res << endl; }
     for (int k = 0; k < p->wr_shape; ++k) {
       (wr->p_resAl).wr_field[k] = res_0[(p->inds[k]).second];
       (wr->p_resBe).wr_field[k] = res_0[npts + (p->inds[k]).second];

@@ -1,5 +1,5 @@
 -outfile
-ell
+hyp
 -resn_factor
 1
 -ic_Amp
@@ -17,7 +17,7 @@ ell
 -ic2_r0
 20.0
 -psi_hyp
-0
+1
 -check_step
 1
 -write_mtot
@@ -27,7 +27,7 @@ ell
 -write_abp
 1
 -write_res
-0
+1
 -write_ires_xp
 1
 -write_ires_abp
@@ -37,7 +37,7 @@ ell
 -save_pt
 1
 -nsteps
-600
+1200
 -save_step
 1
 -maxit
