@@ -303,7 +303,7 @@ inline dbl mass_aspectR(const VD& alpha, const VD& beta, const VD& psi, PAR *p, 
 {
   return 0.5*sqrt(r2(p,k))*sq(psi[k]) *
     ( 1 + r2(p,k)*( sq(sq(psi[k])*(ddr_b(beta,p,k) - (p->r[-k])*beta[k])/(3*alpha[k]))
-		    - sq((p->r[-k]) + (p->indr)*dln_b(psi,k)) ) );
+		   - sq((p->r[-k]) + (p->indr)*dln_b(psi,k)) ) );
 }
 inline dbl mass_aspect0(const VD& alpha, const VD& beta, const VD& psi, PAR *p)
 {
@@ -597,7 +597,7 @@ xsq)*(x*dxbe*pow(ps,2) - 8*dtps*dxps*(lsq + xsq) + 2*ps*(-3*x*dtps -
 xsq)))))/(pow(al,3)*pow(ps,2)*pow(lsq + xsq,2))
     + (p->four_pi)*(sq(xi) + sq(pi));
     
-    (wr->p_EEhh).wr_field[j] = lsq/(lsq + xsq) - (2*pow(dxps,2)*(lsq + xsq))/pow(ps,2) + (x*dxal + 
+    (wr->p_EEhh).wr_field[j] = (lsq/(lsq + xsq) - (2*pow(dxps,2)*(lsq + xsq))/pow(ps,2) + (x*dxal + 
 dx2al*(lsq + xsq))/al + (2*(x*dxps + dx2ps*(lsq + xsq)))/ps + ((-dtal 
 + be*dxal)*pow(ps,3)*((-4*dtps + dxbe*ps)*(lsq + xsq) + be*(x*ps + 
 4*dxps*(lsq + xsq))))/pow(al,3) - 
@@ -608,8 +608,8 @@ xsq)*(8*pow(dtps,2)*(lsq + xsq) - 2*(-2*dt2ps + 3*dtps*dxbe +
 + xsq) - dxdtbe*(lsq + xsq))) + be*(lsq + xsq)*(-16*dtps*dxps*(lsq + 
 xsq) + pow(ps,2)*(2*x*dxbe + dx2be*(lsq + xsq)) + 2*ps*(-3*x*dtps - 
 4*dxdtps*(lsq + xsq) + 5*dxbe*dxps*(lsq + xsq)))))/(pow(al,2)*(lsq + 
-xsq))
-    + (p->four_pi)*(lsq + xsq)*(sq(pi) - sq(xi));
+							       xsq)))/(lsq + xsq)
+    + (p->four_pi)*(sq(pi) - sq(xi));
 
     /*
     wr->EEtt[j] = iresEEtt(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
