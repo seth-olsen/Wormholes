@@ -377,14 +377,14 @@ inline dbl outgoing_nullR(const VD& alpha, const VD& beta,
     
 }
 inline void get_outnull(VD& outnull, const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p) {
-  outnull[0] = outgoing_null0(f_al, f_be, f_ps, p);
+  outnull[0] = half_outgoing_null0(f_al, f_be, f_ps, p);
   for (int k = 1; k < p->zerowr; ++k) {
-    outnull[k] = outgoing_null_rev(f_al, f_be, f_ps, p, (p->inds[k]).second);
+    outnull[k] = half_outgoing_null_rev(f_al, f_be, f_ps, p, (p->inds[k]).second);
   }
   for (int k = (p->zerowr) + 1; k < p->lastwr; ++k) {
-    outnull[k] = outgoing_null(f_al, f_be, f_ps, p, (p->inds[k]).second);
+    outnull[k] = half_outgoing_null(f_al, f_be, f_ps, p, (p->inds[k]).second);
   }
-  outnull[p->lastwr] = outgoing_nullR(f_al, f_be, f_ps, p, p->lastpt);
+  outnull[p->lastwr] = half_outgoing_nullR(f_al, f_be, f_ps, p, p->lastpt);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl sRicci(const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2, const VD& f_ps, int k)

@@ -194,38 +194,21 @@ int params_init(PAR *p, int argc, char **argv)
     cout << "--> corrected: save_pt = " << p->save_pt << endl;
   }
   // set SOLVER
-  /*
   if (p->ic2_Amp == 0) {
-    if (p->psi_hyp) {
+    if (p->static_metric) { p->solver = solve_static; }
+    else if (p->psi_hyp) {
       p->n_ell = 2;
       p->solver = solve_dynamic_psi_hyp;
     }
-    else if (p->static_metric) { p->solver = solve_static; }
-    else { p->solver = solve_dynamic; }
-  }
-  else if (p->ic_Amp == 0) {
-    if (p->psi_hyp) {
-      p->n_ell = 2;
-      p->solver = solve2_dynamic_psi_hyp;
-    }
-    else if (p->static_metric) { p->solver = solve2_static; }
-    else { p->solver = solve2_dynamic; }
   }
   else {
-    if (p->psi_hyp) {
+    if (p->static_metric) { p->solver = solveAll_static; }
+    else if (p->psi_hyp) {
       p->n_ell = 2;
       p->solver = solveAll_dynamic_psi_hyp;
     }
-    else if (p->static_metric) { p->solver = solveAll_static; }
     else { p->solver = solveAll_dynamic; }
   }
-  */
-  if (p->static_metric) { p->solver = solve_static; }
-  else if (p->psi_hyp) {
-    p->n_ell = 2;
-    p->solver = solve_dynamic_psi_hyp;
-  }
-  else { p->solver = solve_dynamic; }
   // ***set rmin because can't set negative numbers with user input***
   p->rmin = -(p->rmax);
   // bbhutil parameters for writing data to sdf
