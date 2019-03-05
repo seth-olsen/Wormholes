@@ -179,7 +179,7 @@ int fields_init(FLDS *f, PAR *p)
 
 int params_init(PAR *p, int argc, char **argv)
 {
-  map<str, str *> p_str { {"-outfile", &(p->outfile)} };
+  map<str, str *> p_str { {"-outfile", &(p->outfile)}, {"-hold_const", &(p->hold_const)} };
   map<str, int *> p_int = get_p_int(p);
   map<str, dbl *> p_dbl = get_p_dbl(p);
   map<str, bool *> p_bool = get_p_bool(p);
@@ -223,7 +223,6 @@ int params_init(PAR *p, int argc, char **argv)
   p->save_pt = p->save_pt * p->resn_factor;
   p->nsteps = p->nsteps * p->resn_factor;
   p->save_step = p->save_step * p->resn_factor;
-  p->outfile = to_string(p->resn_factor) + "-" + p->outfile;
   // derived parameters
   p->npts = p->lastpt + 1;
   p->zeropt = p->lastpt / 2;
@@ -277,11 +276,14 @@ int params_init(PAR *p, int argc, char **argv)
   p->jacRRm2 = (p->in2dr);
   p->cpsi_rhs = 1 / (p->jacRR);
   // parameter data output
-  ofstream specs;
-  str specs_name = p->outfile + ".txt";
-  specs.open(specs_name, ofstream::out);
-  specs << get_paramFile_string(p_str, p_int, p_dbl, p_bool);
-  specs.close();
+  if (((str) argv[0]) == "./ellis") {
+    ofstream specs;
+    str specs_name = to_string(p->resn_factor) + "-" + p->outfile + ".txt";
+    specs.open(specs_name, ofstream::out);
+    specs << get_paramFile_string(p_str, p_int, p_dbl, p_bool);
+    specs.close();
+  }
+  p->outfile = to_string(p->resn_factor) + "-" + p->outfile;
   cout << get_param_string(p_str, p_int, p_dbl, p_bool) << endl;
   return 0;
 }

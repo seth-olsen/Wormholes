@@ -4,9 +4,9 @@ DEBUG		 = -g
 OPTFLAGS	 = -O2
 LIBDIR_LAPACK	 = /usr/lib/lapack-3.8.0
 LGFORTRAN_PATH	 = /usr/lib/gfortran
-INCLUDE		 = $(LIBDIR_LAPACK)/LAPACKE/include
-CFLAGS		 = -std=c++11 -Wall ${DEBUG} ${OPTFLAGS} -I$(INCLUDE)
-CXXFLAGS         = -std=c++11 -Wall ${DEBUG} ${OPTFLAGS} -I$(INCLUDE)
+INCLUDE		 = -I$(LIBDIR_LAPACK)/LAPACKE/include
+CFLAGS		 = -std=c++11 -Wall ${DEBUG} ${OPTFLAGS} $(INCLUDE)
+CXXFLAGS         = -std=c++11 -Wall ${DEBUG} ${OPTFLAGS} $(INCLUDE)
 LDFLAGS	 	 = -Wall ${DEBUG}
 LDLIBS		 = -lbbhutil -L$(LIBDIR_LAPACK) -llapacke -llapack -lblas -L$(LGFORTRAN_PATH) -lgfortran -lm
 LOCDIR		 = home/seth/research/simulations
@@ -29,10 +29,12 @@ ellis-debug: ellis-debug.o
 ellis-debug.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h ellis-debug.cpp
 	$(CXX) -c $(CXXFLAGS) ellis-debug.cpp
 
-ellis-conv: fda-io.h ellis-conv.cpp
-	$(CXX) -c $(CXXFLAGS) ellis-conv.cpp
+ellis-conv: ellis-conv.o
 	$(CXX) -o ellis-conv ellis-conv.o ${LDLIBS}
 	rm -f ellis-conv.o
+
+ellis-conv.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
+	$(CXX) -c $(CXXFLAGS) ellis-conv.cpp
 
 test-code: test-code.o
 	-${CXX} -o test-code test-code.o ${LDLIBS}

@@ -81,7 +81,8 @@ map<str, bool *> get_p_bool(PAR *p)
    {"-write_xp",&(p->write_xp)}, {"-write_ires_xp",&(p->write_ires_xp)},
    {"-write_abp",&(p->write_abp)}, {"-write_ires_abp",&(p->write_ires_abp)},
    {"-write_xp2",&(p->write_xp2)}, {"-write_ires_xp2",&(p->write_ires_xp2)},
-   {"-clean_hyp",&(p->clean_hyp)}, {"-clean_ell",&(p->clean_ell)}};
+   {"-clean_hyp",&(p->clean_hyp)}, {"-clean_ell",&(p->clean_ell)},
+   {"-same_times",&(p->same_times)}, {"-same_grids",&(p->same_grids)}};
   return p_bool;
 }
 
@@ -98,7 +99,11 @@ void file_param_collect(str filename, map<str, str>& dest) {
   str entry;
   ifstream p_file(filename);
   if (p_file.is_open()) {
-    while (getline(p_file, entry)) { source.push_back(entry); }
+    while (getline(p_file, entry)) {
+      if (entry == "TRUE") { source.push_back("1"); }
+      else if (entry == "FALSE") { source.push_back("0"); }
+      else { source.push_back(entry); }
+    }
     for (unsigned int arg = 0; arg < source.size(); ++arg) {
       if (source[arg][0] == '-') { dest[source[arg]] = source[arg+1]; }
     }
@@ -131,7 +136,7 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
     int npts = (p->npts);
     VD res_0(3*npts, 0);
     dbl res = get_res_abp_t0(res_0, f, p);
-    if (res > p->dt) { cout << p->t << " res = " << res << endl; }
+    if (res > p->dr) { cout << p->t << " res = " << res << endl; }
     for (int k = 0; k < p->wr_shape; ++k) {
       (wr->p_resAl).wr_field[k] = res_0[(p->inds[k]).second];
       (wr->p_resBe).wr_field[k] = res_0[npts + (p->inds[k]).second];
@@ -242,19 +247,17 @@ str get_param_string(map<str, str *>& p_str, map<str, int *>& p_int,
 str get_paramFile_string(map<str, str *>& p_str, map<str, int *>& p_int,
 			 map<str, dbl *>& p_dbl, map<str, bool *>& p_bool)
 {
-  str param_string = "";
-  for (pair<str, str *> param : p_str) {
-    param_string += param.first + "\n" + *(param.second) + "\n";
-  }
+  str param_string = "-outfile\n" + *(p_str["-outfile"]) + "\n";
   for (pair<str, int *> param : p_int) {
-    param_string += param.first + "\n" + *(param.second) + "\n";
+    param_string += param.first + "\n" + to_string(*(param.second)) + "\n";
   }
   for (pair<str, dbl *> param : p_dbl) {
-    param_string += param.first + "\n" + *(param.second) + "\n";
+    param_string += param.first + "\n" + to_string(*(param.second)) + "\n";
   }
   for (pair<str, bool *> param : p_bool) {
-    param_string += param.first + "\n" + *(param.second) + "\n";
+    param_string += param.first + "\n" + bool_to_str(*(param.second)) + "\n";
   }
+  param_string += "-hold_const\n" + *(p_str["-hold_const"]) + "\n";
   return param_string;
 }
 
@@ -287,6 +290,13 @@ void record_horizon(PAR *p, const VD& f_ps, int ind, int itn, int t_itn)
   specs.close();
   cout << param_str;
   return;
+}
+
+// for ellis-conv
+vector<str> get_unames(str pre, vector<str>& fnames) {
+  vector<str> unames;
+  for (str name : fnames) { unames.push_back(pre + "-" + name + ".sdf"); }
+  return unames;
 }
 
 #endif

@@ -13,7 +13,6 @@
 #include "fda-fns.h"
 #include "ellis-fns.h"
 #include "jacobian.h"
-//#include "ellis-clean.h"
 #include "ellis-proc.h"
 #include "solvers.h"
 #include "sim-header.h"

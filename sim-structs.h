@@ -151,6 +151,10 @@ struct sim_params {
   bool write_ires_xp2 = false;
   bool write_ires_abp = false; // write ires for metric variables?
   bool horizon_search = false; // search for apparent horizon after each step?
+  // for convergence purposes
+  str hold_const = "lambda"; // "lambda", "dt", or "dr"
+  bool same_times = true;
+  bool same_grids = true;
 
   int n_ell = 3;
 
