@@ -617,10 +617,11 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
       p->exit_itn = itn;
       if (get_res_psi(f, p) < (p->tol)) {
 	if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
-        else {
-	  res = get_res_xp(f, p);
-	  if (res < (p->tol)) { res = get_res_xp2(f, p); }
+        else if (get_res_xp(f, p) < (p->tol)) {
+	  if (get_res_xp2(f, p) < (p->tol)) { res = 0; }
+	  else { return -5; }
 	}
+	else { return -5; }
       }
       else { return -5; }
     }

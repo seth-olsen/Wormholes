@@ -239,6 +239,25 @@ str get_param_string(map<str, str *>& p_str, map<str, int *>& p_int,
   return param_string;
 }
 
+str get_paramFile_string(map<str, str *>& p_str, map<str, int *>& p_int,
+			 map<str, dbl *>& p_dbl, map<str, bool *>& p_bool)
+{
+  str param_string = "";
+  for (pair<str, str *> param : p_str) {
+    param_string += param.first + "\n" + *(param.second) + "\n";
+  }
+  for (pair<str, int *> param : p_int) {
+    param_string += param.first + "\n" + *(param.second) + "\n";
+  }
+  for (pair<str, dbl *> param : p_dbl) {
+    param_string += param.first + "\n" + *(param.second) + "\n";
+  }
+  for (pair<str, bool *> param : p_bool) {
+    param_string += param.first + "\n" + *(param.second) + "\n";
+  }
+  return param_string;
+}
+
 void record_horizon(PAR *p, const VD& f_ps, int ind, int itn, int t_itn)
 {
   cout << "Horizon Found at:\nr[" << ind << "] = " << p->r[ind] << "  (r_areal = "

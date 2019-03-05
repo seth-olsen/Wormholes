@@ -126,8 +126,8 @@ int fields_init(FLDS *f, PAR *p)
   for (int k = (p->zeropt) + 1; k < (p->npts); ++k) {
     f->Xi[k] += ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
     if (!(p->clean_hyp)) { f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0); }
-    //f->Xi2[k] = ic_xi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
-    //f->Pi2[k] = ic_pi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
+    f->Xi2[k] = ic_xi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
+    f->Pi2[k] = ic_pi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
   }
 
   f->oldXi = f->Xi;
@@ -184,7 +184,8 @@ int params_init(PAR *p, int argc, char **argv)
   map<str, dbl *> p_dbl = get_p_dbl(p);
   map<str, bool *> p_bool = get_p_bool(p);
   map<str, str> params;
-  if (argc > 1) { param_collect(argv, argc, params); }
+  if (argc > 2) { param_collect(argv, argc, params); }
+  else if (argc == 2) { file_param_collect(argv[1], params); }
   else { file_param_collect("ellis-parameters.txt", params); }
   param_set(params, p_str, p_int, p_dbl, p_bool);
   // check that grid size (lastpt = npts-1) is divisible by save_pt 
@@ -200,6 +201,7 @@ int params_init(PAR *p, int argc, char **argv)
       p->n_ell = 2;
       p->solver = solve_dynamic_psi_hyp;
     }
+    else { p->solver = solve_dynamic; }
   }
   else {
     if (p->static_metric) { p->solver = solveAll_static; }
@@ -275,13 +277,12 @@ int params_init(PAR *p, int argc, char **argv)
   p->jacRRm2 = (p->in2dr);
   p->cpsi_rhs = 1 / (p->jacRR);
   // parameter data output
-  str param_data = get_param_string(p_str, p_int, p_dbl, p_bool);
   ofstream specs;
   str specs_name = p->outfile + ".txt";
   specs.open(specs_name, ofstream::out);
-  specs << param_data;
+  specs << get_paramFile_string(p_str, p_int, p_dbl, p_bool);
   specs.close();
-  cout << param_data << endl;
+  cout << get_param_string(p_str, p_int, p_dbl, p_bool) << endl;
   return 0;
 }
 
