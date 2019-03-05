@@ -1,9 +1,9 @@
 -outfile
-hyp
+ell
 -resn_factor
 1
 -psi_hyp
-1
+0
 -ic_Amp
 0
 -ic2_Amp
