@@ -13,6 +13,7 @@ typedef struct bbhutil_params BBHP;
 typedef struct sim_fields FLDS;
 typedef struct sim_writers WRS;
 typedef struct sim_params PAR;
+typedef struct sim_diagnostics DIAG;
 */
 
 struct bbhutil_params {
@@ -214,14 +215,127 @@ struct sim_params {
   dbl jacRRm2 = in2dr;
   dbl cpsi_rhs = 1 / jacRR;
 
-
   int (*solver)(FLDS *, PAR *) = NULL;
   
 } ;
 
   
 
+struct sim_diagnostics {
+  dbl dt2ps;
+  dbl dx2al; dbl dx2be; dbl dx2ps;
+  dbl dxdtbe; dbl dxdtps;
+  dbl dtal; dbl dtbe; dbl dtps;
+  dbl dxal; dbl dxbe; dbl dxps;
+  dbl xi; dbl pi; dbl xi2; dbl pi2;
+  dbl al; dbl be; dbl ps;
+  dbl x; dbl xsq; dbl lsq; int k;
 
+  vector<dbl *> read_data(7, NULL);
+  vector<char *> read_files(7, NULL);  
+  str al_nm = "Al-";
+  //dbl *al_data = NULL;
+  str be_nm = "Be-";
+  //dbl *be_data = NULL;
+  str ps_nm = "Ps-";
+  //dbl *ps_data = NULL;
+  str xi_nm = "Xi-";
+  //dbl *xi_data = NULL;
+  str pi_nm = "Pi-";
+  //dbl *pi_data = NULL;
+  str xi2_nm = "Xi2-";
+  //dbl *xi2_data = NULL;
+  str pi2_nm = "Pi2-";
+  //dbl *pi2_data = NULL;
+
+  vector<dbl *> write_data;
+  vector<char *> write_files;  
+  str ial_nm = "iresAl-";
+  //dbl *ial_data = NULL;
+  bool wr_ial = false;
+  str ibe_nm = "iresBe-";
+  //dbl *ibe_data = NULL;
+  bool wr_ibe = false;
+  str ips_nm = "iresPs-";
+  //dbl *ips_data = NULL;
+  bool wr_ips = false;
+  str ixi_nm = "iresXi-";
+  //dbl *ixi_data = NULL;
+  bool wr_ixi = false;
+  str ipi_nm = "iresPi-";
+  //dbl *ipi_data = NULL;
+  bool wr_ipi = false;
+  str ixi2_nm = "iresXi2-";
+  //dbl *ixi2_data = NULL;
+  bool wr_ixi2 = false;
+  str ipi2_nm = "iresPi2-";
+  //dbl *ipi2_data = NULL;
+  bool wr_ipi2 = false;
+  str mass_nm = "maspecet";
+  //dbl *mass_data = NULL;
+  bool wr_mass = false;
+  str null_nm = "outnull";
+  //dbl *null_data = NULL;
+  bool wr_null = false;
+  str revnull_nm = "outnull_rev";
+  //dbl *revnull_data = NULL;
+  bool wr_revnull = false;
+  str ric_nm = "ricci";
+  //dbl *ric_data = NULL;
+  bool wr_ric = false;
+  str ham_nm = "cHamiltonian";
+  //dbl *ham_data = NULL;
+  bool wr_ham = false;
+  str mom_nm = "cMomentum";
+  //dbl *mom_data = NULL;
+  bool wr_mom = false;
+  str kext_nm = "cKext";
+  //dbl *kext_data = NULL;
+  bool wr_kext = false;
+  str dkext_nm = "cDtKext";
+  //dbl *dkext_data = NULL;
+  bool wr_dkext = false;
+  str tt_nm = "EEtt";
+  //dbl *tt_data = NULL;
+  bool wr_tt = false;
+  str tx_nm = "EEtx";
+  //dbl *tx_data = NULL;
+  bool wr_tx = false;
+  str xx_nm = "EExx";
+  //dbl *xx_data = NULL;
+  bool wr_xx = false;
+  str hh_nm = "EEhh";
+  //dbl *hh_data = NULL;
+  bool wr_hh = false;
+
+  BBHP p_Al;
+  BBHP p_Be;
+  BBHP p_Ps;
+  BBHP p_Xi;
+  BBHP p_Pi;
+  BBHP p_Xi2;
+  BBHP p_Pi2;
+
+  BBHP p_iresAl;
+  BBHP p_iresBe;
+  BBHP p_iresPs;
+  BBHP p_iresXi;
+  BBHP p_iresPi;
+  BBHP p_iresXi2;
+  BBHP p_iresPi2;
+  BBHP p_maspect;
+  BBHP p_outnull;
+  BBHP p_ricci;
+  BBHP p_EEtt;
+  BBHP p_EEtx;
+  BBHP p_EExx;
+  BBHP p_EEhh;
+  BBHP p_momentum;
+  BBHP p_hamiltonian;
+  BBHP p_kext;
+  BBHP p_dtkext;
+
+} ;
 
 
 

@@ -28,6 +28,11 @@ inline void write_sdf(const BBHP *bp, dbl t)
   gft_out_bbox(bp->file, t, bp->shape, bp->rank, bp->coords, bp->data);
 }
 
+inline void write_sdf_direct(const char *file, const dbl *data, const PAR *p)
+{
+  gft_out_bbox(file, (p->t), &(p->wr_shape), 1, &(p->coord_lims[0]), data);
+}
+
 inline void prepare_write(const VD& fld, VD& wr_fld, PAR *p)
 {
   for (auto ind : (p->inds)) {
@@ -37,7 +42,7 @@ inline void prepare_write(const VD& fld, VD& wr_fld, PAR *p)
 
 inline void write_bbhp(BBHP *bp, PAR *p)
 {
-  prepare_write(*(bp->full_field), bp->wr_field, p);
+  if ((p->save_pt) != 1) { prepare_write(*(bp->full_field), bp->wr_field, p); }
   gft_out_bbox(bp->file, p->t, bp->shape, bp->rank, bp->coords, bp->data);
 }
 
@@ -113,7 +118,8 @@ void file_param_collect(str filename, map<str, str>& dest) {
 
 void param_set(map<str, str>& p_all, map<str, str *>& p_str,
 	       map<str, int *>& p_int, map<str, dbl *>& p_dbl,
-	       map<str, bool *>& p_bool) {
+	       map<str, bool *>& p_bool)
+{
   for (pair<str, str> p : p_all) {
     if (p_str.count(p.first)) { *p_str[p.first] = p.second; }
     else if (p_int.count(p.first)) { *p_int[p.first] = atoi(&p.second[0]); }
@@ -123,12 +129,15 @@ void param_set(map<str, str>& p_all, map<str, str *>& p_str,
 }
 
 // read fields using bbhutil
-void read_step(const vector<char *>& files, int times[], const vector<dbl *>& fields, int nfields) {
+void read_step(const vector<char *>& files, int times[], const vector<dbl *>& fields, int nfields)
+{
   for (int k = 0; k < nfields; ++k) {
     gft_read_brief(files[k], times[k], fields[k]);
   }
   return;
 }
+
+void read_fields()
 
 void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
 {

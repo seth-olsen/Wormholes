@@ -310,17 +310,9 @@ int diagnostics_init(DIAG *d, FLDS *f, PAR *p, int argc, char **argv) {
     cout << "\nERROR: FIELDS NOT WRITTEN AT SIM RESOLUTION\n" << endl;
     return -1;
   }
-  /*
-  bp->full_field = p_field;
-  bp->wr_field = zeros;
-  bp->filename = fieldname + "-" + p->outfile + ".sdf";
-  bp->file = &(bp->filename[0]);
-  bp->shape = &(p->wr_shape);
-  bp->rank = 1;
-  bp->coords = &(p->coord_lims[0]);  
-  bp->data = &(bp->wr_field[0]);
-  bp->write_this = true;
-  */
+  VD zeros((p->npts));
+  // initialize all read fields in f (4 scalars, 3 metric vars, including old and older (and cn?))
+  
   
 
   return 0;
