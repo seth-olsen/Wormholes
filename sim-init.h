@@ -296,6 +296,35 @@ int params_init(PAR *p, int argc, char **argv)
   return 0;
 }
 
+int diagnostics_init(DIAG *d, FLDS *f, PAR *p, int argc, char **argv) {
+  int new_argc = 2;
+  char *new_argv[] = {argv[0], argv[1]};
+  int err_code = params_init(&p, new_argc, new_argv);
+  if (err_code != 0) {
+    cout << "\nPARAM INIT error code = " << err_code << endl;
+    return err_code;
+  }
+  if ( ((p->lastwr) != (p->lastpt)) || ((p->wr_shape) != (p->npts))
+       || ((p->zerowr) != (p->zeropt)) || ((p->wr_dr) != (p->dr))
+       || ((p->save_pt) != 1) || ((p->save_step) != 1) ) {
+    cout << "\nERROR: FIELDS NOT WRITTEN AT SIM RESOLUTION\n" << endl;
+    return -1;
+  }
+  /*
+  bp->full_field = p_field;
+  bp->wr_field = zeros;
+  bp->filename = fieldname + "-" + p->outfile + ".sdf";
+  bp->file = &(bp->filename[0]);
+  bp->shape = &(p->wr_shape);
+  bp->rank = 1;
+  bp->coords = &(p->coord_lims[0]);  
+  bp->data = &(bp->wr_field[0]);
+  bp->write_this = true;
+  */
+  
+
+  return 0;
+}
 
 #endif
 

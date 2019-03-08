@@ -36,6 +36,14 @@ ellis-conv: ellis-conv.o
 ellis-conv.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
 	$(CXX) -c $(CXXFLAGS) ellis-conv.cpp
 
+ellis-analysis: ellis-analysis.o
+	$(CXX) -o ellis-analysis ellis-analysis.o ${LDLIBS}
+	rm -f ellis-analysis.o
+
+ellis-analysis.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
+	$(CXX) -c $(CXXFLAGS) ellis-analysis.cpp
+
+
 test-code: test-code.o
 	-${CXX} -o test-code test-code.o ${LDLIBS}
 	rm -f test-code.o

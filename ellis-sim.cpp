@@ -71,13 +71,20 @@ int main(int argc, char **argv)
     str ps_nm = "Ps-" + (p.outfile) + ".sdf";
     str xi_nm = "Xi-" + (p.outfile) + ".sdf";
     str pi_nm = "Pi-" + (p.outfile) + ".sdf";
+    str xi2_nm = "Xi2-" + (p.outfile) + ".sdf";
+    str pi2_nm = "Pi2-" + (p.outfile) + ".sdf";
+    if ((p.npts) != (p.wr_shape)) { cout << "\n*ERROR in WRITE SHAPE*" << endl; }
+    int *shape = &(p.wr_shape);
+    dbl *coords = &(p.coord_lims[0]);
     for (int i = 0; i < (p.nsteps); ++i) {
       // WRITING
-      gft_out_bbox(&(al_nm[0]), (p.t), &(p.npts), 1, &(p.coord_lims[0]), &(f.Al[0]));
-      gft_out_bbox(&(be_nm[0]), (p.t), &(p.npts), 1, &(p.coord_lims[0]), &(f.Be[0]));
-      gft_out_bbox(&(ps_nm[0]), (p.t), &(p.npts), 1, &(p.coord_lims[0]), &(f.Ps[0]));
-      gft_out_bbox(&(xi_nm[0]), (p.t), &(p.npts), 1, &(p.coord_lims[0]), &(f.Xi[0]));
-      gft_out_bbox(&(pi_nm[0]), (p.t), &(p.npts), 1, &(p.coord_lims[0]), &(f.Pi[0]));
+      gft_out_bbox(&(al_nm[0]), (p.t), shape, 1, coords, &(f.Al[0]));
+      gft_out_bbox(&(be_nm[0]), (p.t), shape, 1, coords, &(f.Be[0]));
+      gft_out_bbox(&(ps_nm[0]), (p.t), shape, 1, coords, &(f.Ps[0]));
+      gft_out_bbox(&(xi_nm[0]), (p.t), shape, 1, coords, &(f.Xi[0]));
+      gft_out_bbox(&(pi_nm[0]), (p.t), shape, 1, coords, &(f.Pi[0]));
+      gft_out_bbox(&(xi2_nm[0]), (p.t), shape, 1, coords, &(f.Xi2[0]));
+      gft_out_bbox(&(pi2_nm[0]), (p.t), shape, 1, coords, &(f.Pi2[0]));
       // SOLVE FOR NEXT STEP
       err_code = fields_step(&f, &p, i);
       if (err_code) {
@@ -87,11 +94,13 @@ int main(int argc, char **argv)
       }
     }
     // WRITE LAST STEP
-    gft_out_bbox(&(al_nm[0]), (p.t), &(p.npts), 1, &(p.coord_lims[0]), &(f.Al[0]));
-    gft_out_bbox(&(be_nm[0]), (p.t), &(p.npts), 1, &(p.coord_lims[0]), &(f.Be[0]));
-    gft_out_bbox(&(ps_nm[0]), (p.t), &(p.npts), 1, &(p.coord_lims[0]), &(f.Ps[0]));
-    gft_out_bbox(&(xi_nm[0]), (p.t), &(p.npts), 1, &(p.coord_lims[0]), &(f.Xi[0]));
-    gft_out_bbox(&(pi_nm[0]), (p.t), &(p.npts), 1, &(p.coord_lims[0]), &(f.Pi[0]));
+    gft_out_bbox(&(al_nm[0]), (p.t), shape, 1, coords, &(f.Al[0]));
+    gft_out_bbox(&(be_nm[0]), (p.t), shape, 1, coords, &(f.Be[0]));
+    gft_out_bbox(&(ps_nm[0]), (p.t), shape, 1, coords, &(f.Ps[0]));
+    gft_out_bbox(&(xi_nm[0]), (p.t), shape, 1, coords, &(f.Xi[0]));
+    gft_out_bbox(&(pi_nm[0]), (p.t), shape, 1, coords, &(f.Pi[0]));
+    gft_out_bbox(&(xi2_nm[0]), (p.t), shape, 1, coords, &(f.Xi2[0]));
+    gft_out_bbox(&(pi2_nm[0]), (p.t), shape, 1, coords, &(f.Pi2[0]));
   }
   gft_close_all();
   cout << (p.outfile) + " written in "

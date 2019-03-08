@@ -28,6 +28,7 @@ typedef struct bbhutil_params BBHP;
 typedef struct sim_fields FLDS;
 typedef struct sim_writers WRS;
 typedef struct sim_params PAR;
+typedef struct sim_diagnostics DIAG;
 
 
 
