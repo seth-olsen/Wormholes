@@ -188,7 +188,7 @@ int params_init(PAR *p, int argc, char **argv)
   else if (argc == 2) { file_param_collect(argv[1], params); }
   else { file_param_collect("ellis-parameters.txt", params); }
   param_set(params, p_str, p_int, p_dbl, p_bool);
-  // check that grid size (lastpt = npts-1) is divisible by save_pt 
+  // check that grid size (lastpt = npts-1) is divisible by 2*save_pt 
   if (((p->lastpt) % (2*(p->save_pt))) != 0) {
     cout << "ERROR: save_pt = " << p->save_pt << " entered for grid size " << p->lastpt << endl;
     p->save_pt -= ((p->lastpt) % (2*(p->save_pt)));
@@ -214,23 +214,20 @@ int params_init(PAR *p, int argc, char **argv)
   // ***set rmin because can't set negative numbers with user input***
   p->rmin = -(p->rmax);
   // bbhutil parameters for writing data to sdf
-  p->lastwr = p->lastpt / p->save_pt;
-  p->wr_shape = p->lastwr + 1;
-  p->zerowr = p->lastwr / 2;
-  p->coord_lims[0] = p->rmin; p->coord_lims[1] = p->rmax;
-  p->wr_dr = (p->rmax - p->rmin) / ((dbl) p->lastwr);
-  p->lastpt = p->lastpt * p->resn_factor;
-  p->save_pt = p->save_pt * p->resn_factor;
-  p->nsteps = p->nsteps * p->resn_factor;
-  p->save_step = p->save_step * p->resn_factor;
+  p->coord_lims[0] = (p->rmin); p->coord_lims[1] = (p->rmax);
+  p->lastwr = (p->lastpt) / (p->save_pt);
+  p->wr_shape = (p->lastwr) + 1;
+  p->zerowr = (p->lastwr) / 2;
+  p->wr_dr = ((p->rmax) - (p->rmin)) / ((dbl) (p->lastwr));
   // derived parameters
-  p->npts = p->lastpt + 1;
-  p->zeropt = p->lastpt / 2;
-  p->norm_factor = 1 / ((dbl) p->npts);
+  p->lastpt = (p->lastpt) * (p->resn_factor);
+  p->nsteps = (p->nsteps) * (p->resn_factor);
+  p->npts = (p->lastpt) + 1;
+  p->zeropt = (p->lastpt) / 2;
+  p->norm_factor = 1 / ((dbl) (p->npts));
   if (p->norm_type == 1) { p->norm_factor = sqrt(p->norm_factor); }
-  p->dr = (p->rmax - p->rmin) / ((dbl) p->lastpt);
-  p->dt = p->lam * p->dr;
-  p->check_diagnostics = p->save_step * p->check_step;
+  p->dr = ((p->rmax) - (p->rmin)) / ((dbl) (p->lastpt));
+  p->dt = (p->lam) * (p->dr);
   p->r[0] = (p->rmin);
   for (int k = 1; k < (p->npts); ++k) {
     p->r[k] = (p->rmin) + k*(p->dr);
@@ -241,12 +238,23 @@ int params_init(PAR *p, int argc, char **argv)
     cout << "\n***COORDINATE INIT ERROR***\n" << endl;
   }
   p->t = 0;
-  for (int k = 0; k < p->wr_shape; ++k) {
-    (p->inds).push_back({k, (p->save_pt)*k});
+  if (p->same_grids) {
+    p->save_pt = (p->save_pt) * (p->resn_factor);
+    for (int k = 0; k < p->wr_shape; ++k) {
+      (p->inds).push_back({k, (p->save_pt)*k});
+    }
+    if ((p->inds[p->lastwr]).second != p->lastpt || (p->inds[p->zerowr]).second != p->zeropt) {
+      cout << "\n***INDEX INIT ERROR***\n" << endl;
+    }
   }
-  if ((p->inds[p->lastwr]).second != p->lastpt || (p->inds[p->zerowr]).second != p->zeropt) {
-    cout << "\n***INDEX INIT ERROR***\n" << endl;
-  }  
+  else {
+    p->lastwr = (p->lastpt);
+    p->wr_shape = (p->npts);
+    p->zerowr = (p->zeropt);
+    p->wr_dr = (p->dr);
+  }
+  if (p->same_times) { p->save_step = (p->save_step) * (p->resn_factor); }
+  p->check_diagnostics = (p->save_step) * (p->check_step);
   // lapack object declaration
   p->lp_n = (p->n_ell) * (p->npts);
   p->lp_kl = 2;
