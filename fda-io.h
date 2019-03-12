@@ -18,6 +18,26 @@
 #include "ellis-fns.h"
 #include "ellis-proc.h"
 
+map<int, str> get_field_names()
+{
+  map<int, str> names { {0, "Al"}, {1, "Be"}, {2, "Ps"},
+			{3, "Xi"}, {4, "Pi"}, {5, "Xi2"}, {6, "Pi2"}};
+  return names;
+}
+
+map<int, str> get_diagnostic_names()
+{
+  map<int, str> names { {0, "ResAl"}, {1, "ResBe"}, {2, "ResPs"},
+			{3, "ResXi"}, {4, "ResPi"}, {5, "ResXi2"}, {6, "ResPi2"},
+			{7, "iresAl"}, {8, "iresBe"}, {9, "iresPs"},
+			{10, "iresXi"}, {11, "iresPi"}, {12, "iresXi2"}, {13, "iresPi2"},
+			{14, "outnull"}, {15, "revnull"}, {16, "maspect"}, {17, "ricci"},
+			{18, "cHamiltonian"}, {19, "cMomentum"},
+			{20, "cKext"}, {21, "cDtKext"},
+			{22, "EEtt"}, {23, "EEtx"}, {24, "EExx"}, {25, "EEhh"} };
+  return names;
+}
+
 inline str bool_to_str(bool bool_in)
 {
   return ( (bool_in) ? "TRUE" : "FALSE" );
@@ -28,7 +48,7 @@ inline void write_sdf(const BBHP *bp, dbl t)
   gft_out_bbox(bp->file, t, bp->shape, bp->rank, bp->coords, bp->data);
 }
 
-inline void write_sdf_direct(const char *file, const dbl *data, const PAR *p)
+inline void write_sdf_direct(char *file, dbl *data, PAR *p)
 {
   gft_out_bbox(file, (p->t), &(p->wr_shape), 1, &(p->coord_lims[0]), data);
 }
@@ -42,13 +62,44 @@ inline void prepare_write(const VD& fld, VD& wr_fld, PAR *p)
 
 inline void write_bbhp(BBHP *bp, PAR *p)
 {
-  if ((p->save_pt) != 1) { prepare_write(*(bp->full_field), bp->wr_field, p); }
-  gft_out_bbox(bp->file, p->t, bp->shape, bp->rank, bp->coords, bp->data);
+  if ((bp->full_field) == NULL) {
+    gft_out_bbox(bp->file, p->t, bp->shape, bp->rank, bp->coords, bp->data);
+  }
+  else if ((p->save_pt) == 1) {
+    gft_out_bbox(bp->file, p->t, bp->shape, bp->rank, bp->coords, bp->data);
+  }
+  else {
+    prepare_write(*(bp->full_field), bp->wr_field, p);
+    gft_out_bbox(bp->file, p->t, bp->shape, bp->rank, bp->coords, bp->data);
+  }
 }
 
 inline void write_bbhp_vec(vector<BBHP *>& bp_vec, PAR *p)
 {
   for (BBHP *bp : bp_vec) { write_bbhp(bp, p); }
+}
+
+inline void read_bbhp(BBHP *bp, int time)
+{
+  gft_read_brief(bp->file, time, bp->data);
+}
+inline void read_bbhp_vec(const vector<BBHP *>& bpv, int time)
+{
+  for (BBHP *bp : bpv) { gft_read_brief(bp->file, time, bp->data); }
+}
+
+inline void compute_bbhp_vec(const vector<BBHP *>& bpv, SSV& s, int k)
+{
+  for (BBHP *bp : bpv) { (bp->wr_field)[k] = (bp->compute)(s); }
+}
+
+// read fields using bbhutil
+void read_step(const vector<char *>& files, int times[], const vector<dbl *>& fields, int nfields)
+{
+  for (int k = 0; k < nfields; ++k) {
+    gft_read_brief(files[k], times[k], fields[k]);
+  }
+  return;
 }
 
 VD make_vector(int len, dbl val)
@@ -128,16 +179,6 @@ void param_set(map<str, str>& p_all, map<str, str *>& p_str,
   }
 }
 
-// read fields using bbhutil
-void read_step(const vector<char *>& files, int times[], const vector<dbl *>& fields, int nfields)
-{
-  for (int k = 0; k < nfields; ++k) {
-    gft_read_brief(files[k], times[k], fields[k]);
-  }
-  return;
-}
-
-void read_fields()
 
 void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
 {

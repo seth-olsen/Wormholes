@@ -46,6 +46,16 @@ void dissipationB_xp(const VD& old_xi, const VD& old_pi, VD& f_xi, VD& f_pi,
 		     int one_past_last, dbl dspn);
 void dissipationNB2_xp(const VD& old_xi, const VD& old_pi, VD& f_xi, VD& f_pi,
 		       int one_past_last, dbl dspn);
+// analysis processes
+void get_metric_vals(SSV& s, FLDS *f, PAR *p, int k);
+void get_metric_boundvals(SSV& s, FLDS *f, PAR *p, int k);
+void get_scalar_vals(SSV& s, FLDS *f, PAR *p, int k);
+void get_scalar_boundvals(SSV& s, FLDS *f, PAR *p, int k);
+void get_all_vals(SSV& s, FLDS *f, PAR *p, int k);
+void get_all_boundvals(SSV& s, FLDS *f, PAR *p, int k);
+void set_old_metric(FLDS *f);
+void set_old_scalar(FLDS *f);
+void set_old_all(FLDS *f);
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -289,6 +299,275 @@ void dissipationB_xp(const VD& old_xi, const VD& old_pi, VD& f_xi, VD& f_pi,
     f_pi[k] += dissipate(dspn, old_pi, k);
   }
   return;
+}
+
+  
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
+  
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+void get_metric_vals(SSV& s, FLDS *f, PAR *p, int k)
+{
+  s.x = (p->r)[k];
+  s.xsq = sq(s.x);
+  s.dt2ps = sq(p->indt)*(2*(f->Ps[k]) - 5*(f->oldPs[k]) + 4*(f->olderPs[k]) - f->oldestPs[k]);
+  s.dx2al = ddr2_c(f->Al, p, k);
+  s.dx2be = ddr2_c(f->Be, p, k);
+  s.dx2ps = ddr2_c(f->Ps, p, k);
+  s.dxdtbe = (p->in2dr)*(p->indt)*(1.5*(f->Be[k+1] - f->Be[k-1])
+				   - 2*(f->oldBe[k+1] - f->oldBe[k-1])
+				   + 0.5*(f->olderBe[k+1] - f->olderBe[k-1]));
+  s.dxdtps = (p->in2dr)*(p->indt)*(1.5*(f->Ps[k+1] - f->Ps[k-1])
+				   - 2*(f->oldPs[k+1] - f->oldPs[k-1])
+				   + 0.5*(f->olderPs[k+1] - f->olderPs[k-1]));
+  s.dtal = (p->indt)*(1.5*(f->Al[k]) - 2*(f->oldAl[k]) + 0.5*(f->olderAl[k]));
+  s.dtbe = (p->indt)*(1.5*(f->Be[k]) - 2*(f->oldBe[k]) + 0.5*(f->olderBe[k]));
+  s.dtps = (p->indt)*(1.5*(f->Ps[k]) - 2*(f->oldPs[k]) + 0.5*(f->olderPs[k]));
+  s.dxal = ddr_c(f->Al, p, k);
+  s.dxbe = ddr_c(f->Be, p, k);
+  s.dxps = ddr_c(f->Ps, p, k);
+  s.xi = f->Xi[k];
+  s.pi = f->Pi[k];
+  s.xi2 = f->Xi2[k];
+  s.pi2 = f->Pi2[k];
+  s.al = f->Al[k];
+  s.be = f->Be[k];
+  s.ps = f->Ps[k];
+}
+void get_metric_boundvals(SSV& s, FLDS *f, PAR *p, int k)
+{
+  s.x = (p->r)[k];
+  s.xsq = sq(s.x);
+  s.xi = f->Xi[k];
+  s.pi = f->Pi[k];
+  s.xi2 = f->Xi2[k];
+  s.pi2 = f->Pi2[k];
+  s.al = f->Al[k];
+  s.be = f->Be[k];
+  s.ps = f->Ps[k];
+  s.dtal = (p->indt)*(1.5*(f->Al[k]) - 2*(f->oldAl[k]) + 0.5*(f->olderAl[k]));
+  s.dtbe = (p->indt)*(1.5*(f->Be[k]) - 2*(f->oldBe[k]) + 0.5*(f->olderBe[k]));
+  s.dtps = (p->indt)*(1.5*(f->Ps[k]) - 2*(f->oldPs[k]) + 0.5*(f->olderPs[k]));
+  s.dt2ps = sq(p->indt)*(2*(f->Ps[k]) - 5*(f->oldPs[k]) + 4*(f->olderPs[k]) - f->oldestPs[k]);
+  if (k == 0) {
+    s.dx2al = ddr2_f(f->Al, p, k);
+    s.dx2be = ddr2_f(f->Be, p, k);
+    s.dx2ps = ddr2_f(f->Ps, p, k);
+    s.dxdtbe = (p->in2dr)*(p->indt)*(1.5*d_f(f->Be, k) - 2*d_f(f->oldBe, k) + 0.5*d_f(f->olderBe, k));
+    s.dxdtps = (p->in2dr)*(p->indt)*(1.5*d_f(f->Ps, k) - 2*d_f(f->oldPs, k) + 0.5*d_f(f->olderPs, k));
+    s.dxal = ddr_f(f->Al, p, k);
+    s.dxbe = ddr_f(f->Be, p, k);
+    s.dxps = ddr_f(f->Ps, p, k);
+  }
+  else {
+    s.dx2al = ddr2_b(f->Al, p, k);
+    s.dx2be = ddr2_b(f->Be, p, k);
+    s.dx2ps = ddr2_b(f->Ps, p, k);
+    s.dxdtbe = (p->in2dr)*(p->indt)*(1.5*d_b(f->Be, k) - 2*d_b(f->oldBe, k) + 0.5*d_b(f->olderBe, k));
+    s.dxdtps = (p->in2dr)*(p->indt)*(1.5*d_b(f->Ps, k) - 2*d_b(f->oldPs, k) + 0.5*d_b(f->olderPs, k));
+    s.dxal = ddr_b(f->Al, p, k);
+    s.dxbe = ddr_b(f->Be, p, k);
+    s.dxps = ddr_b(f->Ps, p, k);
+  }  
+}
+  
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+void get_scalar_vals(SSV& s, FLDS *f, PAR *p, int k)
+{
+  s.x = (p->r)[k];
+  s.xsq = sq(s.x);
+  s.dtxi = (p->indt)*(1.5*(f->Xi[k]) - 2*(f->oldXi[k]) + 0.5*(f->olderXi[k]));
+  s.dtpi = (p->indt)*(1.5*(f->Pi[k]) - 2*(f->oldPi[k]) + 0.5*(f->olderPi[k]));
+  s.dtxi2 = (p->indt)*(1.5*(f->Xi2[k]) - 2*(f->oldXi2[k]) + 0.5*(f->olderXi2[k]));
+  s.dtpi2 = (p->indt)*(1.5*(f->Pi2[k]) - 2*(f->oldPi2[k]) + 0.5*(f->olderPi2[k]));
+  s.dxxi = ddr_c(f->Xi, p, k);
+  s.dxpi = ddr_c(f->Pi, p, k);
+  s.dxxi2 = ddr_c(f->Xi2, p, k);
+  s.dxpi2 = ddr_c(f->Pi2, p, k);
+  s.dxal = ddr_c(f->Al, p, k);
+  s.dxbe = ddr_c(f->Be, p, k);
+  s.dxps = ddr_c(f->Ps, p, k);
+  s.xi = f->Xi[k];
+  s.pi = f->Pi[k];
+  s.xi2 = f->Xi2[k];
+  s.pi2 = f->Pi2[k];
+  s.al = f->Al[k];
+  s.be = f->Be[k];
+  s.ps = f->Ps[k];
+}
+void get_scalar_boundvals(SSV& s, FLDS *f, PAR *p, int k)
+{
+  s.x = (p->r)[k];
+  s.xsq = sq(s.x);
+  s.xi = f->Xi[k];
+  s.pi = f->Pi[k];
+  s.xi2 = f->Xi2[k];
+  s.pi2 = f->Pi2[k];
+  s.al = f->Al[k];
+  s.be = f->Be[k];
+  s.ps = f->Ps[k];  
+  s.dtxi = (p->indt)*(1.5*(f->Xi[k]) - 2*(f->oldXi[k]) + 0.5*(f->olderXi[k]));
+  s.dtpi = (p->indt)*(1.5*(f->Pi[k]) - 2*(f->oldPi[k]) + 0.5*(f->olderPi[k]));
+  s.dtxi2 = (p->indt)*(1.5*(f->Xi2[k]) - 2*(f->oldXi2[k]) + 0.5*(f->olderXi2[k]));
+  s.dtpi2 = (p->indt)*(1.5*(f->Pi2[k]) - 2*(f->oldPi2[k]) + 0.5*(f->olderPi2[k]));
+  if (k == 0) {
+    s.dxxi = ddr_f(f->Xi, p, k);
+    s.dxpi = ddr_f(f->Pi, p, k);
+    s.dxxi2 = ddr_f(f->Xi2, p, k);
+    s.dxpi2 = ddr_f(f->Pi2, p, k);
+    s.dxal = ddr_f(f->Al, p, k);
+    s.dxbe = ddr_f(f->Be, p, k);
+    s.dxps = ddr_f(f->Ps, p, k);
+  }
+  else {
+    s.dxxi = ddr_b(f->Xi, p, k);
+    s.dxpi = ddr_b(f->Pi, p, k);
+    s.dxxi2 = ddr_b(f->Xi2, p, k);
+    s.dxpi2 = ddr_b(f->Pi2, p, k);
+    s.dxal = ddr_b(f->Al, p, k);
+    s.dxbe = ddr_b(f->Be, p, k);
+    s.dxps = ddr_b(f->Ps, p, k);
+  }  
+}
+  
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+void get_all_vals(SSV& s, FLDS *f, PAR *p, int k)
+{
+  s.x = (p->r)[k];
+  s.xsq = sq(s.x);
+  s.dt2ps = sq(p->indt)*(2*(f->Ps[k]) - 5*(f->oldPs[k]) + 4*(f->olderPs[k]) - f->oldestPs[k]);
+  s.dx2al = ddr2_c(f->Al, p, k);
+  s.dx2be = ddr2_c(f->Be, p, k);
+  s.dx2ps = ddr2_c(f->Ps, p, k);
+  s.dxdtbe = (p->in2dr)*(p->indt)*(1.5*(f->Be[k+1] - f->Be[k-1])
+				   - 2*(f->oldBe[k+1] - f->oldBe[k-1])
+				   + 0.5*(f->olderBe[k+1] - f->olderBe[k-1]));
+  s.dxdtps = (p->in2dr)*(p->indt)*(1.5*(f->Ps[k+1] - f->Ps[k-1])
+				   - 2*(f->oldPs[k+1] - f->oldPs[k-1])
+				   + 0.5*(f->olderPs[k+1] - f->olderPs[k-1]));
+  s.dtxi = (p->indt)*(1.5*(f->Xi[k]) - 2*(f->oldXi[k]) + 0.5*(f->olderXi[k]));
+  s.dtpi = (p->indt)*(1.5*(f->Pi[k]) - 2*(f->oldPi[k]) + 0.5*(f->olderPi[k]));
+  s.dtxi2 = (p->indt)*(1.5*(f->Xi2[k]) - 2*(f->oldXi2[k]) + 0.5*(f->olderXi2[k]));
+  s.dtpi2 = (p->indt)*(1.5*(f->Pi2[k]) - 2*(f->oldPi2[k]) + 0.5*(f->olderPi2[k]));
+  s.dtal = (p->indt)*(1.5*(f->Al[k]) - 2*(f->oldAl[k]) + 0.5*(f->olderAl[k]));
+  s.dtbe = (p->indt)*(1.5*(f->Be[k]) - 2*(f->oldBe[k]) + 0.5*(f->olderBe[k]));
+  s.dtps = (p->indt)*(1.5*(f->Ps[k]) - 2*(f->oldPs[k]) + 0.5*(f->olderPs[k]));
+  s.dxxi = ddr_c(f->Xi, p, k);
+  s.dxpi = ddr_c(f->Pi, p, k);
+  s.dxxi2 = ddr_c(f->Xi2, p, k);
+  s.dxpi2 = ddr_c(f->Pi2, p, k);
+  s.dxal = ddr_c(f->Al, p, k);
+  s.dxbe = ddr_c(f->Be, p, k);
+  s.dxps = ddr_c(f->Ps, p, k);
+  s.xi = f->Xi[k];
+  s.pi = f->Pi[k];
+  s.xi2 = f->Xi2[k];
+  s.pi2 = f->Pi2[k];
+  s.al = f->Al[k];
+  s.be = f->Be[k];
+  s.ps = f->Ps[k];
+}
+
+void get_all_boundvals(SSV& s, FLDS *f, PAR *p, int k)
+{
+  s.x = (p->r)[k];
+  s.xsq = sq(s.x);
+  s.xi = f->Xi[k];
+  s.pi = f->Pi[k];
+  s.xi2 = f->Xi2[k];
+  s.pi2 = f->Pi2[k];
+  s.al = f->Al[k];
+  s.be = f->Be[k];
+  s.ps = f->Ps[k];  
+  s.dtxi = (p->indt)*(1.5*(f->Xi[k]) - 2*(f->oldXi[k]) + 0.5*(f->olderXi[k]));
+  s.dtpi = (p->indt)*(1.5*(f->Pi[k]) - 2*(f->oldPi[k]) + 0.5*(f->olderPi[k]));
+  s.dtxi2 = (p->indt)*(1.5*(f->Xi2[k]) - 2*(f->oldXi2[k]) + 0.5*(f->olderXi2[k]));
+  s.dtpi2 = (p->indt)*(1.5*(f->Pi2[k]) - 2*(f->oldPi2[k]) + 0.5*(f->olderPi2[k]));
+  s.dtal = (p->indt)*(1.5*(f->Al[k]) - 2*(f->oldAl[k]) + 0.5*(f->olderAl[k]));
+  s.dtbe = (p->indt)*(1.5*(f->Be[k]) - 2*(f->oldBe[k]) + 0.5*(f->olderBe[k]));
+  s.dtps = (p->indt)*(1.5*(f->Ps[k]) - 2*(f->oldPs[k]) + 0.5*(f->olderPs[k]));
+  s.dt2ps = sq(p->indt)*(2*(f->Ps[k]) - 5*(f->oldPs[k]) + 4*(f->olderPs[k]) - f->oldestPs[k]);
+  if (k == 0) {
+    s.dx2al = ddr2_f(f->Al, p, k);
+    s.dx2be = ddr2_f(f->Be, p, k);
+    s.dx2ps = ddr2_f(f->Ps, p, k);
+    s.dxdtbe = (p->in2dr)*(p->indt)*(1.5*d_f(f->Be, k) - 2*d_f(f->oldBe, k) + 0.5*d_f(f->olderBe, k));
+    s.dxdtps = (p->in2dr)*(p->indt)*(1.5*d_f(f->Ps, k) - 2*d_f(f->oldPs, k) + 0.5*d_f(f->olderPs, k));
+    s.dxxi = ddr_f(f->Xi, p, k);
+    s.dxpi = ddr_f(f->Pi, p, k);
+    s.dxxi2 = ddr_f(f->Xi2, p, k);
+    s.dxpi2 = ddr_f(f->Pi2, p, k);
+    s.dxal = ddr_f(f->Al, p, k);
+    s.dxbe = ddr_f(f->Be, p, k);
+    s.dxps = ddr_f(f->Ps, p, k);
+  }
+  else {
+    s.dx2al = ddr2_b(f->Al, p, k);
+    s.dx2be = ddr2_b(f->Be, p, k);
+    s.dx2ps = ddr2_b(f->Ps, p, k);
+    s.dxdtbe = (p->in2dr)*(p->indt)*(1.5*d_b(f->Be, k) - 2*d_b(f->oldBe, k) + 0.5*d_b(f->olderBe, k));
+    s.dxdtps = (p->in2dr)*(p->indt)*(1.5*d_b(f->Ps, k) - 2*d_b(f->oldPs, k) + 0.5*d_b(f->olderPs, k));
+    s.dxxi = ddr_b(f->Xi, p, k);
+    s.dxpi = ddr_b(f->Pi, p, k);
+    s.dxxi2 = ddr_b(f->Xi2, p, k);
+    s.dxpi2 = ddr_b(f->Pi2, p, k);
+    s.dxal = ddr_b(f->Al, p, k);
+    s.dxbe = ddr_b(f->Be, p, k);
+    s.dxps = ddr_b(f->Ps, p, k);
+  }  
+}
+  
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+void set_old_metric(FLDS *f)
+{
+  f->oldestPs = f->olderPs;
+  f->olderAl = f->oldAl;
+  f->olderBe = f->oldBe;
+  f->olderPs = f->oldPs;
+  f->oldAl = f->Al;
+  f->oldBe = f->Be;
+  f->oldPs = f->Ps;
+}
+
+void set_old_scalar(FLDS *f)
+{
+  f->olderXi = f->oldXi;
+  f->olderPi = f->oldPi;
+  f->olderXi2 = f->oldXi2;
+  f->olderPi2 = f->oldPi2;
+  f->oldXi = f->Xi;
+  f->oldPi = f->Pi;
+  f->oldXi2 = f->Xi2;
+  f->oldPi2 = f->Pi2;
+}
+
+void set_old_all(FLDS *f)
+{
+  f->oldestPs = f->olderPs;
+  f->olderAl = f->oldAl;
+  f->olderBe = f->oldBe;
+  f->olderPs = f->oldPs;
+  f->olderXi = f->oldXi;
+  f->olderPi = f->oldPi;
+  f->olderXi2 = f->oldXi2;
+  f->olderPi2 = f->oldPi2;
+  f->oldAl = f->Al;
+  f->oldBe = f->Be;
+  f->oldPs = f->Ps;
+  f->oldXi = f->Xi;
+  f->oldPi = f->Pi;
+  f->oldXi2 = f->Xi2;
+  f->oldPi2 = f->Pi2;
 }
   
 #endif

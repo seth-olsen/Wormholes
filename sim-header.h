@@ -28,29 +28,10 @@ typedef struct bbhutil_params BBHP;
 typedef struct sim_fields FLDS;
 typedef struct sim_writers WRS;
 typedef struct sim_params PAR;
-typedef struct sim_diagnostics DIAG;
+typedef struct sim_site_values SSV;
 
+typedef dbl (*D_FN)(SSV&);
+typedef void (*SSVSET)(SSV&, FLDS *, PAR *, int);
 
-
-
-
-
-
-
-
-typedef void (*WR_FN)(const VD&, const VD&, const VD&, const VD&, const VD&,
-		      const VD&, const VD&, const VD&, const VD&, const VD&,
-		      const VD&, const VD&, const VD&, VD&,
-		      VD&, VD&, VD&, VD&, VD&, VD&, VD&, VD&, VD&, VD&,
-		      MAPID&, int, int);
-typedef void (*WR_RES_FN)(const VD&, VD&, VD&, VD&, VD&, VD&, int, int);
-
-// struct typedefs
-/*
-typedef struct bbhutil_params BBHP;
-typedef struct sim_fields FLDS;
-typedef struct sim_writers WRS;
-typedef struct sim_params PAR;
-*/
 
 #endif

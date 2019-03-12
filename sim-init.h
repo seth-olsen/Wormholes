@@ -21,89 +21,101 @@
 #include "sim-header.h"
 #include "sim-structs.h"
 
-void bbhp_init(BBHP *bp, PAR *p, str fieldname, VD *p_field, const VD& zeros)
+void bbhp_init(BBHP *bp, PAR *p, str fieldname, VD *p_field, const VD& zeros, D_FN comp)
 {
   bp->full_field = p_field;
-  bp->wr_field = zeros;
   bp->filename = fieldname + "-" + p->outfile + ".sdf";
   bp->file = &(bp->filename[0]);
   bp->shape = &(p->wr_shape);
   bp->rank = 1;
   bp->coords = &(p->coord_lims[0]);  
-  bp->data = &(bp->wr_field[0]);
   bp->write_this = true;
+  if (((bp->full_field) != NULL) && ((p->save_pt) == 1)) {
+    bp->data = &((*(bp->full_field))[0]);
+  }
+  else {
+    bp->wr_field = zeros;
+    bp->data = &(bp->wr_field[0]);
+  }
+  bp->compute = comp;
   return;
 }
+
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
 
 vector<BBHP *> writers_init(WRS *wr, FLDS *f, PAR *p)
 {
   VD zeros(p->wr_shape, 0);
   vector<BBHP *> out_vec;
   if (p->write_abp) {
-    bbhp_init(&(wr->p_Al), p, "Al", &(f->Al), zeros);
-    bbhp_init(&(wr->p_Be), p, "Be", &(f->Be), zeros);
-    bbhp_init(&(wr->p_Ps), p, "Ps", &(f->Ps), zeros);
+    bbhp_init(&(wr->p_Al), p, "Al", &(f->Al), zeros, NULL);
+    bbhp_init(&(wr->p_Be), p, "Be", &(f->Be), zeros, NULL);
+    bbhp_init(&(wr->p_Ps), p, "Ps", &(f->Ps), zeros, NULL);
     out_vec.push_back(&(wr->p_Al));
     out_vec.push_back(&(wr->p_Be));
     out_vec.push_back(&(wr->p_Ps));
     if (p->write_res) {
-      bbhp_init(&(wr->p_resAl), p, "ResAl", NULL, zeros);
-      bbhp_init(&(wr->p_resBe), p, "ResBe", NULL, zeros);
-      bbhp_init(&(wr->p_resPs), p, "ResPs", NULL, zeros);
+      bbhp_init(&(wr->p_resAl), p, "ResAl", NULL, zeros, NULL);
+      bbhp_init(&(wr->p_resBe), p, "ResBe", NULL, zeros, NULL);
+      bbhp_init(&(wr->p_resPs), p, "ResPs", NULL, zeros, NULL);
     }
   }
   if (p->write_xp) {
-    bbhp_init(&(wr->p_Xi), p, "Xi", &(f->Xi), zeros);
-    bbhp_init(&(wr->p_Pi), p, "Pi", &(f->Pi), zeros);
+    bbhp_init(&(wr->p_Xi), p, "Xi", &(f->Xi), zeros, NULL);
+    bbhp_init(&(wr->p_Pi), p, "Pi", &(f->Pi), zeros, NULL);
     out_vec.push_back(&(wr->p_Xi));
     out_vec.push_back(&(wr->p_Pi));
     if (p->write_res) {
-      bbhp_init(&(wr->p_resXi), p, "ResXi", &(f->resXi), zeros);
-      bbhp_init(&(wr->p_resPi), p, "ResPi", &(f->resPi), zeros);
+      bbhp_init(&(wr->p_resXi), p, "ResXi", &(f->resXi), zeros, NULL);
+      bbhp_init(&(wr->p_resPi), p, "ResPi", &(f->resPi), zeros, NULL);
       out_vec.push_back(&(wr->p_resXi));
       out_vec.push_back(&(wr->p_resPi));
     }
   }
   if (p->write_xp2) {
-    bbhp_init(&(wr->p_Xi2), p, "Xi2", &(f->Xi2), zeros);
-    bbhp_init(&(wr->p_Pi2), p, "Pi2", &(f->Pi2), zeros);
+    bbhp_init(&(wr->p_Xi2), p, "Xi2", &(f->Xi2), zeros, NULL);
+    bbhp_init(&(wr->p_Pi2), p, "Pi2", &(f->Pi2), zeros, NULL);
     out_vec.push_back(&(wr->p_Xi2));
     out_vec.push_back(&(wr->p_Pi2));
     if (p->write_res) {
-      bbhp_init(&(wr->p_resXi2), p, "ResXi2", &(f->resXi2), zeros);
-      bbhp_init(&(wr->p_resPi2), p, "ResPi2", &(f->resPi2), zeros);
+      bbhp_init(&(wr->p_resXi2), p, "ResXi2", &(f->resXi2), zeros, NULL);
+      bbhp_init(&(wr->p_resPi2), p, "ResPi2", &(f->resPi2), zeros, NULL);
       out_vec.push_back(&(wr->p_resXi2));
       out_vec.push_back(&(wr->p_resPi2));
     }
   }
   if (p->write_ires_abp) {
-    bbhp_init(&(wr->p_iresAl), p, "iresAl", NULL, zeros);
-    bbhp_init(&(wr->p_iresBe), p, "iresBe", NULL, zeros);
-    bbhp_init(&(wr->p_iresPs), p, "iresPs", NULL, zeros);
+    bbhp_init(&(wr->p_iresAl), p, "iresAl", NULL, zeros, NULL);
+    bbhp_init(&(wr->p_iresBe), p, "iresBe", NULL, zeros, NULL);
+    bbhp_init(&(wr->p_iresPs), p, "iresPs", NULL, zeros, NULL);
   }
   if (p->write_ires_xp) {
-    bbhp_init(&(wr->p_iresXi), p, "iresXi", NULL, zeros);
-    bbhp_init(&(wr->p_iresPi), p, "iresPi", NULL, zeros);
+    bbhp_init(&(wr->p_iresXi), p, "iresXi", NULL, zeros, NULL);
+    bbhp_init(&(wr->p_iresPi), p, "iresPi", NULL, zeros, NULL);
   }
   if (p->write_ires_xp2) {
-    bbhp_init(&(wr->p_iresXi2), p, "iresXi2", NULL, zeros);
-    bbhp_init(&(wr->p_iresPi2), p, "iresPi2", NULL, zeros);
+    bbhp_init(&(wr->p_iresXi2), p, "iresXi2", NULL, zeros, NULL);
+    bbhp_init(&(wr->p_iresPi2), p, "iresPi2", NULL, zeros, NULL);
   }
-  if (p->write_maspect) { bbhp_init(&(wr->p_maspect), p, "maspect", NULL, zeros); }
-  if (p->write_outnull) { bbhp_init(&(wr->p_outnull), p, "outnull", NULL, zeros); }
-  if (p->write_ricci) { bbhp_init(&(wr->p_ricci), p, "ricci", NULL, zeros); }
+  if (p->write_maspect) { bbhp_init(&(wr->p_maspect), p, "maspect", NULL, zeros, NULL); }
+  if (p->write_outnull) { bbhp_init(&(wr->p_outnull), p, "outnull", NULL, zeros, NULL); }
+  if (p->write_ricci) { bbhp_init(&(wr->p_ricci), p, "ricci", NULL, zeros, NULL); }
   if (p->write_mtot) {
-    bbhp_init(&(wr->p_EEtt), p, "EEtt", NULL, zeros);
-    bbhp_init(&(wr->p_EEtx), p, "EEtx", NULL, zeros);
-    bbhp_init(&(wr->p_EExx), p, "EExx", NULL, zeros);
-    bbhp_init(&(wr->p_EEhh), p, "EEhh", NULL, zeros);
-    bbhp_init(&(wr->p_hamiltonian), p, "cHamiltonian", NULL, zeros);
-    bbhp_init(&(wr->p_momentum), p, "cMomentum", NULL, zeros);
-    bbhp_init(&(wr->p_kext), p, "cKext", NULL, zeros);
-    bbhp_init(&(wr->p_dtkext), p, "cDtKext", NULL, zeros);
+    bbhp_init(&(wr->p_EEtt), p, "EEtt", NULL, zeros, NULL);
+    bbhp_init(&(wr->p_EEtx), p, "EEtx", NULL, zeros, NULL);
+    bbhp_init(&(wr->p_EExx), p, "EExx", NULL, zeros, NULL);
+    bbhp_init(&(wr->p_EEhh), p, "EEhh", NULL, zeros, NULL);
+    bbhp_init(&(wr->p_hamiltonian), p, "cHamiltonian", NULL, zeros, NULL);
+    bbhp_init(&(wr->p_momentum), p, "cMomentum", NULL, zeros, NULL);
+    bbhp_init(&(wr->p_kext), p, "cKext", NULL, zeros, NULL);
+    bbhp_init(&(wr->p_dtkext), p, "cDtKext", NULL, zeros, NULL);
   }
   return out_vec;
 }
+
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
 
 int fields_init(FLDS *f, PAR *p)
 {
@@ -176,6 +188,9 @@ int fields_init(FLDS *f, PAR *p)
   
   return 0;
 }
+
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
 
 int params_init(PAR *p, int argc, char **argv)
 {
@@ -296,26 +311,218 @@ int params_init(PAR *p, int argc, char **argv)
   return 0;
 }
 
-int diagnostics_init(DIAG *d, FLDS *f, PAR *p, int argc, char **argv) {
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+
+vector<BBHP *> analysis_init(WRS *wr, FLDS *f, PAR *p, int argc, char **argv) {
+  bool keep_metric_dt = false;
+  bool keep_scalar_dt = false;
+  vector<BBHP *> writer_vec;
   int new_argc = 2;
   char *new_argv[] = {argv[0], argv[1]};
-  int err_code = params_init(&p, new_argc, new_argv);
+  int err_code = params_init(p, new_argc, new_argv);
   if (err_code != 0) {
     cout << "\nPARAM INIT error code = " << err_code << endl;
-    return err_code;
+    return writer_vec;
   }
   if ( ((p->lastwr) != (p->lastpt)) || ((p->wr_shape) != (p->npts))
        || ((p->zerowr) != (p->zeropt)) || ((p->wr_dr) != (p->dr))
        || ((p->save_pt) != 1) || ((p->save_step) != 1) ) {
     cout << "\nERROR: FIELDS NOT WRITTEN AT SIM RESOLUTION\n" << endl;
-    return -1;
+    return writer_vec;
   }
-  VD zeros((p->npts));
-  // initialize all read fields in f (4 scalars, 3 metric vars, including old and older (and cn?))
+  VD zeros((p->npts), 0);
   
-  
+  f->Xi = zeros;
+  f->Pi = zeros;
+  f->Xi2 = zeros;
+  f->Pi2 = zeros;
+  f->Al = zeros;
+  f->Be = zeros;
+  f->Ps = zeros;
 
-  return 0;
+  bbhp_init(&(wr->p_Xi), p, "Xi", &(f->Xi), zeros, NULL);
+  bbhp_init(&(wr->p_Pi), p, "Pi", &(f->Pi), zeros, NULL);
+  bbhp_init(&(wr->p_Xi2), p, "Xi2", &(f->Xi2), zeros, NULL);
+  bbhp_init(&(wr->p_Pi2), p, "Pi2", &(f->Pi2), zeros, NULL);
+  bbhp_init(&(wr->p_Al), p, "Al", &(f->Al), zeros, NULL);
+  bbhp_init(&(wr->p_Be), p, "Be", &(f->Be), zeros, NULL);
+  bbhp_init(&(wr->p_Ps), p, "Ps", &(f->Ps), zeros, NULL);
+
+  for (int arg_ind = 2; arg_ind < argc; ++arg_ind) {
+    str arg = argv[arg_ind];
+    if ((arg == "ResAl") || (arg == "al")) {
+      bbhp_init(&(wr->p_resAl), p, "ResAl", NULL, zeros, compute_ResAl);
+      writer_vec.push_back(&(wr->p_resAl));
+      keep_metric_dt = true;
+    }
+    if ((arg == "ResBe") || (arg == "be")) {
+      bbhp_init(&(wr->p_resBe), p, "ResBe", NULL, zeros, compute_ResBe);
+      writer_vec.push_back(&(wr->p_resBe));
+      keep_metric_dt = true;
+    }
+    if ((arg == "ResPs") || (arg == "ps")) {
+      bbhp_init(&(wr->p_resPs), p, "ResPs", NULL, zeros, compute_ResPs);
+      writer_vec.push_back(&(wr->p_resPs));
+      keep_metric_dt = true;
+    }
+    if ((arg == "ResXi") || (arg == "xi")) {
+      bbhp_init(&(wr->p_resXi), p, "ResXi", NULL, zeros, compute_ResXi);
+      writer_vec.push_back(&(wr->p_resXi));
+      keep_scalar_dt = true;
+    }
+    if ((arg == "ResPi") || (arg == "pi")) {
+      bbhp_init(&(wr->p_resPi), p, "ResPi", NULL, zeros, compute_ResPi);
+      writer_vec.push_back(&(wr->p_resPi));
+      keep_scalar_dt = true;
+    }
+    if ((arg == "ResXi2") || (arg == "xi2")) {
+      bbhp_init(&(wr->p_resXi2), p, "ResXi2", NULL, zeros, compute_ResXi2);
+      writer_vec.push_back(&(wr->p_resXi2));
+      keep_scalar_dt = true;
+    }
+    if ((arg == "ResPi2") || (arg == "pi2")) {
+      bbhp_init(&(wr->p_resPi2), p, "ResPi2", NULL, zeros, compute_ResPi2);
+      writer_vec.push_back(&(wr->p_resPi2));
+      keep_scalar_dt = true;
+    }
+    if ((arg == "iresAl") || (arg == "ial")) {
+      bbhp_init(&(wr->p_iresAl), p, "iresAl", NULL, zeros, compute_iresAl);
+      writer_vec.push_back(&(wr->p_iresAl));
+      keep_metric_dt = true;
+    }
+    if ((arg == "iresBe") || (arg == "ibe")) {
+      bbhp_init(&(wr->p_iresBe), p, "iresBe", NULL, zeros, compute_iresBe);
+      writer_vec.push_back(&(wr->p_iresBe));
+      keep_metric_dt = true;
+    }
+    if ((arg == "iresPs") || (arg == "ips")) {
+      bbhp_init(&(wr->p_iresPs), p, "iresPs", NULL, zeros, compute_iresPs);
+      writer_vec.push_back(&(wr->p_iresPs));
+      keep_metric_dt = true;
+    }
+    if ((arg == "iresXi") || (arg == "ixi")) {
+      bbhp_init(&(wr->p_iresXi), p, "iresXi", NULL, zeros, compute_iresXi);
+      writer_vec.push_back(&(wr->p_iresXi));
+      keep_scalar_dt = true;
+    }
+    if ((arg == "iresPi") || (arg == "ipi")) {
+      bbhp_init(&(wr->p_iresPi), p, "iresPi", NULL, zeros, compute_iresPi);
+      writer_vec.push_back(&(wr->p_iresPi));
+      keep_scalar_dt = true;
+    }
+    if ((arg == "iresXi2") || (arg == "ixi2")) {
+      bbhp_init(&(wr->p_iresXi2), p, "iresXi2", NULL, zeros, compute_iresXi2);
+      writer_vec.push_back(&(wr->p_iresXi2));
+      keep_scalar_dt = true;
+    }
+    if ((arg == "iresPi2") || (arg == "ipi2")) {
+      bbhp_init(&(wr->p_iresPi2), p, "iresPi2", NULL, zeros, compute_iresPi2);
+      writer_vec.push_back(&(wr->p_iresPi2));
+      keep_scalar_dt = true;
+    }
+    if ((arg == "outnull") || (arg == "null")) {
+      bbhp_init(&(wr->p_outnull), p, "outnull", NULL, zeros, compute_outnull);
+      writer_vec.push_back(&(wr->p_outnull));
+      keep_metric_dt = true;
+    }
+    if ((arg == "revnull") || (arg == "rnull")) {
+      bbhp_init(&(wr->p_revnull), p, "revnull", NULL, zeros, compute_revnull);
+      writer_vec.push_back(&(wr->p_revnull));
+      keep_metric_dt = true;
+    }
+    if ((arg == "maspect") || (arg == "mass")) {
+      bbhp_init(&(wr->p_maspect), p, "maspect", NULL, zeros, compute_maspect);
+      writer_vec.push_back(&(wr->p_maspect));
+      keep_metric_dt = true;
+    }
+    if ((arg == "ricci") || (arg == "ric")) {
+      bbhp_init(&(wr->p_ricci), p, "ricci", NULL, zeros, compute_ricci);
+      writer_vec.push_back(&(wr->p_ricci));
+      keep_metric_dt = true;
+    }
+    if ((arg == "EEtt") || (arg == "tt")) {
+      bbhp_init(&(wr->p_EEtt), p, "EEtt", NULL, zeros, compute_EEtt);
+      writer_vec.push_back(&(wr->p_EEtt));
+      keep_metric_dt = true;
+    }
+    if ((arg == "EEtx") || (arg == "tx") || (arg == "xt")) {
+      bbhp_init(&(wr->p_EEtx), p, "EEtx", NULL, zeros, compute_EEtx);
+      writer_vec.push_back(&(wr->p_EEtx));
+      keep_metric_dt = true;
+    }
+    if ((arg == "EExx") || (arg == "xx")) {
+      bbhp_init(&(wr->p_EExx), p, "EExx", NULL, zeros, compute_EExx);
+      writer_vec.push_back(&(wr->p_EExx));
+      keep_metric_dt = true;
+    }
+    if ((arg == "EEhh") || (arg == "hh")) {
+      bbhp_init(&(wr->p_EEhh), p, "EEhh", NULL, zeros, compute_EEhh);
+      writer_vec.push_back(&(wr->p_EEhh));
+      keep_metric_dt = true;
+    }
+    if ((arg == "cHamiltonian") || (arg == "hamiltonian") || (arg == "ham")) {
+      bbhp_init(&(wr->p_hamiltonian), p, "cHamiltonian", NULL, zeros, compute_hamiltonian);
+      writer_vec.push_back(&(wr->p_hamiltonian));
+      keep_metric_dt = true;
+    }
+    if ((arg == "cMomentum") || (arg == "momentum") || (arg == "mom")) {
+      bbhp_init(&(wr->p_momentum), p, "cMomentum", NULL, zeros, compute_momentum);
+      writer_vec.push_back(&(wr->p_momentum));
+      keep_metric_dt = true;
+    }
+    if ((arg == "cKext") || (arg == "kext")) {
+      bbhp_init(&(wr->p_kext), p, "cKext", NULL, zeros, compute_kext);
+      writer_vec.push_back(&(wr->p_kext));
+      keep_metric_dt = true;
+    }
+    if ((arg == "cDtKext") || (arg == "dtkext")) {
+      bbhp_init(&(wr->p_dtkext), p, "cDtKext", NULL, zeros, compute_dtkext);
+      writer_vec.push_back(&(wr->p_dtkext));
+      keep_metric_dt = true;
+    }
+  }
+  if (keep_metric_dt) {
+    f->oldAl = f->Al;
+    f->oldBe = f->Be;
+    f->oldPs = f->Ps;
+    f->olderAl = f->Al;
+    f->olderBe = f->Be;
+    f->olderPs = f->Ps;
+    f->oldestPs = f->Ps;
+  }
+  if (keep_scalar_dt) {
+    f->oldXi = f->Xi;  
+    f->oldPi = f->Pi;
+    f->olderXi = f->Xi;
+    f->olderPi = f->Pi;
+    f->oldXi2 = f->Xi2;
+    f->oldPi2 = f->Pi2;
+    f->olderXi2 = f->Xi2;
+    f->olderPi2 = f->Pi2;
+  }
+
+  if (keep_metric_dt && keep_scalar_dt) {
+    wr->get_site_vals = get_all_vals;
+    wr->get_bound_vals = get_all_boundvals;
+    wr->set_old_fields = set_old_all;
+  } // BOTH
+  else if (keep_metric_dt && !(keep_scalar_dt)) {
+    wr->get_site_vals = get_metric_vals;
+    wr->get_bound_vals = get_metric_boundvals;
+    wr->set_old_fields = set_old_metric;
+  } // JUST METRIC
+  else if (!(keep_metric_dt) && keep_scalar_dt) {
+    wr->get_site_vals = get_scalar_vals;
+    wr->get_bound_vals = get_scalar_boundvals;
+    wr->set_old_fields = set_old_scalar;
+  } // JUST SCALAR
+  else {
+    cout << "\nERROR DETERMINING WHICH DIAGNOSTICS TO WRITE" << endl;
+    vector<BBHP *> error_msg;
+    return error_msg;
+  }
+  return writer_vec;
 }
 
 #endif

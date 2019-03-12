@@ -415,108 +415,6 @@ int search_for_horizon(const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
 
 // EINSTEIN EQUATIONS
 
-dbl iresEEtt(dbl dt2ps, dbl dx2al, dbl dx2be, dbl dx2ps,
-	     dbl dxdtbe, dbl dxdtps,
-	     dbl dtal, dbl dtbe, dbl dtps,
-	     dbl dxal, dbl dxbe, dbl dxps,
-	     dbl xi, dbl pi, dbl xi2, dbl pi2,
-	     dbl al, dbl be, dbl ps, dbl x, dbl xsq, dbl lsq, dbl four_pi)
-{
-  return (-4*pow(dtps,2))/pow(ps,2) - (4*dt2ps)/ps + (4*dtps*(al*(dtal + 
-be*dxal) - pow(be,2)*pow(ps,3)*(-2*dtps + 2*be*dxps +			
-dxbe*ps)))/(pow(al,2)*ps) + ((pow(al,2) -				
-pow(be,2)*pow(ps,4))*(pow(al,2)*(-2*dxal*dxps + dx2al*ps) +		
-dtal*pow(ps,4)*(2*dtps - dxbe*ps) -					
-2*pow(be,2)*pow(ps,3)*(al*pow(dxps,2) + (al*dx2ps - dxal*dxps)*ps) + 
-be*pow(ps,3)*(4*al*dtps*dxps - 2*(dtps*dxal + dtal*dxps + 
-al*(-2*dxdtps + 3*dxbe*dxps))*ps + (-(al*dx2be) + 
-dxal*dxbe)*pow(ps,2)) + al*pow(ps,3)*(-2*pow(dtps,2) + 2*(-dt2ps + 
-2*dtps*dxbe + dtbe*dxps)*ps + (-pow(dxbe,2) + 
-dxdtbe)*pow(ps,2))))/(pow(al,3)*pow(ps,5)) + 2*(dtbe - (be*(dtal + 
-be*dxal))/al + be*(-dxbe + (4*dtps)/ps) + (al*dxal)/pow(ps,4) - 
-(2*pow(be,2)*dxps)/ps + (pow(be,3)*pow(ps,3)*(-2*dtps + 2*be*dxps + 
-dxbe*ps))/pow(al,2))*((2*dxps)/ps + x/(lsq + xsq)) + ((-pow(al,2) + 
-pow(be,2)*pow(ps,4))*(pow(al,2)*(lsq + xsq)*(2*dxal*dxps*(lsq + xsq) 
-+ ps*(2*x*dxal + dx2al*(lsq + xsq))) + pow(al,3)*(lsq*ps + 4*(lsq + 
-xsq)*(2*x*dxps + dx2ps*(lsq + xsq))) + (-dtal + 
-be*dxal)*pow(ps,4)*(lsq + xsq)*((-6*dtps + dxbe*ps)*(lsq + xsq) + 
-2*be*(x*ps + 3*dxps*(lsq + xsq))) - 
-al*pow(ps,3)*(pow(be,2)*(18*pow(dxps,2)*pow(lsq + xsq,2) + 
-pow(ps,2)*(2*lsq + xsq) + 2*ps*(lsq + xsq)*(8*x*dxps + 3*dx2ps*(lsq + 
-xsq))) + (lsq + xsq)*(18*pow(dtps,2)*(lsq + xsq) - 2*(-3*dt2ps + 
-4*dtps*dxbe + 3*dtbe*dxps)*ps*(lsq + xsq) + pow(ps,2)*(-2*x*dtbe + 
-pow(dxbe,2)*(lsq + xsq) - dxdtbe*(lsq + xsq))) + be*(lsq + 
-xsq)*(-36*dtps*dxps*(lsq + xsq) + pow(ps,2)*(4*x*dxbe + dx2be*(lsq + 
-xsq)) + 2*ps*(-8*x*dtps - 6*dxdtps*(lsq + xsq) + 7*dxbe*dxps*(lsq + 
-xsq))))))/(pow(al,3)*pow(ps,5)*pow(lsq + xsq,2))
-    + (p->four_pi)*(sq(be*xi + al*pi/sq(ps)) + sq(be*pi + al*xi/sq(ps))
-		    - sq(be*xi2 + al*pi2/sq(ps)) - sq(be*pi2 + al*xi2/sq(ps)));
-}
-
-dbl iresEEtr(dbl dt2ps, dbl dx2al, dbl dx2be, dbl dx2ps,
-	     dbl dxdtbe, dbl dxdtps,
-	     dbl dtal, dbl dtbe, dbl dtps,
-	     dbl dxal, dbl dxbe, dbl dxps,
-	     dbl xi, dbl pi, dbl xi2, dbl pi2,
-	     dbl al, dbl be, dbl ps, dbl x, dbl xsq, dbl lsq, dbl four_pi)
-{
-  return (4*pow(al,2)*dtps*dxal*ps*pow(lsq + xsq,2) + 2*be*(-dtal + 
-be*dxal)*pow(ps,5)*(lsq + xsq)*(-2*dtps*(lsq + xsq) + be*(x*ps + 
-2*dxps*(lsq + xsq))) + pow(al,3)*(4*(dtps*dxps - dxdtps*ps)*pow(lsq + 
-xsq,2) + be*ps*(lsq*ps + 4*(lsq + xsq)*(2*x*dxps + dx2ps*(lsq + 
-xsq)))) - al*be*pow(ps,4)*(-2*(lsq + xsq)*(x*dtbe*pow(ps,2) - 
-4*pow(dtps,2)*(lsq + xsq) + 2*(-dt2ps + dtbe*dxps)*ps*(lsq + xsq)) + 
-pow(be,2)*(8*pow(dxps,2)*pow(lsq + xsq,2) + pow(ps,2)*(2*lsq + xsq) + 
-4*ps*(lsq + xsq)*(3*x*dxps + dx2ps*(lsq + xsq))) + 2*be*(lsq + 
-xsq)*(x*dxbe*pow(ps,2) - 8*dtps*dxps*(lsq + xsq) + 2*ps*(-3*x*dtps - 
-2*dxdtps*(lsq + xsq) + dxbe*dxps*(lsq + 
-xsq)))))/(pow(al,3)*pow(ps,2)*pow(lsq + xsq,2))
-    + (p->four_pi)*(be*(sq(xi) + sq(pi) - sq(xi2) - sq(pi2))
-		    + 2*al*(xi*pi - xi2*pi2)/sq(ps));
-}
-
-dbl iresEErr(dbl dt2ps, dbl dx2al, dbl dx2be, dbl dx2ps,
-	     dbl dxdtbe, dbl dxdtps,
-	     dbl dtal, dbl dtbe, dbl dtps,
-	     dbl dxal, dbl dxbe, dbl dxps,
-	     dbl xi, dbl pi, dbl xi2, dbl pi2,
-	     dbl al, dbl be, dbl ps, dbl x, dbl xsq, dbl lsq, dbl four_pi)
-{
-  return (2*pow(al,2)*dxal*ps*(lsq + xsq)*(x*ps + 2*dxps*(lsq + xsq)) + 
-pow(al,3)*(-(lsq*pow(ps,2)) + 4*x*dxps*ps*(lsq + xsq) + 
-4*pow(dxps,2)*pow(lsq + xsq,2)) + 2*(-dtal + be*dxal)*pow(ps,5)*(lsq 
-+ xsq)*(-2*dtps*(lsq + xsq) + be*(x*ps + 2*dxps*(lsq + xsq))) - 
-al*pow(ps,4)*(-2*(lsq + xsq)*(x*dtbe*pow(ps,2) - 4*pow(dtps,2)*(lsq + 
-xsq) + 2*(-dt2ps + dtbe*dxps)*ps*(lsq + xsq)) + 
-pow(be,2)*(8*pow(dxps,2)*pow(lsq + xsq,2) + pow(ps,2)*(2*lsq + xsq) + 
-4*ps*(lsq + xsq)*(3*x*dxps + dx2ps*(lsq + xsq))) + 2*be*(lsq + 
-xsq)*(x*dxbe*pow(ps,2) - 8*dtps*dxps*(lsq + xsq) + 2*ps*(-3*x*dtps - 
-2*dxdtps*(lsq + xsq) + dxbe*dxps*(lsq + 
-xsq)))))/(pow(al,3)*pow(ps,2)*pow(lsq + xsq,2))
-    + (p->four_pi)*(sq(xi) + sq(pi) - sq(xi2) - sq(pi2));
-}
-
-dbl iresEEthth(dbl dt2ps, dbl dx2al, dbl dx2be, dbl dx2ps,
-	       dbl dxdtbe, dbl dxdtps,
-	       dbl dtal, dbl dtbe, dbl dtps,
-	       dbl dxal, dbl dxbe, dbl dxps,
-	       dbl xi, dbl pi, dbl xi2, dbl pi2,
-	       dbl al, dbl be, dbl ps, dbl x, dbl xsq, dbl lsq, dbl four_pi)
-{
-  return (lsq/(lsq + xsq) - (2*pow(dxps,2)*(lsq + xsq))/pow(ps,2) + (x*dxal + 
-dx2al*(lsq + xsq))/al + (2*(x*dxps + dx2ps*(lsq + xsq)))/ps + ((-dtal 
-+ be*dxal)*pow(ps,3)*((-4*dtps + dxbe*ps)*(lsq + xsq) + be*(x*ps + 
-4*dxps*(lsq + xsq))))/pow(al,3) - 
-(pow(ps,2)*(pow(be,2)*(lsq*pow(ps,2) + 8*pow(dxps,2)*pow(lsq + xsq,2) 
-+ 2*ps*(lsq + xsq)*(3*x*dxps + 2*dx2ps*(lsq + xsq))) + (lsq + 
-xsq)*(8*pow(dtps,2)*(lsq + xsq) - 2*(-2*dt2ps + 3*dtps*dxbe + 
-2*dtbe*dxps)*ps*(lsq + xsq) + pow(ps,2)*(-(x*dtbe) + pow(dxbe,2)*(lsq 
-+ xsq) - dxdtbe*(lsq + xsq))) + be*(lsq + xsq)*(-16*dtps*dxps*(lsq + 
-xsq) + pow(ps,2)*(2*x*dxbe + dx2be*(lsq + xsq)) + 2*ps*(-3*x*dtps - 
-4*dxdtps*(lsq + xsq) + 5*dxbe*dxps*(lsq + xsq)))))/(pow(al,2)*(lsq + 
-							       xsq)))/(lsq + xsq)
-    + (p->four_pi)*(sq(pi) - sq(xi) - sq(pi2) + sq(xi2));
-}
 
 inline void get_EE_adm(WRS *wr, FLDS *f, PAR *p)
 {
@@ -615,20 +513,6 @@ xsq) + pow(ps,2)*(2*x*dxbe + dx2be*(lsq + xsq)) + 2*ps*(-3*x*dtps -
 							       xsq)))/(lsq + xsq)
     + (p->four_pi)*(sq(pi) - sq(xi) - sq(pi2) + sq(xi2));
 
-    /*
-    wr->EEtt[j] = iresEEtt(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
-			   dtal, dtbe, dtps, dxal, dxbe, dxps,
-			   xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
-    wr->EEtx[j] = iresEEtr(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
-			   dtal, dtbe, dtps, dxal, dxbe, dxps,
-			   xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
-    wr->EExx[j] = iresEErr(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
-			   dtal, dtbe, dtps, dxal, dxbe, dxps,
-			   xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
-    wr->EEhh[j] = iresEEthth(dt2ps, dx2al, dx2be, dx2ps, dxdtbe, dxdtps,
-			     dtal, dtbe, dtps, dxal, dxbe, dxps,
-			     xi, pi, xi2, pi2, al, be, ps, x, xsq, p->lsq, p->four_pi);
-    */
 
     (wr->p_hamiltonian).wr_field[j] =
       ((p->eight_pi)*ps*(pow(pi,2) + pow(xi,2)) + (-2*pow(al,2)*(lsq*ps + 4*(lsq +
@@ -664,5 +548,138 @@ dxbe*ps) + (-6*dxdtps + dxbe*dxps + dx2be*ps)*(lsq + xsq) +
   }
   return;
 }
+
+dbl compute_outnull(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_revnull(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_maspect(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_ricci(SSV& s)
+{
+  return 0;
+}
+
+
+dbl compute_EEtt(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_EEtx(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_EExx(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_EEhh(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_hamiltonian(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_momentum(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_kext(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_dtkext(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_iresAl(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_iresBe(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_iresPs(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_iresXi(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_iresPi(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_iresXi2(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_iresPi2(SSV& s)
+{
+  return 0;
+}
+
+
+dbl compute_ResAl(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_ResBe(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_ResPs(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_ResXi(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_ResPi(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_ResXi2(SSV& s)
+{
+  return 0;
+}
+
+dbl compute_ResPi2(SSV& s)
+{
+  return 0;
+}
+
 
 #endif
