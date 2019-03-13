@@ -551,134 +551,259 @@ dxbe*ps) + (-6*dxdtps + dxbe*dxps + dx2be*ps)*(lsq + xsq) +
 
 dbl compute_outnull(SSV& s)
 {
-  return 0;
+  return (2*s.al*(2*s.dxps*s.rsq + s.ps*s.x) - 2*pow(s.ps,2)*(-2*s.dtps*s.rsq
++ s.be*(2*s.dxps*s.rsq + s.ps*s.x)))/(s.al*pow(s.ps,3)*s.rsq);
 }
 
 dbl compute_revnull(SSV& s)
 {
-  return 0;
+  return (-2*(s.al*(2*s.dxps*s.rsq + s.ps*s.x) + pow(s.ps,2)*(-2*s.dtps*s.rsq
++ s.be*(2*s.dxps*s.rsq + s.ps*s.x))))/(s.al*pow(s.ps,3)*s.rsq);
 }
 
 dbl compute_maspect(SSV& s)
 {
-  return 0;
+  return 0.5*sqrt(pow(s.ps,4)*s.rsq)*(1 +
+(4*pow(s.dtps,2)*pow(s.ps,2)*s.rsq)/pow(s.al,2) -
+(4*s.be*s.dtps*pow(s.ps,2)*(2*s.dxps*s.rsq + s.ps*s.x))/pow(s.al,2) -
+((pow(s.al,2) - pow(s.be,2)*pow(s.ps,4))*pow(2*s.dxps*s.rsq +
+s.ps*s.x,2))/(pow(s.al,2)*pow(s.ps,2)*s.rsq));
 }
 
 dbl compute_ricci(SSV& s)
 {
-  return 0;
+  return (-2*(pow(s.al,2)*s.rsq*(2*s.dxal*s.dxps*s.rsq + s.ps*(s.dx2al*s.rsq + \
+2*s.dxal*s.x)) + pow(s.al,3)*(s.lsq*s.ps + 4*s.rsq*(s.dx2ps*s.rsq + \
+2*s.dxps*s.x)) + (-s.dtal + \
+s.be*s.dxal)*pow(s.ps,4)*s.rsq*((-6*s.dtps + s.dxbe*s.ps)*s.rsq + \
+2*s.be*(3*s.dxps*s.rsq + s.ps*s.x)) - \
+s.al*pow(s.ps,3)*(s.rsq*(18*pow(s.dtps,2)*s.rsq - 2*(-3*s.dt2ps + \
+4*s.dtps*s.dxbe + 3*s.dtbe*s.dxps)*s.ps*s.rsq + \
+pow(s.ps,2)*(pow(s.dxbe,2)*s.rsq - s.dxdtbe*s.rsq - 2*s.dtbe*s.x)) + \
+s.be*s.rsq*(-36*s.dtps*s.dxps*s.rsq + 2*s.ps*(-6*s.dxdtps*s.rsq + \
+7*s.dxbe*s.dxps*s.rsq - 8*s.dtps*s.x) + pow(s.ps,2)*(s.dx2be*s.rsq + \
+4*s.dxbe*s.x)) + pow(s.be,2)*(18*pow(s.dxps,2)*pow(s.rsq,2) + \
+2*s.ps*s.rsq*(3*s.dx2ps*s.rsq + 8*s.dxps*s.x) + pow(s.ps,2)*(2*s.lsq \
++ s.xsq)))))/(pow(s.al,3)*pow(s.ps,5)*pow(s.rsq,2));
 }
 
 
 dbl compute_EEtt(SSV& s)
 {
-  return 0;
+  return (-4*pow(s.dtps,2))/pow(s.ps,2) - (4*s.dt2ps)/s.ps + \
+(4*s.dtps*(s.al*(s.dtal + s.be*s.dxal) - \
+pow(s.be,2)*pow(s.ps,3)*(-2*s.dtps + 2*s.be*s.dxps + \
+s.dxbe*s.ps)))/(pow(s.al,2)*s.ps) + ((pow(s.al,2) - \
+pow(s.be,2)*pow(s.ps,4))*(pow(s.al,2)*(-2*s.dxal*s.dxps + \
+s.dx2al*s.ps) + s.dtal*pow(s.ps,4)*(2*s.dtps - s.dxbe*s.ps) - \
+2*pow(s.be,2)*pow(s.ps,3)*(s.al*pow(s.dxps,2) + (s.al*s.dx2ps - \
+s.dxal*s.dxps)*s.ps) + s.be*pow(s.ps,3)*(4*s.al*s.dtps*s.dxps - \
+2*(s.dtps*s.dxal + s.dtal*s.dxps + s.al*(-2*s.dxdtps + \
+3*s.dxbe*s.dxps))*s.ps + (-(s.al*s.dx2be) + \
+s.dxal*s.dxbe)*pow(s.ps,2)) + s.al*pow(s.ps,3)*(-2*pow(s.dtps,2) + \
+2*(-s.dt2ps + 2*s.dtps*s.dxbe + s.dtbe*s.dxps)*s.ps + (-pow(s.dxbe,2) \
++ s.dxdtbe)*pow(s.ps,2))))/(pow(s.al,3)*pow(s.ps,5)) + 2*(s.dtbe - \
+(s.be*(s.dtal + s.be*s.dxal))/s.al + s.be*(-s.dxbe + (4*s.dtps)/s.ps) \
++ (s.al*s.dxal)/pow(s.ps,4) - (2*pow(s.be,2)*s.dxps)/s.ps + \
+(pow(s.be,3)*pow(s.ps,3)*(-2*s.dtps + 2*s.be*s.dxps + \
+s.dxbe*s.ps))/pow(s.al,2))*((2*s.dxps)/s.ps + s.x/s.rsq) - \
+4*M_PI*(-pow((s.al*s.pi)/pow(s.ps,2) + s.be*s.xi,2) - pow(s.be*s.pi + \
+(s.al*s.xi)/pow(s.ps,2),2) + pow((s.al*s.pi2)/pow(s.ps,2) + \
+s.be*s.xi2,2) + pow(s.be*s.pi2 + (s.al*s.xi2)/pow(s.ps,2),2)) + \
+((-pow(s.al,2) + \
+pow(s.be,2)*pow(s.ps,4))*(pow(s.al,2)*s.rsq*(2*s.dxal*s.dxps*s.rsq + \
+s.ps*(s.dx2al*s.rsq + 2*s.dxal*s.x)) + pow(s.al,3)*(s.lsq*s.ps + \
+4*s.rsq*(s.dx2ps*s.rsq + 2*s.dxps*s.x)) + (-s.dtal + \
+s.be*s.dxal)*pow(s.ps,4)*s.rsq*((-6*s.dtps + s.dxbe*s.ps)*s.rsq + \
+2*s.be*(3*s.dxps*s.rsq + s.ps*s.x)) - \
+s.al*pow(s.ps,3)*(s.rsq*(18*pow(s.dtps,2)*s.rsq - 2*(-3*s.dt2ps + \
+4*s.dtps*s.dxbe + 3*s.dtbe*s.dxps)*s.ps*s.rsq + \
+pow(s.ps,2)*(pow(s.dxbe,2)*s.rsq - s.dxdtbe*s.rsq - 2*s.dtbe*s.x)) + \
+s.be*s.rsq*(-36*s.dtps*s.dxps*s.rsq + 2*s.ps*(-6*s.dxdtps*s.rsq + \
+7*s.dxbe*s.dxps*s.rsq - 8*s.dtps*s.x) + pow(s.ps,2)*(s.dx2be*s.rsq + \
+4*s.dxbe*s.x)) + pow(s.be,2)*(18*pow(s.dxps,2)*pow(s.rsq,2) + \
+2*s.ps*s.rsq*(3*s.dx2ps*s.rsq + 8*s.dxps*s.x) + pow(s.ps,2)*(2*s.lsq \
++ s.xsq)))))/(pow(s.al,3)*pow(s.ps,5)*pow(s.rsq,2));
 }
 
 dbl compute_EEtx(SSV& s)
 {
-  return 0;
+  return -4*M_PI*((2*s.al*(-(s.pi*s.xi) + s.pi2*s.xi2))/pow(s.ps,2) + \
+s.be*(-pow(s.pi,2) + pow(s.pi2,2) - pow(s.xi,2) + pow(s.xi2,2))) + \
+(4*pow(s.al,2)*s.dtps*s.dxal*s.ps*pow(s.rsq,2) + 2*s.be*(-s.dtal + \
+s.be*s.dxal)*pow(s.ps,5)*s.rsq*(-2*s.dtps*s.rsq + \
+s.be*(2*s.dxps*s.rsq + s.ps*s.x)) + pow(s.al,3)*(4*(s.dtps*s.dxps - \
+s.dxdtps*s.ps)*pow(s.rsq,2) + s.be*s.ps*(s.lsq*s.ps + \
+4*s.rsq*(s.dx2ps*s.rsq + 2*s.dxps*s.x))) - \
+s.al*s.be*pow(s.ps,4)*(-2*s.rsq*(-4*pow(s.dtps,2)*s.rsq + 2*(-s.dt2ps \
++ s.dtbe*s.dxps)*s.ps*s.rsq + s.dtbe*pow(s.ps,2)*s.x) + \
+2*s.be*s.rsq*(-8*s.dtps*s.dxps*s.rsq + s.dxbe*pow(s.ps,2)*s.x + \
+2*s.ps*(-2*s.dxdtps*s.rsq + s.dxbe*s.dxps*s.rsq - 3*s.dtps*s.x)) + \
+pow(s.be,2)*(8*pow(s.dxps,2)*pow(s.rsq,2) + \
+4*s.ps*s.rsq*(s.dx2ps*s.rsq + 3*s.dxps*s.x) + pow(s.ps,2)*(2*s.lsq + \
+s.xsq))))/(pow(s.al,3)*pow(s.ps,2)*pow(s.rsq,2));
 }
 
 dbl compute_EExx(SSV& s)
 {
-  return 0;
+  return -4*M_PI*(-pow(s.pi,2) + pow(s.pi2,2) - pow(s.xi,2) + pow(s.xi2,2)) + \
+(2*pow(s.al,2)*s.dxal*s.ps*s.rsq*(2*s.dxps*s.rsq + s.ps*s.x) + \
+pow(s.al,3)*(-(s.lsq*pow(s.ps,2)) + 4*pow(s.dxps,2)*pow(s.rsq,2) + \
+4*s.dxps*s.ps*s.rsq*s.x) + 2*(-s.dtal + \
+s.be*s.dxal)*pow(s.ps,5)*s.rsq*(-2*s.dtps*s.rsq + \
+s.be*(2*s.dxps*s.rsq + s.ps*s.x)) - \
+s.al*pow(s.ps,4)*(-2*s.rsq*(-4*pow(s.dtps,2)*s.rsq + 2*(-s.dt2ps + \
+s.dtbe*s.dxps)*s.ps*s.rsq + s.dtbe*pow(s.ps,2)*s.x) + \
+2*s.be*s.rsq*(-8*s.dtps*s.dxps*s.rsq + s.dxbe*pow(s.ps,2)*s.x + \
+2*s.ps*(-2*s.dxdtps*s.rsq + s.dxbe*s.dxps*s.rsq - 3*s.dtps*s.x)) + \
+pow(s.be,2)*(8*pow(s.dxps,2)*pow(s.rsq,2) + \
+4*s.ps*s.rsq*(s.dx2ps*s.rsq + 3*s.dxps*s.x) + pow(s.ps,2)*(2*s.lsq + \
+s.xsq))))/(pow(s.al,3)*pow(s.ps,2)*pow(s.rsq,2));
 }
 
 dbl compute_EEhh(SSV& s)
 {
-  return 0;
+  return s.lsq/s.rsq - (2*pow(s.dxps,2)*s.rsq)/pow(s.ps,2) + (s.dx2al*s.rsq + \
+s.dxal*s.x)/s.al + (2*(s.dx2ps*s.rsq + s.dxps*s.x))/s.ps + ((-s.dtal \
++ s.be*s.dxal)*pow(s.ps,3)*((-4*s.dtps + s.dxbe*s.ps)*s.rsq + \
+s.be*(4*s.dxps*s.rsq + s.ps*s.x)))/pow(s.al,3) - \
+(pow(s.ps,2)*(s.rsq*(8*pow(s.dtps,2)*s.rsq - 2*(-2*s.dt2ps + \
+3*s.dtps*s.dxbe + 2*s.dtbe*s.dxps)*s.ps*s.rsq + \
+pow(s.ps,2)*(pow(s.dxbe,2)*s.rsq - s.dxdtbe*s.rsq - s.dtbe*s.x)) + \
+s.be*s.rsq*(-16*s.dtps*s.dxps*s.rsq + 2*s.ps*(-4*s.dxdtps*s.rsq + \
+5*s.dxbe*s.dxps*s.rsq - 3*s.dtps*s.x) + pow(s.ps,2)*(s.dx2be*s.rsq + \
+2*s.dxbe*s.x)) + pow(s.be,2)*(s.lsq*pow(s.ps,2) + \
+8*pow(s.dxps,2)*pow(s.rsq,2) + 2*s.ps*s.rsq*(2*s.dx2ps*s.rsq + \
+3*s.dxps*s.x))))/(pow(s.al,2)*s.rsq) + 4*M_PI*s.rsq*(pow(s.pi,2) - \
+pow(s.pi2,2) - pow(s.xi,2) + pow(s.xi2,2));
 }
 
 dbl compute_hamiltonian(SSV& s)
 {
-  return 0;
+  return ((-2*pow(s.al,2)*(s.lsq*s.ps + 4*s.rsq*(s.dx2ps*s.rsq + \
+2*s.dxps*s.x)) + 2*pow(s.ps,3)*(-2*s.dtps*s.rsq + \
+s.be*(2*s.dxps*s.rsq + s.ps*s.x))*(2*(-3*s.dtps + s.dxbe*s.ps)*s.rsq \
++ s.be*(6*s.dxps*s.rsq + s.ps*s.x)))/(pow(s.al,2)*pow(s.rsq,2)) - \
+8*M_PI*s.ps*(-pow(s.pi,2) + pow(s.pi2,2) - pow(s.xi,2) + \
+pow(s.xi2,2)))/pow(s.ps,5);
 }
 
 dbl compute_momentum(SSV& s)
 {
-  return 0;
+  return ((2*s.dxal*s.ps*s.rsq*(-2*s.dtps*s.rsq + s.be*(2*s.dxps*s.rsq + \
+s.ps*s.x)) - 2*s.al*(2*(s.dtps*s.dxps - s.dxdtps*s.ps)*pow(s.rsq,2) + \
+s.be*(s.lsq*pow(s.ps,2) - 2*pow(s.dxps,2)*pow(s.rsq,2) + \
+2*s.ps*s.rsq*(s.dx2ps*s.rsq + \
+s.dxps*s.x))))/(pow(s.al,2)*pow(s.rsq,2)) + 8*M_PI*(-(s.pi*s.xi) + \
+s.pi2*s.xi2))/pow(s.ps,2);
 }
 
 dbl compute_kext(SSV& s)
 {
-  return 0;
+  return ((-6*s.dtps + s.dxbe*s.ps)*s.rsq + 2*s.be*(3*s.dxps*s.rsq + \
+s.ps*s.x))/(s.al*s.ps*s.rsq);
 }
 
 dbl compute_dtkext(SSV& s)
 {
-  return 0;
+  return (-(pow(s.al,2)*s.rsq*(2*s.dxal*s.dxps*s.rsq + s.ps*(s.dx2al*s.rsq + \
+2*s.dxal*s.x))) + s.al*s.ps*(8*M_PI*pow(s.al,2)*(-pow(s.pi,2) + \
+pow(s.pi2,2))*pow(s.rsq,2) + pow(s.ps,2)*pow(-2*s.dtps + \
+2*s.be*s.dxps + s.dxbe*s.ps,2)*pow(s.rsq,2) + \
+2*pow(s.ps,2)*pow(-2*s.dtps*s.rsq + s.be*(2*s.dxps*s.rsq + \
+s.ps*s.x),2)) - s.be*pow(s.ps,3)*(s.dxal*s.ps*s.rsq*((-6*s.dtps + \
+s.dxbe*s.ps)*s.rsq + 2*s.be*(3*s.dxps*s.rsq + s.ps*s.x)) - \
+s.al*(s.rsq*(6*s.dtps*s.dxps*s.rsq + 6*(-s.dxdtps + \
+s.dxbe*s.dxps)*s.ps*s.rsq + pow(s.ps,2)*(s.dx2be*s.rsq + \
+2*s.dxbe*s.x)) + 2*s.be*(-3*pow(s.dxps,2)*pow(s.rsq,2) + \
+3*s.dx2ps*s.ps*pow(s.rsq,2) + pow(s.ps,2)*(s.lsq - \
+s.xsq)))))/(pow(s.al,2)*pow(s.ps,5)*pow(s.rsq,2));
 }
 
-dbl compute_iresAl(SSV& s)
+dbl compute_iresAl(SSV& s) //8*M_PI*tr(T)
 {
-  return 0;
+  return (8*M_PI*(-pow(s.pi,2) + pow(s.pi2,2) + pow(s.xi,2) - \
+		  pow(s.xi2,2)))/pow(s.ps,4);
 }
 
-dbl compute_iresBe(SSV& s)
+dbl compute_iresBe(SSV& s) // areal radius
 {
-  return 0;
+  return sq(s.ps)*sqrt(s.rsq);
 }
 
-dbl compute_iresPs(SSV& s)
+dbl compute_iresPs(SSV& s) // hyperbolic residual
 {
-  return 0;
+  return s.dtps - s.be*s.dxps - (s.ps/6.0)*(s.dxbe + (2*s.be*s.x)/s.rsq);
 }
 
-dbl compute_iresXi(SSV& s)
+dbl compute_iresXi(SSV& s) // expanded EOM residual without CN
 {
-  return 0;
+  return s.dtxi - s.be*s.dxxi - (s.al*s.dxpi)/pow(s.ps,2) - \
+(s.pi*(-2*s.al*s.dxps + s.dxal*s.ps))/pow(s.ps,3) - s.dxbe*s.xi;
 }
 
-dbl compute_iresPi(SSV& s)
+dbl compute_iresPi(SSV& s) // expanded EOM residual without CN
 {
-  return 0;
+  return -((s.al*(s.dxxi*s.ps*s.rsq + 2*(s.dxps*s.rsq + s.ps*s.x)*s.xi) + \
+s.ps*(s.be*s.ps*(s.dxpi*s.ps*s.rsq + 2*s.pi*(2*s.dxps*s.rsq + \
+s.ps*s.x)) + s.rsq*(s.ps*(-(s.dtpi*s.ps) + s.pi*(-4*s.dtps + \
+s.dxbe*s.ps)) + s.dxal*s.xi)))/(pow(s.ps,3)*s.rsq));
 }
 
-dbl compute_iresXi2(SSV& s)
+dbl compute_iresXi2(SSV& s) // expanded EOM residual without CN
 {
-  return 0;
+  return s.dtxi2 - s.be*s.dxxi2 - (s.al*s.dxpi2)/pow(s.ps,2) - \
+(s.pi2*(-2*s.al*s.dxps + s.dxal*s.ps))/pow(s.ps,3) - s.dxbe*s.xi2;
 }
 
-dbl compute_iresPi2(SSV& s)
+dbl compute_iresPi2(SSV& s) // expanded EOM residual without CN
 {
-  return 0;
+  return -((s.al*(s.dxxi2*s.ps*s.rsq + 2*(s.dxps*s.rsq + s.ps*s.x)*s.xi2) + \
+s.ps*(s.be*s.ps*(s.dxpi2*s.ps*s.rsq + 2*s.pi2*(2*s.dxps*s.rsq + \
+s.ps*s.x)) + s.rsq*(s.ps*(-(s.dtpi2*s.ps) + s.pi2*(-4*s.dtps + \
+s.dxbe*s.ps)) + s.dxal*s.xi2)))/(pow(s.ps,3)*s.rsq));
 }
 
 
-dbl compute_ResAl(SSV& s)
+dbl compute_ResAl(SSV& s) // elliptic residual
 {
-  return 0;
+  return s.dx2al + 8*M_PI*s.al*(pow(s.pi,2) - pow(s.pi2,2)) + \
+2*s.dxal*(s.dxps/s.ps + s.x/s.rsq) - (2*pow(s.ps,4)*pow(s.dxbe - \
+(s.be*s.x)/s.rsq,2))/(3.*s.al);
 }
 
-dbl compute_ResBe(SSV& s)
+dbl compute_ResBe(SSV& s) // elliptic residual
 {
-  return 0;
+  return s.dx2be - (s.be*s.lsq)/pow(s.rsq,2) - (-(s.dxal/s.al) + \
+(6*s.dxps)/s.ps + (2*s.x)/s.rsq)*(-s.dxbe + (s.be*s.x)/s.rsq) + \
+(12*M_PI*s.al*(-(s.pi*s.xi) + s.pi2*s.xi2))/pow(s.ps,2);
 }
 
-dbl compute_ResPs(SSV& s)
+dbl compute_ResPs(SSV& s) // elliptic residual
 {
-  return 0;
+  return s.dx2ps + (s.lsq*s.ps)/(4.*pow(s.rsq,2)) + (2*s.dxps*s.x)/s.rsq + \
+(pow(s.ps,5)*pow(s.dxbe - (s.be*s.x)/s.rsq,2))/(12.*pow(s.al,2)) + \
+M_PI*s.ps*(-pow(s.pi,2) + pow(s.pi2,2) - pow(s.xi,2) + pow(s.xi2,2));
 }
 
-dbl compute_ResXi(SSV& s)
+dbl compute_ResXi(SSV& s) // ghost energy density
 {
-  return 0;
+  return (-0.5*(pow(s.pi,2) + pow(s.xi,2)))/pow(s.ps,4);
 }
 
-dbl compute_ResPi(SSV& s)
+dbl compute_ResPi(SSV& s) // ghost momentum density
 {
-  return 0;
+  return (s.pi*s.xi)/pow(s.ps,6);
 }
 
-dbl compute_ResXi2(SSV& s)
+dbl compute_ResXi2(SSV& s) // normal energy density
 {
-  return 0;
+  return (-0.5*(pow(s.pi2,2) + pow(s.xi2,2)))/pow(s.ps,4);
 }
 
-dbl compute_ResPi2(SSV& s)
+dbl compute_ResPi2(SSV& s) // normal momentum density
 {
-  return 0;
+  return (s.pi2*s.xi2)/pow(s.ps,6);
 }
 
 
