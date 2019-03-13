@@ -227,7 +227,7 @@ struct sim_params {
 
 struct sim_site_values {
   dbl lsq = 1;
-  dbl x; dbl xsq;
+  dbl x; dbl xsq; dbl rsq;
   dbl dt2ps;
   dbl dx2al; dbl dx2be; dbl dx2ps;
   dbl dxdtbe; dbl dxdtps;
