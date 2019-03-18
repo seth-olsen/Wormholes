@@ -351,132 +351,132 @@ vector<BBHP *> analysis_init(WRS *wr, FLDS *f, PAR *p, int argc, char **argv) {
 
   for (int arg_ind = 2; arg_ind < argc; ++arg_ind) {
     str arg = argv[arg_ind];
-    if ((arg == "ResAl") || (arg == "al")) {
+    if ((arg == "ResAl") || (arg == "ALL") || (arg == "al")) {
       bbhp_init(&(wr->p_resAl), p, "ResAl", NULL, zeros, compute_ResAl);
       writer_vec.push_back(&(wr->p_resAl));
       keep_metric_dt = true;
     }
-    if ((arg == "ResBe") || (arg == "be")) {
+    if ((arg == "ResBe") || (arg == "ALL") || (arg == "be")) {
       bbhp_init(&(wr->p_resBe), p, "ResBe", NULL, zeros, compute_ResBe);
       writer_vec.push_back(&(wr->p_resBe));
       keep_metric_dt = true;
     }
-    if ((arg == "ResPs") || (arg == "ps")) {
+    if ((arg == "ResPs") || (arg == "ALL") || (arg == "ps")) {
       bbhp_init(&(wr->p_resPs), p, "ResPs", NULL, zeros, compute_ResPs);
       writer_vec.push_back(&(wr->p_resPs));
       keep_metric_dt = true;
     }
-    if ((arg == "ResXi") || (arg == "xi")) {
+    if ((arg == "ResXi") || (arg == "ALL") || (arg == "xi")) {
       bbhp_init(&(wr->p_resXi), p, "ResXi", NULL, zeros, compute_ResXi);
       writer_vec.push_back(&(wr->p_resXi));
       keep_scalar_dt = true;
     }
-    if ((arg == "ResPi") || (arg == "pi")) {
+    if ((arg == "ResPi") || (arg == "ALL") || (arg == "pi")) {
       bbhp_init(&(wr->p_resPi), p, "ResPi", NULL, zeros, compute_ResPi);
       writer_vec.push_back(&(wr->p_resPi));
       keep_scalar_dt = true;
     }
-    if ((arg == "ResXi2") || (arg == "xi2")) {
+    if ((arg == "ResXi2") || (arg == "ALL") || (arg == "xi2")) {
       bbhp_init(&(wr->p_resXi2), p, "ResXi2", NULL, zeros, compute_ResXi2);
       writer_vec.push_back(&(wr->p_resXi2));
       keep_scalar_dt = true;
     }
-    if ((arg == "ResPi2") || (arg == "pi2")) {
+    if ((arg == "ResPi2") || (arg == "ALL") || (arg == "pi2")) {
       bbhp_init(&(wr->p_resPi2), p, "ResPi2", NULL, zeros, compute_ResPi2);
       writer_vec.push_back(&(wr->p_resPi2));
       keep_scalar_dt = true;
     }
-    if ((arg == "iresAl") || (arg == "ial")) {
+    if ((arg == "iresAl") || (arg == "ALL") || (arg == "ial")) {
       bbhp_init(&(wr->p_iresAl), p, "iresAl", NULL, zeros, compute_iresAl);
       writer_vec.push_back(&(wr->p_iresAl));
       keep_metric_dt = true;
     }
-    if ((arg == "iresBe") || (arg == "ibe")) {
+    if ((arg == "iresBe") || (arg == "ALL") || (arg == "ibe")) {
       bbhp_init(&(wr->p_iresBe), p, "iresBe", NULL, zeros, compute_iresBe);
       writer_vec.push_back(&(wr->p_iresBe));
       keep_metric_dt = true;
     }
-    if ((arg == "iresPs") || (arg == "ips")) {
+    if ((arg == "iresPs") || (arg == "ALL") || (arg == "ips")) {
       bbhp_init(&(wr->p_iresPs), p, "iresPs", NULL, zeros, compute_iresPs);
       writer_vec.push_back(&(wr->p_iresPs));
       keep_metric_dt = true;
     }
-    if ((arg == "iresXi") || (arg == "ixi")) {
+    if ((arg == "iresXi") || (arg == "ALL") || (arg == "ixi")) {
       bbhp_init(&(wr->p_iresXi), p, "iresXi", NULL, zeros, compute_iresXi);
       writer_vec.push_back(&(wr->p_iresXi));
       keep_scalar_dt = true;
     }
-    if ((arg == "iresPi") || (arg == "ipi")) {
+    if ((arg == "iresPi") || (arg == "ALL") || (arg == "ipi")) {
       bbhp_init(&(wr->p_iresPi), p, "iresPi", NULL, zeros, compute_iresPi);
       writer_vec.push_back(&(wr->p_iresPi));
       keep_scalar_dt = true;
     }
-    if ((arg == "iresXi2") || (arg == "ixi2")) {
+    if ((arg == "iresXi2") || (arg == "ALL") || (arg == "ixi2")) {
       bbhp_init(&(wr->p_iresXi2), p, "iresXi2", NULL, zeros, compute_iresXi2);
       writer_vec.push_back(&(wr->p_iresXi2));
       keep_scalar_dt = true;
     }
-    if ((arg == "iresPi2") || (arg == "ipi2")) {
+    if ((arg == "iresPi2") || (arg == "ALL") || (arg == "ipi2")) {
       bbhp_init(&(wr->p_iresPi2), p, "iresPi2", NULL, zeros, compute_iresPi2);
       writer_vec.push_back(&(wr->p_iresPi2));
       keep_scalar_dt = true;
     }
-    if ((arg == "outnull") || (arg == "null")) {
+    if ((arg == "outnull") || (arg == "ALL") || (arg == "null")) {
       bbhp_init(&(wr->p_outnull), p, "outnull", NULL, zeros, compute_outnull);
       writer_vec.push_back(&(wr->p_outnull));
       keep_metric_dt = true;
     }
-    if ((arg == "revnull") || (arg == "rnull")) {
+    if ((arg == "revnull") || (arg == "ALL") || (arg == "rnull")) {
       bbhp_init(&(wr->p_revnull), p, "revnull", NULL, zeros, compute_revnull);
       writer_vec.push_back(&(wr->p_revnull));
       keep_metric_dt = true;
     }
-    if ((arg == "maspect") || (arg == "mass")) {
+    if ((arg == "maspect") || (arg == "ALL") || (arg == "mass")) {
       bbhp_init(&(wr->p_maspect), p, "maspect", NULL, zeros, compute_maspect);
       writer_vec.push_back(&(wr->p_maspect));
       keep_metric_dt = true;
     }
-    if ((arg == "ricci") || (arg == "ric")) {
+    if ((arg == "ricci") || (arg == "ALL") || (arg == "ric")) {
       bbhp_init(&(wr->p_ricci), p, "ricci", NULL, zeros, compute_ricci);
       writer_vec.push_back(&(wr->p_ricci));
       keep_metric_dt = true;
     }
-    if ((arg == "EEtt") || (arg == "tt")) {
+    if ((arg == "EEtt") || (arg == "ALL") || (arg == "tt")) {
       bbhp_init(&(wr->p_EEtt), p, "EEtt", NULL, zeros, compute_EEtt);
       writer_vec.push_back(&(wr->p_EEtt));
       keep_metric_dt = true;
     }
-    if ((arg == "EEtx") || (arg == "tx") || (arg == "xt")) {
+    if ((arg == "EEtx") || (arg == "ALL") || (arg == "tx") || (arg == "xt")) {
       bbhp_init(&(wr->p_EEtx), p, "EEtx", NULL, zeros, compute_EEtx);
       writer_vec.push_back(&(wr->p_EEtx));
       keep_metric_dt = true;
     }
-    if ((arg == "EExx") || (arg == "xx")) {
+    if ((arg == "EExx") || (arg == "ALL") || (arg == "xx")) {
       bbhp_init(&(wr->p_EExx), p, "EExx", NULL, zeros, compute_EExx);
       writer_vec.push_back(&(wr->p_EExx));
       keep_metric_dt = true;
     }
-    if ((arg == "EEhh") || (arg == "hh")) {
+    if ((arg == "EEhh") || (arg == "ALL") || (arg == "hh")) {
       bbhp_init(&(wr->p_EEhh), p, "EEhh", NULL, zeros, compute_EEhh);
       writer_vec.push_back(&(wr->p_EEhh));
       keep_metric_dt = true;
     }
-    if ((arg == "cHamiltonian") || (arg == "hamiltonian") || (arg == "ham")) {
+    if ((arg == "cHamiltonian") || (arg == "ALL") || (arg == "hamiltonian") || (arg == "ham")) {
       bbhp_init(&(wr->p_hamiltonian), p, "cHamiltonian", NULL, zeros, compute_hamiltonian);
       writer_vec.push_back(&(wr->p_hamiltonian));
       keep_metric_dt = true;
     }
-    if ((arg == "cMomentum") || (arg == "momentum") || (arg == "mom")) {
+    if ((arg == "cMomentum") || (arg == "ALL") || (arg == "momentum") || (arg == "mom")) {
       bbhp_init(&(wr->p_momentum), p, "cMomentum", NULL, zeros, compute_momentum);
       writer_vec.push_back(&(wr->p_momentum));
       keep_metric_dt = true;
     }
-    if ((arg == "cKext") || (arg == "kext")) {
+    if ((arg == "cKext") || (arg == "ALL") || (arg == "kext")) {
       bbhp_init(&(wr->p_kext), p, "cKext", NULL, zeros, compute_kext);
       writer_vec.push_back(&(wr->p_kext));
       keep_metric_dt = true;
     }
-    if ((arg == "cDtKext") || (arg == "dtkext")) {
+    if ((arg == "cDtKext") || (arg == "ALL") || (arg == "dtkext")) {
       bbhp_init(&(wr->p_dtkext), p, "cDtKext", NULL, zeros, compute_dtkext);
       writer_vec.push_back(&(wr->p_dtkext));
       keep_metric_dt = true;

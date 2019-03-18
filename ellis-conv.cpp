@@ -22,48 +22,50 @@
 int main(int argc, char **argv)
 {
   PAR p;
-  int err_code = params_init(&p, argc, argv);
-  if (err_code != 0) {
-    cout << "\nPARAM INIT error code = " << err_code << endl;
-    return err_code;
-  }
-  int resn0 = p.resn_factor;
-  int resn1 = 2*resn0;
-  int resn2 = 4*resn0; // 4h, 2h, and h
-
   vector<str> prefixes;
   vector<str> iprefixes;
-  if (p.write_xp) {
-    prefixes.push_back("Xi");
-    prefixes.push_back("Pi");
+
+  if (argc < 2) {
+    cout << "\nNOT ENOUGH ARGUMENTS" << endl;
+    return argc;
   }
-  if (p.write_xp2) {
-    prefixes.push_back("Xi2");
-    prefixes.push_back("Pi2");
-  }
-  if (p.write_abp) {
-    prefixes.push_back("Al");
-    prefixes.push_back("Be");
-    prefixes.push_back("Ps");
-    if (p.write_res) { iprefixes.push_back("ResPs"); }
-  }
-  if (p.write_ires_xp) {
+  else if (argc == 2) {
+    int err_code = params_init(&p, argc, argv);
+    if (err_code != 0) {
+      cout << "\nPARAM INIT error code = " << err_code << endl;
+      return err_code;
+    }
+    if (p.write_xp) {
+      prefixes.push_back("Xi");
+      prefixes.push_back("Pi");
+    }
+    if (p.write_xp2) {
+      prefixes.push_back("Xi2");
+      prefixes.push_back("Pi2");
+    }
+    if (p.write_abp) {
+      prefixes.push_back("Al");
+      prefixes.push_back("Be");
+      prefixes.push_back("Ps");
+      if (p.write_res) { iprefixes.push_back("ResPs"); }
+    }
+    if (p.write_ires_xp) {
       iprefixes.push_back("iresXi");
       iprefixes.push_back("iresPi");
-  }
-  if (p.write_ires_xp2) {
+    }
+    if (p.write_ires_xp2) {
       iprefixes.push_back("iresXi2");
       iprefixes.push_back("iresPi2");
-  }
-  if (p.write_ires_abp) {
+    }
+    if (p.write_ires_abp) {
       iprefixes.push_back("iresAl");
       iprefixes.push_back("iresBe");
       iprefixes.push_back("iresPs");
-  }
-  if (p.write_outnull) { prefixes.push_back("outnull"); }
-  if (p.write_maspect) { prefixes.push_back("maspect"); }
-  if (p.write_ricci) { prefixes.push_back("ricci"); }
-  if (p.write_mtot) {
+    }
+    if (p.write_outnull) { prefixes.push_back("outnull"); }
+    if (p.write_maspect) { prefixes.push_back("maspect"); }
+    if (p.write_ricci) { prefixes.push_back("ricci"); }
+    if (p.write_mtot) {
       iprefixes.push_back("EEtt");
       iprefixes.push_back("EEtx");
       iprefixes.push_back("EExx");
@@ -72,7 +74,100 @@ int main(int argc, char **argv)
       iprefixes.push_back("cMomentum");
       iprefixes.push_back("cKext");
       iprefixes.push_back("cDtKext");
+    }
   }
+  else {
+    int new_argc = 2;
+    char *new_argv[] = {argv[0], argv[1]};
+    int err_code = params_init(&p, new_argc, new_argv);
+    if (err_code != 0) {
+      cout << "\nPARAM INIT error code = " << err_code << endl;
+      return err_code;
+    }
+    for (int arg_ind = 2; arg_ind < argc; ++arg_ind) {
+      str arg = argv[arg_ind];
+      if ((arg == "Al") || (arg == "ALL") || (arg == "al")) { prefixes.push_back("Al"); }
+      if ((arg == "Be") || (arg == "ALL") || (arg == "be")) { prefixes.push_back("Be"); }
+      if ((arg == "Ps") || (arg == "ALL") || (arg == "ps")) { prefixes.push_back("Ps"); }
+      if ((arg == "Xi") || (arg == "ALL") || (arg == "xi")) { prefixes.push_back("Xi"); }
+      if ((arg == "Pi") || (arg == "ALL") || (arg == "pi")) { prefixes.push_back("Pi"); }
+      if ((arg == "Xi2") || (arg == "ALL") || (arg == "xi2")) { prefixes.push_back("Xi2"); }
+      if ((arg == "Pi2") || (arg == "ALL") || (arg == "pi2")) { prefixes.push_back("Pi2"); }
+      if ((arg == "outnull") || (arg == "ALL") || (arg == "null")) { prefixes.push_back("outnull"); }
+      if ((arg == "revnull") || (arg == "ALL") || (arg == "rnull")) { prefixes.push_back("revnull"); }
+      if ((arg == "maspect") || (arg == "ALL") || (arg == "mass")) { prefixes.push_back("maspect"); }
+      if ((arg == "ricci") || (arg == "ALL") || (arg == "ric")) { prefixes.push_back("ricci"); }
+      if ((arg == "ResAl") || (arg == "ALL") || (arg == "ral")) {
+	iprefixes.push_back("ResAl");
+      }
+      if ((arg == "ResBe") || (arg == "ALL") || (arg == "rbe")) {
+	iprefixes.push_back("ResBe");
+      }
+      if ((arg == "ResPs") || (arg == "ALL") || (arg == "rps")) {
+	iprefixes.push_back("ResPs");
+      }
+      if ((arg == "ResXi") || (arg == "ALL") || (arg == "rxi")) {
+	iprefixes.push_back("ResXi");
+      }
+      if ((arg == "ResPi") || (arg == "ALL") || (arg == "rpi")) {
+	iprefixes.push_back("ResPi");
+      }
+      if ((arg == "ResXi2") || (arg == "ALL") || (arg == "rxi2")) {
+	iprefixes.push_back("ResXi2");
+      }
+      if ((arg == "ResPi2") || (arg == "ALL") || (arg == "rpi2")) {
+	iprefixes.push_back("ResPi2");
+      }
+      if ((arg == "iresAl") || (arg == "ALL") || (arg == "ial")) {
+	iprefixes.push_back("iresAl");
+      }
+      if ((arg == "iresBe") || (arg == "ALL") || (arg == "ibe")) {
+	iprefixes.push_back("iresBe");
+      }
+      if ((arg == "iresPs") || (arg == "ALL") || (arg == "ips")) {
+	iprefixes.push_back("iresPs");
+      }
+      if ((arg == "iresXi") || (arg == "ALL") || (arg == "ixi")) {
+	iprefixes.push_back("iresXi");
+      }
+      if ((arg == "iresPi") || (arg == "ALL") || (arg == "ipi")) {
+	iprefixes.push_back("iresPi");
+      }
+      if ((arg == "iresXi2") || (arg == "ALL") || (arg == "ixi2")) {
+	iprefixes.push_back("iresXi2");
+      }
+      if ((arg == "iresPi2") || (arg == "ALL") || (arg == "ipi2")) {
+	iprefixes.push_back("iresPi2");
+      }
+      if ((arg == "EEtt") || (arg == "ALL") || (arg == "tt")) {
+	iprefixes.push_back("EEtt");
+      }
+      if ((arg == "EEtx") || (arg == "ALL") || (arg == "tx") || (arg == "xt")) {
+	iprefixes.push_back("EEtx");
+      }
+      if ((arg == "EExx") || (arg == "ALL") || (arg == "xx")) {
+	iprefixes.push_back("EExx");
+      }
+      if ((arg == "EEhh") || (arg == "ALL") || (arg == "hh")) {
+	iprefixes.push_back("EEhh");
+      }
+      if ((arg == "cHamiltonian") || (arg == "ALL") || (arg == "hamiltonian") || (arg == "ham")) {
+	iprefixes.push_back("hamiltonian");
+      }
+      if ((arg == "cMomentum") || (arg == "ALL") || (arg == "momentum") || (arg == "mom")) {
+	iprefixes.push_back("momentum");
+      }
+      if ((arg == "cKext") || (arg == "ALL") || (arg == "kext")) {
+	iprefixes.push_back("kext");
+      }
+      if ((arg == "cDtKext") || (arg == "ALL") || (arg == "dtkext")) {
+	iprefixes.push_back("dtkext");
+      }
+    }
+  }
+  int resn0 = p.resn_factor;
+  int resn1 = 2*resn0;
+  int resn2 = 4*resn0; // 4h, 2h, and h
   int nwr = prefixes.size();
   int inwr = iprefixes.size();
   str outfile = p.outfile;
