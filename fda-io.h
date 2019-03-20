@@ -11,6 +11,7 @@
 #include <sstream> // for printing doubles to full precision
 #include <map> // for parameter input
 #include <cstdlib> // for atoi() and atof()
+#include <cctype> // for isdigit()
 #include "bbhutil.h" // for output to .sdf
 #include "sim-structs.h"
 #include "sim-header.h"
@@ -145,7 +146,7 @@ map<str, bool *> get_p_bool(PAR *p)
 void param_collect(char **source, int num, map<str, str>& dest) {
   for (int arg = 1; arg < num; ++arg) {
     if (source[arg][0] == '-') {
-      dest[source[arg]] = source[arg+1];
+      if (isdigit(source[arg][1]) == 0) { dest[source[arg]] = source[arg+1]; }
     }
   }
 }
@@ -161,7 +162,9 @@ void file_param_collect(str filename, map<str, str>& dest) {
       else { source.push_back(entry); }
     }
     for (unsigned int arg = 0; arg < source.size(); ++arg) {
-      if (source[arg][0] == '-') { dest[source[arg]] = source[arg+1]; }
+      if (source[arg][0] == '-') {
+	if (isdigit(source[arg][1]) == 0) { dest[source[arg]] = source[arg+1]; }
+      }
     }
   }
   else { cout << "\n***UNABLE TO OPEN PARAMETER FILE***\n" << endl; }
@@ -313,32 +316,19 @@ str get_paramFile_string(map<str, str *>& p_str, map<str, int *>& p_int,
 
 void record_horizon(PAR *p, const VD& f_ps, int ind, int itn, int t_itn)
 {
-  cout << "Horizon Found at:\nr[" << ind << "] = " << p->r[ind] << "  (r_areal = "
-       << sq(f_ps[ind])*p->r[ind] << ")\nt[" << t_itn << "] = "
-       << p->t << "  (itn " << itn << ")\n" << endl;
-  str param_str = "\noutfile name = " + p->outfile + "\nlaspt (save_pt) = " +
-    to_string(p->lastpt) + " (" + to_string(p->save_pt) + ")\nnsteps (save_step) = " +
-    to_string(p->nsteps) + " (" + to_string(p->save_step) + ")\nrmin = " + to_string(p->rmin)
-    + ";\trmax = " + to_string(p->rmax) + "\nlambda = " + to_string(p->lam) +
-    "\ndt = " + to_string(p->dt) + "\ndissipation = " + to_string(p->dspn) +
-    "\nell_up_weight = " + to_string(p->ell_up_weight) + "\nhyp_tol = " + to_string(p->tol) +
-    "\nell_tol = " + to_string(p->ell_tol) + "\nmaxit = " + to_string(p->maxit) + "\nic_r0 = " +
-    to_string(p->ic_r0) + "\nic_Amp = " + to_string(p->ic_Amp) + "\nic_Dsq = " +
-    to_string(p->ic_Dsq) + "\ndr = " + to_string(p->dr);
-  param_str += "\noptions:\nhyperbolic psi evolution = " + bool_to_str(p->psi_hyp) +
-    "\nsommerfeld bc = " + bool_to_str(p->somm_cond)
-    + "\ndissipation at bound = " + bool_to_str(p->dspn_bound) + "\nclean hyperbolic update functions = "
-    + bool_to_str(p->clean_hyp) + "\nclean elliptic update functions = " + bool_to_str(p->clean_ell) + "\n";
+  str horizon_msg = "Horizon Found at:\nr[" + to_string(ind) + "] = " + to_string(p->r[ind])
+    + "  (r_areal = " + to_string(sq(f_ps[ind])*sqrt(r2(p,ind))) + ")\nt[" + to_string(t_itn)
+    + "] = " + to_string(p->t) + "  (itn " + to_string(itn) + ")\nUsing:\ndr = " + to_string(p->dr)
+    + "\nic_Amp = " + to_string(p->ic_Amp) + "\nic_Dsq = " + to_string(p->ic_Dsq) + "\nic_r0 = "
+    + to_string(p->ic_r0) + "\n\nic2_Amp = " + to_string(p->ic2_Amp) + "\nic2_Dsq = "
+    + to_string(p->ic2_Dsq) + "\nic2_r0 = " + to_string(p->ic2_r0) + "]n\nfile = " + p->outfile
+    + "\nresolution = " + to_string(p->resn_factor) + "\npsi_hyp = " + bool_to_str(p->psi_hyp);
+  cout << horizon_msg << "\n\nAPPARENT HORIZON EXIT\n" << endl;
   ofstream specs;
   str specs_name = "horizon-" + p->outfile + ".txt";
   specs.open(specs_name, ofstream::out);
-  specs << "Horizon Found at:\nr[" << ind << "] = " << p->r[ind] << "  (r_areal = "
-	<< sq(f_ps[ind])*p->r[ind] << ")\nt[" << t_itn << "] = "
-	<< p->t << "  (itn " << itn << ")\nUsing:\ndr = " << p->dr << "\nic_Amp = " << p->ic_Amp
-	<< "\nic_Dsq = " << p->ic_Dsq << "\nic_r0 = " << p->ic_r0 << "\n\n\nFULL PARAMETER DATA:\n";
-  specs << param_str;
+  specs << horizon_msg << endl;
   specs.close();
-  cout << param_str;
   return;
 }
 
