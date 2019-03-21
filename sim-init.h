@@ -24,8 +24,11 @@
 void bbhp_init(BBHP *bp, PAR *p, str fieldname, VD *p_field, const VD& zeros, D_FN comp)
 {
   bp->full_field = p_field;
-  bp->filename = fieldname + "-" + p->outfile + ".sdf";
-  bp->file = &(bp->filename[0]);
+  if (fieldname == "") { bp->filename = fieldname; }
+  else {
+    bp->filename = fieldname + "-" + p->outfile + ".sdf";
+    bp->file = &(bp->filename[0]);
+  } 
   bp->shape = &(p->wr_shape);
   bp->rank = 1;
   bp->coords = &(p->coord_lims[0]);  
@@ -199,7 +202,11 @@ int params_init(PAR *p, int argc, char **argv)
   map<str, dbl *> p_dbl = get_p_dbl(p);
   map<str, bool *> p_bool = get_p_bool(p);
   map<str, str> params;
-  if (argc > 2) { param_collect(argv, argc, params); }
+  bool sim_cmd_line = false;
+  if (argc > 2) {
+    param_collect(argv, argc, params);
+    if (((str) argv[0]) == "./ellis") { sim_cmd_line = true; }
+  }
   else if (argc == 2) { file_param_collect(argv[1], params); }
   else { file_param_collect("ellis-parameters.txt", params); }
   param_set(params, p_str, p_int, p_dbl, p_bool);
@@ -235,8 +242,14 @@ int params_init(PAR *p, int argc, char **argv)
   p->zerowr = (p->lastwr) / 2;
   p->wr_dr = ((p->rmax) - (p->rmin)) / ((dbl) (p->lastwr));
   // derived parameters
-  p->lastpt = (p->lastpt) * (p->resn_factor);
-  p->nsteps = (p->nsteps) * (p->resn_factor);
+  //////////////////////////////////////////////////////////////////////////////////////
+  // IMPORTANT NOTE: will take (lastpt & nsteps)*=resn if in sim and use cmd line args,
+  //                 otherwise lastpt & nsteps will be taken from param file directly
+  //////////////////////////////////////////////////////////////////////////////////////
+  if (sim_cmd_line) { 
+    p->lastpt = (p->lastpt) * (p->resn_factor);
+    p->nsteps = (p->nsteps) * (p->resn_factor);
+  }
   p->npts = (p->lastpt) + 1;
   p->zeropt = (p->lastpt) / 2;
   p->norm_factor = 1 / ((dbl) (p->npts));
@@ -253,8 +266,12 @@ int params_init(PAR *p, int argc, char **argv)
     cout << "\n***COORDINATE INIT ERROR***\n" << endl;
   }
   p->t = 0;
+  //////////////////////////////////////////////////////////////////////////////////////
+  // IMPORTANT NOTE: will take (save_pt & save_step)*=resn if in sim and use cmd line args,
+  //                 otherwise save_pt & save_step will be taken from param file directly
+  //////////////////////////////////////////////////////////////////////////////////////
   if (p->same_grids) {
-    p->save_pt = (p->save_pt) * (p->resn_factor);
+    if (sim_cmd_line) { p->save_pt = (p->save_pt) * (p->resn_factor); }
     for (int k = 0; k < p->wr_shape; ++k) {
       (p->inds).push_back({k, (p->save_pt)*k});
     }
@@ -262,13 +279,12 @@ int params_init(PAR *p, int argc, char **argv)
       cout << "\n***INDEX INIT ERROR***\n" << endl;
     }
   }
-  else {
-    p->lastwr = (p->lastpt);
-    p->wr_shape = (p->npts);
-    p->zerowr = (p->zeropt);
-    p->wr_dr = (p->dr);
+  else if ((p->save_pt) != 1) { cout << "\nWARNING: SAME_GRIDS=FALSE and SAVE_PT != 1\n" << endl; }
+  else if (((p->lastwr) != (p->lastpt)) || ((p->wr_shape) != (p->npts)) || ((p->zerowr) != (p->zeropt))) {
+    cout << "\nERROR: number of grid points not set correctly\n" << endl;
+    return -2;
   }
-  if (p->same_times) { p->save_step = (p->save_step) * (p->resn_factor); }
+  if ((p->same_times) && (sim_cmd_line)) { p->save_step = (p->save_step) * (p->resn_factor); }
   p->check_diagnostics = (p->save_step) * (p->check_step);
   // lapack object declaration
   p->lp_n = (p->n_ell) * (p->npts);
@@ -299,7 +315,7 @@ int params_init(PAR *p, int argc, char **argv)
   p->jacRRm2 = (p->in2dr);
   p->cpsi_rhs = 1 / (p->jacRR);
   // parameter data output
-  if (((str) argv[0]) == "./ellis") {
+  if (sim_cmd_line) {
     ofstream specs;
     str specs_name = to_string(p->resn_factor) + "-" + p->outfile + ".txt";
     specs.open(specs_name, ofstream::out);
@@ -343,8 +359,10 @@ vector<BBHP *> analysis_init(WRS *wr, FLDS *f, PAR *p, int argc, char **argv) {
 
   bbhp_init(&(wr->p_Xi), p, "Xi", &(f->Xi), zeros, NULL);
   bbhp_init(&(wr->p_Pi), p, "Pi", &(f->Pi), zeros, NULL);
-  bbhp_init(&(wr->p_Xi2), p, "Xi2", &(f->Xi2), zeros, NULL);
-  bbhp_init(&(wr->p_Pi2), p, "Pi2", &(f->Pi2), zeros, NULL);
+  if (p->write_xp2) {
+    bbhp_init(&(wr->p_Xi2), p, "Xi2", &(f->Xi2), zeros, NULL);
+    bbhp_init(&(wr->p_Pi2), p, "Pi2", &(f->Pi2), zeros, NULL);
+  }
   bbhp_init(&(wr->p_Al), p, "Al", &(f->Al), zeros, NULL);
   bbhp_init(&(wr->p_Be), p, "Be", &(f->Be), zeros, NULL);
   bbhp_init(&(wr->p_Ps), p, "Ps", &(f->Ps), zeros, NULL);
