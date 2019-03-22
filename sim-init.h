@@ -380,37 +380,37 @@ vector<BBHP *> analysis_init(WRS *wr, FLDS *f, PAR *p, int argc, char **argv) {
 
   for (int arg_ind = 2; arg_ind < argc; ++arg_ind) {
     str arg = argv[arg_ind];
-    if ((arg == "ResAl") || (arg == "ALL") || (arg == "al")) {
+    if ((arg == "ResAl") || (arg == "ALL") || (arg == "ral")) {
       bbhp_init(&(wr->p_resAl), p, "ResAl", NULL, zeros, compute_ResAl);
       writer_vec.push_back(&(wr->p_resAl));
       keep_metric_dt = true;
     }
-    if ((arg == "ResBe") || (arg == "ALL") || (arg == "be")) {
+    if ((arg == "ResBe") || (arg == "ALL") || (arg == "rbe")) {
       bbhp_init(&(wr->p_resBe), p, "ResBe", NULL, zeros, compute_ResBe);
       writer_vec.push_back(&(wr->p_resBe));
       keep_metric_dt = true;
     }
-    if ((arg == "ResPs") || (arg == "ALL") || (arg == "ps")) {
+    if ((arg == "ResPs") || (arg == "ALL") || (arg == "rps")) {
       bbhp_init(&(wr->p_resPs), p, "ResPs", NULL, zeros, compute_ResPs);
       writer_vec.push_back(&(wr->p_resPs));
       keep_metric_dt = true;
     }
-    if ((arg == "ResXi") || (arg == "ALL") || (arg == "xi")) {
+    if ((arg == "ResXi") || (arg == "ALL") || (arg == "rxi")) {
       bbhp_init(&(wr->p_resXi), p, "ResXi", NULL, zeros, compute_ResXi);
       writer_vec.push_back(&(wr->p_resXi));
       keep_scalar_dt = true;
     }
-    if ((arg == "ResPi") || (arg == "ALL") || (arg == "pi")) {
+    if ((arg == "ResPi") || (arg == "ALL") || (arg == "rpi")) {
       bbhp_init(&(wr->p_resPi), p, "ResPi", NULL, zeros, compute_ResPi);
       writer_vec.push_back(&(wr->p_resPi));
       keep_scalar_dt = true;
     }
-    if ((arg == "ResXi2") || (arg == "ALL") || (arg == "xi2")) {
+    if ((arg == "ResXi2") || (arg == "ALL") || (arg == "rxi2")) {
       bbhp_init(&(wr->p_resXi2), p, "ResXi2", NULL, zeros, compute_ResXi2);
       writer_vec.push_back(&(wr->p_resXi2));
       keep_scalar_dt = true;
     }
-    if ((arg == "ResPi2") || (arg == "ALL") || (arg == "pi2")) {
+    if ((arg == "ResPi2") || (arg == "ALL") || (arg == "rpi2")) {
       bbhp_init(&(wr->p_resPi2), p, "ResPi2", NULL, zeros, compute_ResPi2);
       writer_vec.push_back(&(wr->p_resPi2));
       keep_scalar_dt = true;
