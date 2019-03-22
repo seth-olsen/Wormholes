@@ -275,7 +275,7 @@ int params_init(PAR *p, int argc, char **argv)
     for (int k = 0; k < p->wr_shape; ++k) {
       (p->inds).push_back({k, (p->save_pt)*k});
     }
-    if ((p->inds[p->lastwr]).second != p->lastpt || (p->inds[p->zerowr]).second != p->zeropt) {
+    if (((p->inds[p->lastwr]).second != (p->lastpt)) || ((p->inds[p->zerowr]).second != (p->zeropt))) {
       cout << "\n***INDEX INIT ERROR***\n" << endl;
     }
   }
@@ -284,6 +284,8 @@ int params_init(PAR *p, int argc, char **argv)
     cout << "\nERROR: number of grid points not set correctly\n" << endl;
     return -2;
   }
+  else { p->wr_dr = (p->dr); }
+  
   if ((p->same_times) && (sim_cmd_line)) { p->save_step = (p->save_step) * (p->resn_factor); }
   p->check_diagnostics = (p->save_step) * (p->check_step);
   // lapack object declaration
@@ -315,7 +317,7 @@ int params_init(PAR *p, int argc, char **argv)
   p->jacRRm2 = (p->in2dr);
   p->cpsi_rhs = 1 / (p->jacRR);
   // parameter data output
-  if (sim_cmd_line) {
+  if ((sim_cmd_line) || (argc == 1)) {
     ofstream specs;
     str specs_name = to_string(p->resn_factor) + "-" + p->outfile + ".txt";
     specs.open(specs_name, ofstream::out);

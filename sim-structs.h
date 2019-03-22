@@ -17,7 +17,7 @@ typedef struct sim_site_values SSV;
 */
 
 struct bbhutil_params {
-  str filename = "none";
+  str filename = "";
   VD *full_field = NULL;
   VD wr_field;
   char *file = NULL;
@@ -114,16 +114,16 @@ struct sim_writers {
 
 struct sim_params {
   str outfile = "ellis";
-  int lastpt = 1200;
+  int lastpt = 1000;
   int save_pt = 1;
-  int nsteps = 2400;
-  int save_step = 4;
+  int nsteps = 2000;
+  int save_step = 1;
   int resn_factor = 1;
   int check_step = 1;
   int maxit = 100;
   int norm_type = 0;
   dbl lam = 0.25; // dt/dr
-  dbl rmax = 60;
+  dbl rmax = 100;
   dbl rmin = -rmax;
   dbl lsq = 1;
   dbl dspn = 0.5; // dissipation coefficient
