@@ -136,14 +136,23 @@ int fields_init(FLDS *f, PAR *p)
     f->Al[k] = 1;
     //f->Be[k] = 0;
     f->Ps[k] = 1;
-    f->Xi[k] = (amp0 / (sq(p->r[k]) + (p->lsq)));
+    f->Xi[k] = amp0 / r2(p,k);
   }
   for (int k = (p->zeropt) + 1; k < (p->npts); ++k) {
     f->Xi[k] += ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
     if (!(p->clean_hyp)) { f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0); }
     f->Xi2[k] = ic_xi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
-    f->Pi2[k] = ic_pi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
+    if (!(p->clean_ell)) { f->Pi2[k] = ic_pi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0); }
   }
+  if (p->sym_pert) {
+    for (int k = 0; k < (p->zeropt); ++k) {
+      f->Xi[k] = f->Xi[(p->lastpt) - k];
+      f->Pi[k] = f->Pi[(p->lastpt) - k];
+      f->Xi2[k] = f->Xi2[(p->lastpt) - k];
+      f->Pi2[k] = f->Pi2[(p->lastpt) - k];
+    }
+  }
+  // ******** WHAT TO DO AT X = 0 ??? ********
 
   f->oldXi = f->Xi;
   f->cnXi = f->Xi;

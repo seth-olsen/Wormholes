@@ -114,7 +114,8 @@ map<str, int *> get_p_int(PAR *p)
   map<str, int *> p_int {{"-lastpt",&(p->lastpt)}, {"-save_pt",&(p->save_pt)},
    {"-nsteps",&(p->nsteps)}, {"-save_step",&(p->save_step)},
    {"-norm_type",&(p->norm_type)}, {"-maxit",&(p->maxit)},
-   {"-check_step",&(p->check_step)}, {"-resn_factor",&(p->resn_factor)}};
+   {"-check_step",&(p->check_step)}, {"-resn_factor",&(p->resn_factor)},
+   {"-signal_code",&(p->signal_code)}};
   return p_int;
 }
 map<str, dbl *> get_p_dbl(PAR *p)
@@ -139,7 +140,8 @@ map<str, bool *> get_p_bool(PAR *p)
    {"-write_abp",&(p->write_abp)}, {"-write_ires_abp",&(p->write_ires_abp)},
    {"-write_xp2",&(p->write_xp2)}, {"-write_ires_xp2",&(p->write_ires_xp2)},
    {"-clean_hyp",&(p->clean_hyp)}, {"-clean_ell",&(p->clean_ell)},
-   {"-same_times",&(p->same_times)}, {"-same_grids",&(p->same_grids)}};
+   {"-same_times",&(p->same_times)}, {"-same_grids",&(p->same_grids)},
+   {"-sym_pert",&(p->sym_pert)}};
   return p_bool;
 }
 

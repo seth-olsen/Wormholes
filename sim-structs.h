@@ -121,7 +121,8 @@ struct sim_params {
   int resn_factor = 1;
   int check_step = 1;
   int maxit = 100;
-  int norm_type = 0;
+  int norm_type = 0; // type of l-norm to compute
+  int signal_code = 0; // code for multipurpose signaling
   dbl lam = 0.25; // dt/dr
   dbl rmax = 100;
   dbl rmin = -rmax;
@@ -156,6 +157,7 @@ struct sim_params {
   bool write_ires_xp2 = false;
   bool write_ires_abp = false; // write ires for metric variables?
   bool horizon_search = false; // search for apparent horizon after each step?
+  bool sym_pert = false; // symmetric perturbation?
   // for convergence purposes
   str hold_const = "lambda"; // "lambda", "dt", or "dr"
   bool same_times = true;
