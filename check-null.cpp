@@ -66,7 +66,7 @@ int main(int argc, char **argv)
   // iterate through time steps
   int times[3];
   gft_set_multi();
-  for (int t = 0; t < num_steps; ++t) {
+  for (int t = 2; t < num_steps; ++t) {
     ofs << t << c << t*(p.save_step)*(p.dt) << endl;
     times[0] = t+1; times[1] = t+1; times[2] = t+1;
     read_step(name_arr, times, field_arr, 3);
