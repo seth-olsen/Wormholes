@@ -214,7 +214,10 @@ int params_init(PAR *p, int argc, char **argv)
   bool sim_cmd_line = false;
   if (argc > 2) {
     param_collect(argv, argc, params);
-    if (((str) argv[0]) == "./ellis") { sim_cmd_line = true; }
+    if (((str) argv[0]) == "./ellis") {
+      sim_cmd_line = true;
+      cout << "\ntaking sim parameters from command line\n" << endl;
+    }
   }
   else if (argc == 2) { file_param_collect(argv[1], params); }
   else { file_param_collect("ellis-parameters.txt", params); }
@@ -242,14 +245,7 @@ int params_init(PAR *p, int argc, char **argv)
     }
     else { p->solver = solveAll_dynamic; }
   }
-  // ***set rmin because can't set negative numbers with user input***
-  p->rmin = -(p->rmax);
-  // bbhutil parameters for writing data to sdf
-  p->coord_lims[0] = (p->rmin); p->coord_lims[1] = (p->rmax);
-  p->lastwr = (p->lastpt) / (p->save_pt);
-  p->wr_shape = (p->lastwr) + 1;
-  p->zerowr = (p->lastwr) / 2;
-  p->wr_dr = ((p->rmax) - (p->rmin)) / ((dbl) (p->lastwr));
+  
   // derived parameters
   //////////////////////////////////////////////////////////////////////////////////////
   // IMPORTANT NOTE: will take (lastpt & nsteps)*=resn if in sim and use cmd line args,
@@ -258,11 +254,15 @@ int params_init(PAR *p, int argc, char **argv)
   if (sim_cmd_line) { 
     p->lastpt = (p->lastpt) * (p->resn_factor);
     p->nsteps = (p->nsteps) * (p->resn_factor);
+    if (p->same_grids) { p->save_pt = (p->save_pt) * (p->resn_factor); }
+    if (p->same_times) { p->save_step = (p->save_step) * (p->resn_factor); }
   }
   p->npts = (p->lastpt) + 1;
   p->zeropt = (p->lastpt) / 2;
   p->norm_factor = 1 / ((dbl) (p->npts));
   if (p->norm_type == 1) { p->norm_factor = sqrt(p->norm_factor); }
+  // ***set rmin because can't set negative numbers with user input***
+  p->rmin = -(p->rmax);
   p->dr = ((p->rmax) - (p->rmin)) / ((dbl) (p->lastpt));
   p->dt = (p->lam) * (p->dr);
   p->r[0] = (p->rmin);
@@ -279,8 +279,14 @@ int params_init(PAR *p, int argc, char **argv)
   // IMPORTANT NOTE: will take (save_pt & save_step)*=resn if in sim and use cmd line args,
   //                 otherwise save_pt & save_step will be taken from param file directly
   //////////////////////////////////////////////////////////////////////////////////////
+  // bbhutil parameters for writing data to sdf
+  p->coord_lims[0] = (p->rmin); p->coord_lims[1] = (p->rmax);
+  p->lastwr = (p->lastpt) / (p->save_pt);
+  p->wr_shape = (p->lastwr) + 1;
+  p->zerowr = (p->lastwr) / 2;
+  p->wr_dr = ((p->rmax) - (p->rmin)) / ((dbl) (p->lastwr));
+  p->check_diagnostics = (p->save_step) * (p->check_step);
   if (p->same_grids) {
-    if (sim_cmd_line) { p->save_pt = (p->save_pt) * (p->resn_factor); }
     for (int k = 0; k < p->wr_shape; ++k) {
       (p->inds).push_back({k, (p->save_pt)*k});
     }
@@ -295,8 +301,6 @@ int params_init(PAR *p, int argc, char **argv)
   }
   else { p->wr_dr = (p->dr); }
   
-  if ((p->same_times) && (sim_cmd_line)) { p->save_step = (p->save_step) * (p->resn_factor); }
-  p->check_diagnostics = (p->save_step) * (p->check_step);
   // lapack object declaration
   p->lp_n = (p->n_ell) * (p->npts);
   p->lp_kl = 2;
