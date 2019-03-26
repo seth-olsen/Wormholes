@@ -152,6 +152,7 @@ int solve_t0(FLDS *f, PAR *p)
       cout << "\nt = 0\nitn = " << ell_itn << "\nres = " << res << endl;
       int horizon_code = search_for_horizon(f->Al, f->Be, f->Ps, p);
       if (horizon_code) {
+	cout << "\n\n***HORIZON IN INITIAL DATA***\n" << endl;
 	if (horizon_code == (p->npts)) { record_horizon(p, f->Ps, 0, 0, 0); }
 	else { record_horizon(p, f->Ps, horizon_code, 0, 0); }
 	return -1;
@@ -182,7 +183,9 @@ int solve_dynamic(FLDS *f, PAR *p)
 	cout << endl << "HYPERBOLIC solver STUCK at t = " << (p->t) << endl;
         cout << "res = " << res << endl;
 	p->exit_itn = itn;
-        return -2;
+        //return -2;
+	if (relax_tol(p) != 0) { return -2; }
+	// new
       }
     }    
     res = get_res_abp(f, p);
@@ -203,11 +206,15 @@ int solve_dynamic(FLDS *f, PAR *p)
 	cout << endl << "ELLIPTIC solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
 	p->exit_itn = itn;
+	/*
         if (res < (p->tol)) {
 	  if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -4; }
 	  else { res = 0; }
 	}
         else { return -4; }
+	*/
+	if (relax_tol(p) != 0) { return -4; }
+	// new
       }
     }
     set_abp_cn(f->oldAl, f->oldBe, f->oldPs, f->Al, f->Be, f->Ps,
@@ -216,11 +223,15 @@ int solve_dynamic(FLDS *f, PAR *p)
     if (++itn > p->maxit) {
       cout << endl << "FULL solver STUCK at t = " << (p->t) << "\nres = " << res << endl;
       p->exit_itn = itn;
+      /*
       if (res < (p->tol)) {
 	if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
 	else { res = 0; }
       }
       else { return -5; }
+      */
+      if (relax_tol(p) != 0) { return -5; }
+      // new
     }   
   }
   // *********************** kreiss-oliger DISSIPATION ************************
@@ -246,11 +257,15 @@ int solve_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << endl << "PSI hyperbolic solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
 	p->exit_itn = itn;
+	/*
 	if (res < (p->tol)) {
 	  if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -1; }
 	  else { res = 0; }
 	}
 	else { return -1; }
+	*/
+	if (relax_tol(p) != 0) { return -1; }
+	// new
       }
     }
     res = (p->tol) + 1;
@@ -262,7 +277,9 @@ int solve_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << endl << "HYPERBOLIC solver STUCK at t = " << (p->t) << endl;
         cout << "res = " << res << endl;
 	p->exit_itn = itn;
-        return -2;
+        // return -2;
+	if (relax_tol(p) != 0) { return -2; }
+	// new
       }
     }
     res = get_res_ab(f, p);
@@ -283,11 +300,15 @@ int solve_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << endl << "ELLIPTIC solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
 	p->exit_itn = itn;
+	/*
         if (res < (p->tol)) {
 	  if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -4; }
 	  else { res = 0; }
 	}
         else { return -4; }
+	*/
+	if (relax_tol(p) != 0) { return -4; }
+	// new
       }
     }
     set_ab_cn(f->oldAl, f->oldBe, f->Al, f->Be, f->cnAl, f->cnBe, p->npts);
@@ -299,11 +320,15 @@ int solve_dynamic_psi_hyp(FLDS *f, PAR *p)
     if (++itn > p->maxit) {
       cout << endl << "FULL solver STUCK at t = " << (p->t) << "\nres = " << res << endl;
       p->exit_itn = itn;
+      /*
       if (get_res_psi(f, p) < (p->tol)) {
 	if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
 	else { res = get_res_xp(f, p); }
       }
       else { return -5; }
+      */
+      if (relax_tol(p) != 0) { return -5; }
+      // new
     }
   }
   // *********************** kreiss-oliger DISSIPATION ************************
@@ -328,7 +353,9 @@ int solveAll_dynamic(FLDS *f, PAR *p)
 	cout << endl << "GHOST HYPERBOLIC solver STUCK at t = " << (p->t) << endl;
         cout << "res = " << res << endl;
 	p->exit_itn = itn;
-        return -2;
+        //return -1;
+	if (relax_tol(p) != 0) { return -1; }
+	// new
       }
     }
     res = (p->tol) + 1;
@@ -340,7 +367,9 @@ int solveAll_dynamic(FLDS *f, PAR *p)
 	cout << endl << "NORMAL HYPERBOLIC solver STUCK at t = " << (p->t) << endl;
         cout << "res = " << res << endl;
 	p->exit_itn = itn;
-        return -2;
+        //return -2;
+	if (relax_tol(p) != 0) { return -2; }
+	// new
       }
     }
     res = get_res_abp(f, p);
@@ -361,11 +390,15 @@ int solveAll_dynamic(FLDS *f, PAR *p)
 	cout << endl << "ELLIPTIC solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
 	p->exit_itn = itn;
+	/*
         if (res < (p->tol)) {
 	  if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -4; }
 	  else { res = 0; }
 	}
         else { return -4; }
+	*/
+	if (relax_tol(p) != 0) { return -4; }
+	// new
       }
     }
     set_abp_cn(f->oldAl, f->oldBe, f->oldPs, f->Al, f->Be, f->Ps,
@@ -375,11 +408,15 @@ int solveAll_dynamic(FLDS *f, PAR *p)
     if (++itn > p->maxit) {
       cout << endl << "FULL solver STUCK at t = " << (p->t) << "\nres = " << res << endl;
       p->exit_itn = itn;
+      /*
       if (res < (p->tol)) {
 	if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
 	else { res = 0; }
       }
       else { return -5; }
+      */
+      if (relax_tol(p) != 0) { return -5; }
+      // new
     }   
   }
   // *********************** kreiss-oliger DISSIPATION ************************
@@ -406,11 +443,15 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << endl << "PSI hyperbolic solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
 	p->exit_itn = itn;
+	/*
 	if (res < (p->tol)) {
 	  if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -1; }
 	  else { res = 0; }
 	}
 	else { return -1; }
+	*/
+	if (relax_tol(p) != 0) { return -1; }
+	// new
       }
     }
     res = (p->tol) + 1;
@@ -422,7 +463,9 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << endl << "GHOST HYPERBOLIC solver STUCK at t = " << (p->t) << endl;
         cout << "res = " << res << endl;
 	p->exit_itn = itn;
-        return -2;
+        //return -2;
+	if (relax_tol(p) != 0) { return -2; }
+	// new
       }
     }
     res = (p->tol) + 1;
@@ -434,7 +477,9 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << endl << "NORMAL HYPERBOLIC solver STUCK at t = " << (p->t) << endl;
         cout << "res = " << res << endl;
 	p->exit_itn = itn;
-        return -2;
+        //return -20;
+	if (relax_tol(p) != 0) { return -20; }
+	// new
       }
     }
     res = get_res_ab(f, p);
@@ -455,11 +500,15 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
 	cout << endl << "ELLIPTIC solver STUCK at t = " << (p->t) << endl;
 	cout << "res = " << res << endl;
 	p->exit_itn = itn;
+	/*
         if (res < (p->tol)) {
 	  if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -4; }
 	  else { res = 0; }
 	}
         else { return -4; }
+	*/
+	if (relax_tol(p) != 0) { return -4; }
+	// new
       }
     }
     set_ab_cn(f->oldAl, f->oldBe, f->Al, f->Be, f->cnAl, f->cnBe, p->npts);
@@ -473,6 +522,7 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
     if (++itn > p->maxit) {
       cout << endl << "FULL solver STUCK at t = " << (p->t) << "\nres = " << res << endl;
       p->exit_itn = itn;
+      /*
       if (get_res_psi(f, p) < (p->tol)) {
 	if (search_for_horizon(f->Al, f->Be, f->Ps, p)) { return -5; }
         else if (get_res_xp(f, p) < (p->tol)) {
@@ -482,6 +532,9 @@ int solveAll_dynamic_psi_hyp(FLDS *f, PAR *p)
 	else { return -5; }
       }
       else { return -5; }
+      */
+      if (relax_tol(p) != 0) { return -5; }
+      // new
     }
   }
   // *********************** kreiss-oliger DISSIPATION ************************

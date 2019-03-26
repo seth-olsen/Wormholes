@@ -39,6 +39,7 @@ void set_abp_cn(const VD& old_al, const VD& old_be, const VD& old_ps,
 void apply_up_ab(const VD& res_ell, VD& f_al, VD& f_be, VD& f_ps, int npts, dbl eup_weight);
 void set_ab_cn(const VD& old_al, const VD& old_be, const VD& f_al, const VD& f_be,
 	       VD& cn_al, VD& cn_be, int npts);
+int relax_tol(PAR *p);
 // dissipation functions
 void dissipationNB_xp(const VD& old_xi, const VD& old_pi, VD& f_xi, VD& f_pi,
 		      int one_past_last, dbl dspn);
@@ -533,6 +534,18 @@ void set_old_all(FLDS *f)
   f->oldPi = f->Pi;
   f->oldXi2 = f->Xi2;
   f->oldPi2 = f->Pi2;
+}
+
+int relax_tol(PAR *p)
+{
+  if ((p->tol) < pw3(p->dt)) {
+    p->tol = 5*(p->tol);
+    p->ell_tol = 5*(p->ell_tol);
+    cout << "\nt = " << (p->t) << "\ntol = " << (p->tol)
+	 << "\nell_tol = " << (p->ell_tol) << endl;
+    return 0;
+  }
+  else { return -1; }
 }
   
 #endif
