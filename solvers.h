@@ -72,7 +72,10 @@ int fields_step(FLDS *f, PAR *p, int i)
       else { record_horizon(p, f->Ps, horizon_code, p->exit_itn, i); }
       return horizon_code;
     }
-    else { return itn; }
+    else {
+      record_exit(p, itn, p->exit_itn, i);
+      return itn;
+    }
   }
   p->t += p->dt;
   return 0;

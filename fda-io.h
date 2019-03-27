@@ -327,12 +327,31 @@ void record_horizon(PAR *p, const VD& f_ps, int ind, int itn, int t_itn)
     + "\nic_Amp = " + to_string(p->ic_Amp) + "\nic_Dsq = " + to_string(p->ic_Dsq) + "\nic_r0 = "
     + to_string(p->ic_r0) + "\n\nic2_Amp = " + to_string(p->ic2_Amp) + "\nic2_Dsq = "
     + to_string(p->ic2_Dsq) + "\nic2_r0 = " + to_string(p->ic2_r0) + "]n\nfile = " + p->outfile
-    + "\nresolution = " + to_string(p->resn_factor) + "\npsi_hyp = " + bool_to_str(p->psi_hyp);
+    + "\nresolution = " + to_string(p->resn_factor) + "\npsi_hyp = " + bool_to_str(p->psi_hyp)
+    + "\nsym_pert = " + bool_to_str(p->sym_pert);
   cout << horizon_msg << "\n\nAPPARENT HORIZON EXIT\n" << endl;
   ofstream specs;
   str specs_name = "horizon-" + p->outfile + ".txt";
   specs.open(specs_name, ofstream::out);
   specs << horizon_msg << endl;
+  specs.close();
+  return;
+}
+
+void record_exit(PAR *p, int code, int itn, int t_itn)
+{
+  str exit_msg = "EXIT without horizon at t[" + to_string(t_itn) + "] = " + to_string(p->t)
+    + "\ncode = " + to_string(code) + "\nitn = " + to_string(itn) + ")\nUsing:\ndr = " + to_string(p->dr)
+    + "\nic_Amp = " + to_string(p->ic_Amp) + "\nic_Dsq = " + to_string(p->ic_Dsq) + "\nic_r0 = "
+    + to_string(p->ic_r0) + "\n\nic2_Amp = " + to_string(p->ic2_Amp) + "\nic2_Dsq = "
+    + to_string(p->ic2_Dsq) + "\nic2_r0 = " + to_string(p->ic2_r0) + "]n\nfile = " + p->outfile
+    + "\nresolution = " + to_string(p->resn_factor) + "\npsi_hyp = " + bool_to_str(p->psi_hyp)
+    + "\nsym_pert = " + bool_to_str(p->sym_pert);
+  cout << exit_msg << "\n\nEXIT WITHOUT HORIZON\n" << endl;
+  ofstream specs;
+  str specs_name = "EXIT-" + p->outfile + ".txt";
+  specs.open(specs_name, ofstream::out);
+  specs << exit_msg << endl;
   specs.close();
   return;
 }
