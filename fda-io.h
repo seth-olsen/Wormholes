@@ -80,13 +80,16 @@ inline void write_bbhp_vec(vector<BBHP *>& bp_vec, PAR *p)
   for (BBHP *bp : bp_vec) { write_bbhp(bp, p); }
 }
 
-inline void read_bbhp(BBHP *bp, int time)
+inline int read_bbhp(BBHP *bp, int time)
 {
-  gft_read_brief(bp->file, time, bp->data);
+  return gft_read_brief(bp->file, time, bp->data);
 }
-inline void read_bbhp_vec(const vector<BBHP *>& bpv, int time)
+inline int read_bbhp_vec(const vector<BBHP *>& bpv, int time)
 {
-  for (BBHP *bp : bpv) { gft_read_brief(bp->file, time, bp->data); }
+  for (BBHP *bp : bpv) {
+    if (gft_read_brief(bp->file, time, bp->data) == 0) { return 0; }
+  }
+  return 1;
 }
 
 inline void compute_bbhp_vec(const vector<BBHP *>& bpv, SSV& s, int k)
@@ -95,12 +98,12 @@ inline void compute_bbhp_vec(const vector<BBHP *>& bpv, SSV& s, int k)
 }
 
 // read fields using bbhutil
-void read_step(const vector<char *>& files, int times[], const vector<dbl *>& fields, int nfields)
+int read_step(const vector<char *>& files, int times[], const vector<dbl *>& fields, int nfields)
 {
   for (int k = 0; k < nfields; ++k) {
-    gft_read_brief(files[k], times[k], fields[k]);
+    if (gft_read_brief(files[k], times[k], fields[k]) == 0) { return 0; }
   }
-  return;
+  return 1;
 }
 
 VD make_vector(int len, dbl val)

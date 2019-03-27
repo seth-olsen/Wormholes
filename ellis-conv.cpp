@@ -231,11 +231,11 @@ int main(int argc, char **argv)
     // compute ||u_4h(x,t) - u_2h(x,t)||/||u_2h(x,t) - u_h(x,t)||    
     times[0] = t+1, times[1] = t1*t+1, times[2] = t2*t+1;
     for (int k = 0; k < nwr; ++k) {
-      read_step(name_arr[k], times, field_arr[k], 3);
+      if (read_step(name_arr[k], times, field_arr[k], 3) == 0) { return t; }
       norms[k] = zeros;
     }
     for (int k = 0; k < inwr; ++k) {
-      read_step(iname_arr[k], times, ires_arr[k], 3);
+      if (read_step(iname_arr[k], times, ires_arr[k], 3) == 0) { return t; }
       inorms[k] = izeros;
     }
     // iterate through grid points
