@@ -152,16 +152,16 @@ int main(int argc, char **argv)
 	iprefixes.push_back("EEhh");
       }
       if ((arg == "cHamiltonian") || (arg == "ALL") || (arg == "hamiltonian") || (arg == "ham")) {
-	iprefixes.push_back("hamiltonian");
+	iprefixes.push_back("cHamiltonian");
       }
       if ((arg == "cMomentum") || (arg == "ALL") || (arg == "momentum") || (arg == "mom")) {
-	iprefixes.push_back("momentum");
+	iprefixes.push_back("cMomentum");
       }
       if ((arg == "cKext") || (arg == "ALL") || (arg == "kext")) {
-	iprefixes.push_back("kext");
+	iprefixes.push_back("cKext");
       }
       if ((arg == "cDtKext") || (arg == "ALL") || (arg == "dtkext")) {
-	iprefixes.push_back("dtkext");
+	iprefixes.push_back("cDtKext");
       }
     }
   }
