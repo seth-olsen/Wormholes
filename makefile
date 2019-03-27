@@ -50,6 +50,13 @@ check-null: check-null.o
 check-null.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
 	$(CXX) -c $(CXXFLAGS) check-null.cpp
 
+check-mass: check-mass.o
+	$(CXX) -o check-mass check-mass.o ${LDLIBS}
+	rm -f check-mass.o
+
+check-mass.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
+	$(CXX) -c $(CXXFLAGS) check-mass.cpp
+
 test-code: test-code.o
 	-${CXX} -o test-code test-code.o ${LDLIBS}
 	rm -f test-code.o
