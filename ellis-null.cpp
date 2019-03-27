@@ -69,7 +69,12 @@ int main(int argc, char **argv)
   for (int t = 2; t < num_steps; ++t) {
     ofs << t << c << t*(p.save_step)*(p.dt) << endl;
     times[0] = t+1; times[1] = t+1; times[2] = t+1;
-    if (read_step(name_arr, times, field_arr, 3) == 0) { return t; }
+    if (read_step(name_arr, times, field_arr, 3) == 0) {
+      ofs.close();
+      gft_close_all();
+      cout << outname << "  written up to " << t << endl;
+      return t;
+    }
     // iterate through grid points
     for (int j = 0; j < zeropt; ++j) {
       if ((outnull[j] > 0) || (revnull[j] < 0)) {

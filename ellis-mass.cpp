@@ -67,7 +67,12 @@ int main(int argc, char **argv)
   gft_set_multi();
   for (int t = 2; t < num_steps; ++t) {
     times[0] = t+1; times[1] = t+1;
-    if (read_step(name_arr, times, field_arr, 2) == 0) { return t; }
+    if (read_step(name_arr, times, field_arr, 2) == 0) {
+      ofs.close();
+      gft_close_all();
+      cout << outname << "  written up to " << t << endl;
+      return t;
+    }
     ofs << t << c << t*(p.save_step)*(p.dt) << c
 	<< maspect[0] << c << maspect[zeropt] << c << maspect[gs] << c;
     int ind_max = distance(maspect.begin(), max_element(maspect.begin(), maspect.end())) - 1;

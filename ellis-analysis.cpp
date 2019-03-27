@@ -77,7 +77,11 @@ int main(int argc, char **argv)
     // SET OLD FIELDS
     wr.set_old_fields(&f);
     // GET NEW TIME DATA
-    if (read_bbhp_vec(reader_vec, t) == 0) { return t; }
+    if (read_bbhp_vec(reader_vec, t) == 0) {
+      gft_close_all();
+      cout << (p.outfile) << "  written up to " << t << endl;
+      return t;
+    }
     // SET BOUNDARY VALS and COMPUTE
     wr.get_bound_vals(s, &f, &p, 0);
     compute_bbhp_vec(writer_vec, s, 0);
@@ -95,7 +99,7 @@ int main(int argc, char **argv)
   }
   
   gft_close_all();
-  cout << (p.outfile) + " analysis completed in "
+  cout << (p.outfile) << " analysis completed in "
        << difftime(time(NULL),start_time) << " seconds" << endl;
   
   return 0;
