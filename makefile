@@ -43,19 +43,19 @@ ellis-analysis: ellis-analysis.o
 ellis-analysis.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
 	$(CXX) -c $(CXXFLAGS) ellis-analysis.cpp
 
-check-null: check-null.o
-	$(CXX) -o check-null check-null.o ${LDLIBS}
-	rm -f check-null.o
+ellis-null: ellis-null.o
+	$(CXX) -o ellis-null ellis-null.o ${LDLIBS}
+	rm -f ellis-null.o
 
-check-null.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
-	$(CXX) -c $(CXXFLAGS) check-null.cpp
+ellis-null.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
+	$(CXX) -c $(CXXFLAGS) ellis-null.cpp
 
-check-mass: check-mass.o
-	$(CXX) -o check-mass check-mass.o ${LDLIBS}
-	rm -f check-mass.o
+ellis-mass: ellis-mass.o
+	$(CXX) -o ellis-mass ellis-mass.o ${LDLIBS}
+	rm -f ellis-mass.o
 
-check-mass.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
-	$(CXX) -c $(CXXFLAGS) check-mass.cpp
+ellis-mass.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
+	$(CXX) -c $(CXXFLAGS) ellis-mass.cpp
 
 test-code: test-code.o
 	-${CXX} -o test-code test-code.o ${LDLIBS}
