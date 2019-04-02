@@ -1,31 +1,31 @@
 /*
   DIAGNOSTIC CODES:
-  xi = ResXi
-  pi = ResPi
-  xi2 = ResXi2
-  pi2 = ResPi2
-  al = ResAl
-  be = ResBe
-  ps = ResPs
-  ixi = iresXi
-  ipi = iresPi
-  ixi2 = iresXi2
-  ipi2 = iresPi2
-  ial = iresAl
-  ibe = iresBe
-  ips = iresPs
-  mass = maspect
-  null = outnull
-  revnull = outnull_rev
-  ric = ricci
-  ham = hamiltonian = cHamiltonian
-  mom = momentum = cMomentum
-  kext = cKext
-  dkext = cDtKext
-  tt = EEtt
-  tx = xt = EEtx
-  xx = EExx
-  hh = EEhh
+  xi = ResXi -> ghost energy density
+  pi = ResPi -> ghost momentum density
+  xi2 = ResXi2 -> normal energy density
+  pi2 = ResPi2 -> normal momenutm density
+  al = ResAl -> elliptic residual
+  be = ResBe -> elliptic residual
+  ps = ResPs -> elliptic residual
+  ixi = iresXi -> expanded res w/o CN
+  ipi = iresPi -> expanded res w/o CN
+  ixi2 = iresXi2 -> expanded res w/o CN
+  ipi2 = iresPi2 -> expanded res w/o CN
+  ial = iresAl -> 8 * M_PI * trace(T)
+  ibe = iresBe -> areal radius
+  ips = iresPs -> hyperbolic residual
+  mass = maspect -> mass aspect (Misner-Sharp)
+  null = outnull -> outgoing null expansion
+  revnull = outnull_rev -> ingoing null expansion
+  ric = ricci -> ricci scalar
+  ham = hamiltonian = cHamiltonian -> hamiltonian constraint
+  mom = momentum = cMomentum -> momentum constraint
+  kext = cKext -> slicing constraint
+  dkext = cDtKext -> slicing constraint time derivative
+  tt = EEtt -> einstein equation t,t
+  tx = xt = EEtx -> einstein equation t,x=x,t
+  xx = EExx -> einstein equation x,x
+  hh = EEhh -> einstein equation theta,theta
 
  */
 

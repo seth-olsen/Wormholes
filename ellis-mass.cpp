@@ -75,8 +75,8 @@ int main(int argc, char **argv)
     }
     ofs << t << c << t*(p.save_step)*(p.dt) << c
 	<< maspect[0] << c << maspect[zeropt] << c << maspect[gs] << c;
-    int ind_max = distance(maspect.begin(), max_element(maspect.begin(), maspect.end())) - 1;
-    int ind_min = distance(maspect.begin(), min_element(maspect.begin(), maspect.end())) - 1;
+    int ind_max = distance(maspect.begin(), max_element(maspect.begin(), maspect.end()));
+    int ind_min = distance(maspect.begin(), min_element(maspect.begin(), maspect.end()));
     ofs << maspect[ind_max] << c << ind_max << c << p.r[(p.save_pt)*ind_max] << c
 	<< pw4(ps[ind_max])*r2(&p,ind_max) << c
 	<< maspect[ind_min] << c << ind_min << c << p.r[(p.save_pt)*ind_min] << c

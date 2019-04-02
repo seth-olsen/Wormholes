@@ -67,7 +67,6 @@ int main(int argc, char **argv)
   int times[3];
   gft_set_multi();
   for (int t = 2; t < num_steps; ++t) {
-    ofs << t << c << t*(p.save_step)*(p.dt) << endl;
     times[0] = t+1; times[1] = t+1; times[2] = t+1;
     if (read_step(name_arr, times, field_arr, 3) == 0) {
       ofs.close();
@@ -75,6 +74,9 @@ int main(int argc, char **argv)
       cout << outname << "  written up to " << t << endl;
       return t;
     }
+    ofs << t << c << t*(p.save_step)*(p.dt) << c << zeropt << ",0,"
+	<< pw4(ps[zeropt])*r2(&p,zeropt) << c
+	<< outnull[zeropt] << c << revnull[zeropt] << endl;
     // iterate through grid points
     for (int j = 0; j < zeropt; ++j) {
       if ((outnull[j] > 0) || (revnull[j] < 0)) {
