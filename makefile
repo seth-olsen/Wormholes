@@ -43,6 +43,13 @@ ellis-analysis: ellis-analysis.o
 ellis-analysis.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
 	$(CXX) -c $(CXXFLAGS) ellis-analysis.cpp
 
+ellis-check: ellis-check.o
+	$(CXX) -o ellis-check ellis-check.o ${LDLIBS}
+	rm -f ellis-check.o
+
+ellis-check.o: solvers.h ellis-proc.h jacobian.h ellis-fns.h fda-fns.h fda-io.h sim-structs.h sim-header.h sim-init.h ellis-sim.cpp
+	$(CXX) -c $(CXXFLAGS) ellis-check.cpp
+
 ellis-null: ellis-null.o
 	$(CXX) -o ellis-null ellis-null.o ${LDLIBS}
 	rm -f ellis-null.o
