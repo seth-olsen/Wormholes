@@ -88,13 +88,11 @@ int main(int argc, char **argv)
     ofs << p.outfile << "\nstep,time,m(-R),m(0),m(R),m_max,at,x,r2ps4,m_min,at,x,r2ps4" << endl;  
     // iterate through time steps
     int times[2];
-    for (int t = 2; t < num_steps; ++t) {
+    for (int t = 2; t < (num_steps + 1); ++t) {
       times[0] = t+1; times[1] = t+1;
       if (read_step(name_arr, times, field_arr, 2) == 0) {
-	ofs.close();
-	gft_close_all();
 	cout << outname << "  written up to " << t << endl;
-	return t;
+        break;
       }
       ofs << t << c << t*(p.save_step)*(p.dt) << c
 	  << maspect[0] << c << maspect[zeropt] << c << maspect[gs] << c;
@@ -125,13 +123,11 @@ int main(int argc, char **argv)
     ofs << p.outfile << "\nstep,time,point,x,r2ps4,outnull,revnull" << endl;    
     // iterate through time steps
     int times[3];
-    for (int t = 2; t < num_steps; ++t) {
+    for (int t = 2; t < (num_steps + 1); ++t) {
       times[0] = t+1; times[1] = t+1; times[2] = t+1;
       if (read_step(name_arr, times, field_arr, 3) == 0) {
-	ofs.close();
-	gft_close_all();
 	cout << outname << "  written up to " << t << endl;
-	return t;
+        break;
       }
       ofs << t << c << t*(p.save_step)*(p.dt) << c << zeropt << ",0,"
 	  << pw4(ps[zeropt])*r2(&p,zeropt) << c
@@ -168,9 +164,8 @@ int main(int argc, char **argv)
     for (int t = 0; t < (num_steps + 1); ++t) {
       times[0] = t+1;
       if (read_step(name_arr, times, field_arr, 1) == 0) {
-	gft_close_all();
 	cout << areal_name << "  written up to " << t << endl;
-	return t;
+	break;
       }
       for (int j = 0; j < npts; ++j) { areal[j] = sq(ps[j])*sqrt(r2(&p,j)); }
       write_sdf_direct(&areal_name[0], &areal[0], &p);
