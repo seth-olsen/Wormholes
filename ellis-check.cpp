@@ -23,7 +23,7 @@
 int main(int argc, char **argv)
 {
   PAR p;
-  if (argc != 3) {
+  if ((argc < 3) || (argc > 5)) {
     cout << "\nINCORRECT NUMBER OF ARGUMENTS" << endl;
     return argc;
   }
@@ -37,7 +37,27 @@ int main(int argc, char **argv)
     }
   }
   str outfile = p.outfile;
-  str out_type = argv[2];
+  bool write_mass = false;
+  bool write_null = false;
+  bool write_areal = false;
+  for (int k = 2; k < argc; ++k) {
+    str out_type = argv[k];
+    if ((out_type == "m") || (out_type == "M") || (out_type == "mass") || (out_type == "Mass")
+	|| (out_type == "maspect") || (out_type == "Maspect")) {
+      write_mass = true;
+    }
+    if ((out_type == "n") || (out_type == "N") || (out_type == "null") || (out_type == "Null")
+	|| (out_type == "outnull") || (out_type == "Outnull") || (out_type == "outgoing_null")
+	|| (out_type == "revnull") || (out_type == "Revnull") || (out_type == "outnull_rev")) {
+      write_null = true;
+    }
+    if ((out_type == "a") || (out_type == "A") || (out_type == "areal") || (out_type == "Areal")
+	|| (out_type == "r") || (out_type == "R") || (out_type == "rad") || (out_type == "Rad")
+	|| (out_type == "radius") || (out_type == "Radius")) {
+      write_areal = true;
+    }
+  }
+    
   // derived parameters from coarse file
   int gs = p.lastwr;
   int zeropt = p.zerowr;
@@ -55,8 +75,7 @@ int main(int argc, char **argv)
 
   gft_set_multi();
 
-  if ((out_type == "m") || (out_type == "M") || (out_type == "mass") || (out_type == "Mass")
-      || (out_type == "maspect") || (out_type == "Maspect")) {
+  if (write_mass) {
     str c = ",";
     VD maspect(npts, 0.0);
     field_arr.push_back(&maspect[0]);
@@ -88,9 +107,8 @@ int main(int argc, char **argv)
     }
     ofs.close();
   }
-  else if ((out_type == "n") || (out_type == "N") || (out_type == "null") || (out_type == "Null")
-	   || (out_type == "outnull") || (out_type == "Outnull") || (out_type == "outgoing_null")
-	   || (out_type == "revnull") || (out_type == "Revnull") || (out_type == "outnull_rev")) {
+  
+  if (write_null) {
     str c = ",";
     VD outnull(npts, 0.0);
     VD revnull(npts, 0.0);
@@ -140,9 +158,8 @@ int main(int argc, char **argv)
     }
     ofs.close();
   }
-  else if ((out_type == "a") || (out_type == "A") || (out_type == "areal") || (out_type == "Areal")
-	   || (out_type == "r") || (out_type == "R") || (out_type == "rad") || (out_type == "Rad")
-	   || (out_type == "radius") || (out_type == "Radius")) {
+  
+  if (write_areal) {
     // output file 
     VD areal(npts, 0.0);
     str areal_name = "areal-" + outfile + ".sdf";
@@ -160,16 +177,15 @@ int main(int argc, char **argv)
       p.t += ((p.dt) * (p.save_step));
     }
   }
-  else {
-    cout << "\nUNRECOGNIZED OUT_TYPE\n" << endl;
-    gft_close_all();
-    return -111;
-  }
 
   gft_close_all();
-  cout << outfile << " " << out_type << "  written with:" << endl;
-  cout << "grid points used = " << npts << "  " << ((p.same_grids) ?
-   "(same grids)" : "(dif grids)") << "\ntime steps used = " << num_steps
+  str out_types = " ";
+  if (write_mass) { out_types += "mass "; }
+  if (write_null) { out_types += "null "; }
+  if (write_areal) { out_types += "areal "; }
+  cout << outfile << out_types << "written with:\ngrid points used = " << npts
+       << "  "  << ((p.same_grids) ? "(same grids)" : "(dif grids)")
+       << "\ntime steps used = " << num_steps
        << "  " << ((p.same_times) ? "(same times)" : "(dif times)") << endl;
 
   return 0;
