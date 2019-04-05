@@ -36,6 +36,7 @@ int main(int argc, char **argv)
       return err_code;
     }
   }
+  str c = ",";
   str outfile = p.outfile;
   bool write_mass = false;
   bool write_null = false;
@@ -75,8 +76,37 @@ int main(int argc, char **argv)
 
   gft_set_multi();
 
+  if (write_areal) {
+    // output file 
+    VD areal(npts, 0.0);
+    str areal_name = "areal-" + outfile + ".sdf";
+    ofstream ofs;
+    str outname = "arealCheck-" + outfile + ".csv";
+    ofs.open(outname, ofstream::out);
+    ofs << p.outfile << "\nstep,time,R(0),R_min,at,x,R_Lmin,at,x,R_Rmin,at,x" << endl;
+    // iterate through time steps
+    int times[1];
+    for (int t = 0; t < (num_steps + 1); ++t) {
+      times[0] = t+1;
+      if (read_step(name_arr, times, field_arr, 1) == 0) {
+	cout << areal_name << "  written up to " << t << endl;
+	break;
+      }
+      for (int j = 0; j < npts; ++j) { areal[j] = sq(ps[j])*sqrt(r2(&p,j)); }
+      write_sdf_direct(&areal_name[0], &areal[0], &p);
+      ofs << t << c << t*(p.save_step)*(p.dt) << c << areal[zeropt] << c;
+      int ind_min = distance(areal.begin(), min_element(areal.begin(), areal.end()));
+      int ind_Lmin = distance(areal.begin(), min_element(areal.begin(), areal.begin() + zeropt));
+      int ind_Rmin = distance(areal.begin(), min_element(areal.begin() + zeropt + 1, areal.end()));
+      ofs << areal[ind_min] << c << ind_min << c << p.r[(p.save_pt)*ind_min] << c
+	  << areal[ind_Lmin] << c << ind_Lmin << c << p.r[(p.save_pt)*ind_Lmin] << c
+	  << areal[ind_Rmin] << c << ind_Rmin << c << p.r[(p.save_pt)*ind_Rmin] << endl;
+      p.t += ((p.dt) * (p.save_step));
+    }
+    ofs.close();
+  }
+
   if (write_mass) {
-    str c = ",";
     VD maspect(npts, 0.0);
     field_arr.push_back(&maspect[0]);
     str maspect_name = "maspect-" + outfile + ".sdf";
@@ -107,7 +137,6 @@ int main(int argc, char **argv)
   }
   
   if (write_null) {
-    str c = ",";
     VD outnull(npts, 0.0);
     VD revnull(npts, 0.0);
     field_arr.push_back(&outnull[0]);
@@ -153,24 +182,6 @@ int main(int argc, char **argv)
       }
     }
     ofs.close();
-  }
-  
-  if (write_areal) {
-    // output file 
-    VD areal(npts, 0.0);
-    str areal_name = "areal-" + outfile + ".sdf";
-    // iterate through time steps
-    int times[1];
-    for (int t = 0; t < (num_steps + 1); ++t) {
-      times[0] = t+1;
-      if (read_step(name_arr, times, field_arr, 1) == 0) {
-	cout << areal_name << "  written up to " << t << endl;
-	break;
-      }
-      for (int j = 0; j < npts; ++j) { areal[j] = sq(ps[j])*sqrt(r2(&p,j)); }
-      write_sdf_direct(&areal_name[0], &areal[0], &p);
-      p.t += ((p.dt) * (p.save_step));
-    }
   }
 
   gft_close_all();
