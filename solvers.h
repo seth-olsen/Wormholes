@@ -138,32 +138,50 @@ int solve_t0(FLDS *f, PAR *p)
   vector<lapack_int> ipiv_0(N_0);
   VD res_0(ldb_0, 0);
   lapack_int info = 0;
-  //dbl ell_tol = 20 * (p->ell_tol);
+  dbl ell_tol = (p->ell_tol);
   int ell_maxit = (p->maxit) * 10;
+  dbl ell_up_weight = (p->ell_up_weight);
 
   int ell_itn = 0;
+  int ell_cycle = 0;
   dbl res = get_res_abp_t0(res_0, f, p);
-  while (res > (p->ell_tol)) {
+  while (res > ell_tol) {
     VD jac(ldab*N_0, 0);
     set_jacCM_abp(jac, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Al, f->Be, f->Ps, p);
     info = LAPACKE_dgbsv(LAPACK_COL_MAJOR, N_0, kl, ku, nrhs,
 			 &jac[0], ldab, &ipiv_0[0], &res_0[0], ldb_0);
     if (info != 0) { cout << ell_itn << "\nERROR: cannot solve t0\ninfo = " << info << endl; }
-    apply_up_abp(res_0, f->Al, f->Be, f->Ps, p->npts, p->ell_up_weight);
+    apply_up_abp(res_0, f->Al, f->Be, f->Ps, p->npts, ell_up_weight);
     res = get_res_abp_t0(res_0, f, p);    
     if (++ell_itn > ell_maxit) {
+      ++ell_cycle;
       cout << "\nt = 0\nitn = " << ell_itn << "\nres = " << res << endl;
       int horizon_code = search_for_horizon(f->Al, f->Be, f->Ps, p);
       if (horizon_code) {
 	cout << "\n\n***HORIZON IN INITIAL DATA***\n" << endl;
 	if (horizon_code == (p->npts)) { record_horizon(p, f->Ps, 0, 0, 0); }
 	else { record_horizon(p, f->Ps, horizon_code, 0, 0); }
-	return -1;
       }
-      else if (res < (p->tol)) { return 0; }
+      
+      if (res < (p->tol)) { return ell_itn; }
+      else if (ell_cycle > 5) { return -ell_cycle; }
       else {
-	cout << "\nUNDETERMINED ERROR IN T = 0 ELLIPTIC CONSTRAINTS" << endl;
-	return -2;
+	cout << "\nt=0 enering CYCLE " << ell_cycle << endl;
+	ell_itn = 0;
+	reset_metric(f, p);
+	res = get_res_abp_t0(res_0, f, p);
+	if (ell_cycle == 1) { ell_up_weight = 0.5*(p->ell_up_weight); }
+	else if (ell_cycle == 2) { ell_up_weight = 2*(p->ell_up_weight); }
+	else if (ell_cycle == 3) {
+	  ell_up_weight = (p->ell_up_weight);
+	  relax_tol(p);
+	}
+	else if (ell_cycle == 4) { ell_up_weight = 0.5*(p->ell_up_weight); }
+	else if (ell_cycle == 5) { ell_up_weight = 2*(p->ell_up_weight); }
+	else {
+	  cout << "\nUNDETERMINED ERROR IN T = 0 ELLIPTIC CONSTRAINTS" << endl;
+	  return -2;
+	}
       }
     }
   }

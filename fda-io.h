@@ -326,7 +326,7 @@ void record_horizon(PAR *p, const VD& f_ps, int ind, int itn, int t_itn)
     + "] = " + to_string(p->t) + "  (itn " + to_string(itn) + ")\nUsing:\ndr = " + to_string(p->dr)
     + "\nic_Amp = " + to_string(p->ic_Amp) + "\nic_Dsq = " + to_string(p->ic_Dsq) + "\nic_r0 = "
     + to_string(p->ic_r0) + "\n\nic2_Amp = " + to_string(p->ic2_Amp) + "\nic2_Dsq = "
-    + to_string(p->ic2_Dsq) + "\nic2_r0 = " + to_string(p->ic2_r0) + "]n\nfile = " + p->outfile
+    + to_string(p->ic2_Dsq) + "\nic2_r0 = " + to_string(p->ic2_r0) + "\n\nfile = " + p->outfile
     + "\nresolution = " + to_string(p->resn_factor) + "\npsi_hyp = " + bool_to_str(p->psi_hyp)
     + "\nsym_pert = " + bool_to_str(p->sym_pert);
   cout << horizon_msg << "\n\nAPPARENT HORIZON EXIT\n" << endl;

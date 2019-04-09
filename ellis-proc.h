@@ -40,6 +40,7 @@ void apply_up_ab(const VD& res_ell, VD& f_al, VD& f_be, VD& f_ps, int npts, dbl 
 void set_ab_cn(const VD& old_al, const VD& old_be, const VD& f_al, const VD& f_be,
 	       VD& cn_al, VD& cn_be, int npts);
 int relax_tol(PAR *p);
+void reset_metric(FLDS *f, PAR *p);
 // dissipation functions
 void dissipationNB_xp(const VD& old_xi, const VD& old_pi, VD& f_xi, VD& f_pi,
 		      int one_past_last, dbl dspn);
@@ -546,6 +547,16 @@ int relax_tol(PAR *p)
     return 0;
   }
   else { return -1; }
+}
+
+void reset_metric(FLDS *f, PAR *p)
+{
+  for (int k = 0; k < (p->npts); ++k) {
+    f->Al[k] = 1;
+    f->Be[k] = 0;
+    f->Ps[k] = 1;
+  }
+  return;
 }
   
 #endif
