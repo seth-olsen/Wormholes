@@ -459,11 +459,17 @@ vector<BBHP *> analysis_init(WRS *wr, FLDS *f, PAR *p, int argc, char **argv) {
       writer_vec.push_back(&(wr->p_iresAl));
       keep_metric_dt = true;
     }
-    if ((arg == "iresBe") || (arg == "ALL") || (arg == "ibe")) {
-      bbhp_init(&(wr->p_iresBe), p, "iresBe", NULL, zeros, compute_iresBe);
+    // AREAL RADIUS USING IRES_BE BBHP
+    if ((arg == "iresBe") || (arg == "ibe")) {
+      bbhp_init(&(wr->p_iresBe), p, "areal"/*CHANGE*/, NULL, zeros, compute_iresBe);
       writer_vec.push_back(&(wr->p_iresBe));
       keep_metric_dt = true;
     }
+    else if ((arg == "areal") || (arg == "rad") || (arg == "r") || (arg == "ALL")) {
+      bbhp_init(&(wr->p_iresBe), p, "areal", NULL, zeros, compute_areal);
+      writer_vec.push_back(&(wr->p_iresBe));
+    }
+    // CHANGE WHEN GET REAL IRES_BE FN
     if ((arg == "iresPs") || (arg == "ALL") || (arg == "ips")) {
       bbhp_init(&(wr->p_iresPs), p, "iresPs", NULL, zeros, compute_iresPs);
       writer_vec.push_back(&(wr->p_iresPs));

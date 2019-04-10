@@ -720,6 +720,11 @@ s.dxbe*s.dxps)*s.ps*s.rsq + pow(s.ps,2)*(s.dx2be*s.rsq + \
 s.xsq)))))/(pow(s.al,2)*pow(s.ps,5)*pow(s.rsq,2));
 }
 
+dbl compute_areal(SSV& s) // areal radius
+{
+  return sq(s.ps)*sqrt(s.rsq);
+}
+
 dbl compute_iresAl(SSV& s) //8*M_PI*tr(T)
 {
   return (8*M_PI*(-pow(s.pi,2) + pow(s.pi2,2) + pow(s.xi,2) - \
