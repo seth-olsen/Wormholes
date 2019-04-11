@@ -41,21 +41,29 @@ int main(int argc, char **argv)
   bool write_mass = false;
   bool write_null = false;
   bool write_areal = false;
+  bool write_areal_new = false;
   for (int k = 2; k < argc; ++k) {
     str out_type = argv[k];
     if ((out_type == "m") || (out_type == "M") || (out_type == "mass") || (out_type == "Mass")
 	|| (out_type == "maspect") || (out_type == "Maspect")) {
       write_mass = true;
     }
-    if ((out_type == "n") || (out_type == "N") || (out_type == "null") || (out_type == "Null")
+    else if ((out_type == "n") || (out_type == "N") || (out_type == "null") || (out_type == "Null")
 	|| (out_type == "outnull") || (out_type == "Outnull") || (out_type == "outgoing_null")
 	|| (out_type == "revnull") || (out_type == "Revnull") || (out_type == "outnull_rev")) {
       write_null = true;
     }
-    if ((out_type == "a") || (out_type == "A") || (out_type == "areal") || (out_type == "Areal")
+    else if ((out_type == "a") || (out_type == "A") || (out_type == "areal") || (out_type == "Areal")
 	|| (out_type == "r") || (out_type == "R") || (out_type == "rad") || (out_type == "Rad")
 	|| (out_type == "radius") || (out_type == "Radius")) {
       write_areal = true;
+      write_areal_new = false;
+    }
+    else if ((out_type == "a_new") || (out_type == "A_new") || (out_type == "areal_new") || (out_type == "Areal_new")
+	|| (out_type == "r_new") || (out_type == "R_new") || (out_type == "rad_new") || (out_type == "Rad_new")
+	|| (out_type == "radius_new") || (out_type == "Radius_new")) {
+      write_areal_new = true;
+      write_areal = false;
     }
   }
     
@@ -76,7 +84,7 @@ int main(int argc, char **argv)
 
   gft_set_multi();
 
-  if (write_areal) {
+  if (write_areal_new) {
     // output file 
     VD areal(npts, 0.0);
     str areal_name = "areal-" + outfile + ".sdf";
@@ -94,6 +102,31 @@ int main(int argc, char **argv)
       }
       for (int j = 0; j < npts; ++j) { areal[j] = sq(ps[j])*sqrt(r2(&p,j)); }
       write_sdf_direct(&areal_name[0], &areal[0], &p);
+      ofs << t << c << t*(p.save_step)*(p.dt) << c << areal[zeropt] << c;
+      int ind_min = distance(areal.begin(), min_element(areal.begin(), areal.end()));
+      int ind_Lmin = distance(areal.begin(), min_element(areal.begin(), areal.begin() + zeropt));
+      int ind_Rmin = distance(areal.begin(), min_element(areal.begin() + zeropt + 1, areal.end()));
+      ofs << areal[ind_min] << c << ind_min << c << p.r[(p.save_pt)*ind_min] << c
+	  << areal[ind_Lmin] << c << ind_Lmin << c << p.r[(p.save_pt)*ind_Lmin] << c
+	  << areal[ind_Rmin] << c << ind_Rmin << c << p.r[(p.save_pt)*ind_Rmin] << endl;
+      p.t += ((p.dt) * (p.save_step));
+    }
+    ofs.close();
+  }
+  else if (write_areal) {
+    // output file 
+    VD areal(npts, 0.0);
+    str areal_name = "areal-" + outfile + ".sdf";
+    ofstream ofs;
+    str outname = "arealCheck-" + outfile + ".csv";
+    ofs.open(outname, ofstream::out);
+    ofs << p.outfile << "\nstep,time,R(0),R_min,at,x,R_Lmin,at,x,R_Rmin,at,x" << endl;
+    // iterate through time steps
+    for (int t = 0; t < (num_steps + 1); ++t) {
+      if (gft_read_brief(&areal_name[0], t+1, &areal[0]) == 0)  {
+	cout << areal_name << "  written up to " << t << endl;
+	break;
+      }
       ofs << t << c << t*(p.save_step)*(p.dt) << c << areal[zeropt] << c;
       int ind_min = distance(areal.begin(), min_element(areal.begin(), areal.end()));
       int ind_Lmin = distance(areal.begin(), min_element(areal.begin(), areal.begin() + zeropt));
