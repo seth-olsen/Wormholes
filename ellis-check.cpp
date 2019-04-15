@@ -77,14 +77,13 @@ int main(int argc, char **argv)
     return -1;
   }
   VD ps(npts, 0.0);
-  str outname = outfile;
-  vector<dbl *> field_arr {&ps[0]};
   str ps_name = "Ps-" + outfile + ".sdf";
-  vector<char *> name_arr {&ps_name[0]};
 
   gft_set_multi();
 
   if (write_areal_new) {
+    vector<dbl *> field_arr {&ps[0]};
+    vector<char *> name_arr {&ps_name[0]};
     // output file 
     VD areal(npts, 0.0);
     str areal_name = "areal-" + outfile + ".sdf";
@@ -140,6 +139,8 @@ int main(int argc, char **argv)
   }
 
   if (write_mass) {
+    vector<dbl *> field_arr {&ps[0]};
+    vector<char *> name_arr {&ps_name[0]};
     VD maspect(npts, 0.0);
     field_arr.push_back(&maspect[0]);
     str maspect_name = "maspect-" + outfile + ".sdf";
@@ -170,6 +171,8 @@ int main(int argc, char **argv)
   }
   
   if (write_null) {
+    vector<dbl *> field_arr {&ps[0]};
+    vector<char *> name_arr {&ps_name[0]};
     VD outnull(npts, 0.0);
     VD revnull(npts, 0.0);
     field_arr.push_back(&outnull[0]);
@@ -200,6 +203,7 @@ int main(int argc, char **argv)
 	  ofs << " , ," << j << c << p.r[(p.save_pt)*j] << c << pw4(ps[j])*r2(&p,j);
 	  if (outnull[j] > 0) { ofs << c << outnull[j]; }
 	  else { ofs << ", "; }
+	  
 	  if (revnull[j] < 0) { ofs << c << revnull[j] << endl; }
 	  else { ofs << endl; }
 	}
@@ -209,6 +213,7 @@ int main(int argc, char **argv)
 	  ofs << " , ," << j << c << p.r[(p.save_pt)*j] << c << pw4(ps[j])*r2(&p,j);
 	  if (outnull[j] < 0) { ofs << c << outnull[j]; }
 	  else { ofs << ", "; }
+	  
 	  if (revnull[j] > 0) { ofs << c << revnull[j] << endl; }
 	  else { ofs << endl; }
 	}
