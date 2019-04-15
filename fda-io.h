@@ -228,8 +228,9 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
   }
   // write outnull
   if (p->write_outnull) {
-    get_outnull((wr->p_outnull).wr_field, f->Al, f->Be, f->Ps, p);
+    get_nullex((wr->p_outnull).wr_field, (wr->p_revnull).wr_field, f->Al, f->Be, f->Ps, p);
     write_sdf(&(wr->p_outnull), p->t);
+    write_sdf(&(wr->p_revnull), p->t);
   }
   // write maspect
   if (p->write_maspect) {

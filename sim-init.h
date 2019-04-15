@@ -102,7 +102,10 @@ vector<BBHP *> writers_init(WRS *wr, FLDS *f, PAR *p)
     bbhp_init(&(wr->p_iresPi2), p, "iresPi2", NULL, zeros, NULL);
   }
   if (p->write_maspect) { bbhp_init(&(wr->p_maspect), p, "maspect", NULL, zeros, NULL); }
-  if (p->write_outnull) { bbhp_init(&(wr->p_outnull), p, "outnull", NULL, zeros, NULL); }
+  if (p->write_outnull) {
+    bbhp_init(&(wr->p_outnull), p, "outnull", NULL, zeros, NULL);
+    bbhp_init(&(wr->p_revnull), p, "revnull", NULL, zeros, NULL);
+  }
   if (p->write_ricci) { bbhp_init(&(wr->p_ricci), p, "ricci", NULL, zeros, NULL); }
   if (p->write_mtot) {
     bbhp_init(&(wr->p_EEtt), p, "EEtt", NULL, zeros, NULL);
