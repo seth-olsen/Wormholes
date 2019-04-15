@@ -412,6 +412,18 @@ int search_for_horizon(const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
   return 0;
 }
 
+int search_for_antihorizon(const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p)
+{
+  int k = p->lastpt;
+  while (--k > p->zeropt) {
+    if (half_outgoing_null_rev(f_al, f_be, f_ps, p, k) >= 0) { return k; }
+  }
+  while (--k > 0) {
+    if (half_outgoing_null(f_al, f_be, f_ps, p, k) >= 0) { return k; }
+  }
+  return 0;
+}
+
 
 // EINSTEIN EQUATIONS
 

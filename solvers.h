@@ -72,11 +72,18 @@ int fields_step(FLDS *f, PAR *p, int i)
       else { record_horizon(p, f->Ps, horizon_code, p->exit_itn, i); }
       return horizon_code;
     }
+    else { horizon_code = search_for_antihorizon(f->Al, f->Be, f->Ps, p); }
+    
+    if (horizon_code) {
+      record_antihorizon(p, f->Ps, horizon_code, p->exit_itn, i);
+      return horizon_code;
+    }
     else {
       record_exit(p, itn, p->exit_itn, i);
       return itn;
     }
   }
+  
   p->t += p->dt;
   return 0;
 }

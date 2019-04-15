@@ -338,6 +338,25 @@ void record_horizon(PAR *p, const VD& f_ps, int ind, int itn, int t_itn)
   return;
 }
 
+void record_antihorizon(PAR *p, const VD& f_ps, int ind, int itn, int t_itn)
+{
+  str horizon_msg = "Anti-Horizon Found at:\nr[" + to_string(ind) + "] = " + to_string(p->r[ind])
+    + "  (r_areal = " + to_string(sq(f_ps[ind])*sqrt(r2(p,ind))) + ")\nt[" + to_string(t_itn)
+    + "] = " + to_string(p->t) + "  (itn " + to_string(itn) + ")\nUsing:\ndr = " + to_string(p->dr)
+    + "\nic_Amp = " + to_string(p->ic_Amp) + "\nic_Dsq = " + to_string(p->ic_Dsq) + "\nic_r0 = "
+    + to_string(p->ic_r0) + "\n\nic2_Amp = " + to_string(p->ic2_Amp) + "\nic2_Dsq = "
+    + to_string(p->ic2_Dsq) + "\nic2_r0 = " + to_string(p->ic2_r0) + "\n\nfile = " + p->outfile
+    + "\nresolution = " + to_string(p->resn_factor) + "\npsi_hyp = " + bool_to_str(p->psi_hyp)
+    + "\nsym_pert = " + bool_to_str(p->sym_pert);
+  cout << horizon_msg << "\n\nANTI-HORIZON EXIT\n" << endl;
+  ofstream specs;
+  str specs_name = "antihorizon-" + p->outfile + ".txt";
+  specs.open(specs_name, ofstream::out);
+  specs << horizon_msg << endl;
+  specs.close();
+  return;
+}
+
 void record_exit(PAR *p, int code, int itn, int t_itn)
 {
   str exit_msg = "EXIT without horizon at t[" + to_string(t_itn) + "] = " + to_string(p->t)
