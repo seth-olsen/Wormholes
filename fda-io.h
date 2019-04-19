@@ -63,10 +63,7 @@ inline void prepare_write(const VD& fld, VD& wr_fld, PAR *p)
 
 inline void write_bbhp(BBHP *bp, PAR *p)
 {
-  if ((bp->full_field) == NULL) {
-    gft_out_bbox(bp->file, p->t, bp->shape, bp->rank, bp->coords, bp->data);
-  }
-  else if ((p->save_pt) == 1) {
+  if (((p->save_pt) == 1) || ((bp->full_field) == NULL)) {
     gft_out_bbox(bp->file, p->t, bp->shape, bp->rank, bp->coords, bp->data);
   }
   else {

@@ -338,15 +338,15 @@ int params_init(PAR *p, int argc, char **argv)
   p->zerowr = (p->lastwr) / 2;
   p->wr_dr = ((p->rmax) - (p->rmin)) / ((dbl) (p->lastwr));
   p->check_diagnostics = (p->save_step) * (p->check_step);
-  if (p->same_grids) {
-    for (int k = 0; k < p->wr_shape; ++k) {
-      (p->inds).push_back({k, (p->save_pt)*k});
-    }
-    if (((p->inds[p->lastwr]).second != (p->lastpt)) || ((p->inds[p->zerowr]).second != (p->zeropt))) {
-      cout << "\n***INDEX INIT ERROR***\n" << endl;
-    }
+  for (int k = 0; k < p->wr_shape; ++k) {
+    (p->inds).push_back({k, (p->save_pt)*k});
   }
-  else if ((p->save_pt) != 1) { cout << "\nWARNING: SAME_GRIDS=FALSE and SAVE_PT != 1\n" << endl; }
+  if (((p->inds[p->lastwr]).second != (p->lastpt)) || ((p->inds[p->zerowr]).second != (p->zeropt))) {
+    cout << "\n***INDEX INIT ERROR***\n" << endl;
+  }
+  if (((p->save_pt) != 1) && (!(p->same_grids))) {
+    cout << "\nWARNING: SAME_GRIDS=FALSE and SAVE_PT != 1\n" << endl;
+  }
   else if (((p->lastwr) != (p->lastpt)) || ((p->wr_shape) != (p->npts)) || ((p->zerowr) != (p->zeropt))) {
     cout << "\nERROR: number of grid points not set correctly\n" << endl;
     return -2;
