@@ -105,6 +105,20 @@ vector<BBHP *> writers_init(WRS *wr, FLDS *f, PAR *p)
   if (p->write_outnull) {
     bbhp_init(&(wr->p_outnull), p, "outnull", NULL, zeros, NULL);
     bbhp_init(&(wr->p_revnull), p, "revnull", NULL, zeros, NULL);
+    f->areal = f->Ps;
+    get_areal(f, p);
+    bbhp_init(&(wr->p_areal), p, "areal", &(f->areal), zeros, NULL);
+    VD start_amin { f->areal[p->zeropt] };
+    (wr->p_amin).wr_field = start_amin;
+    (wr->p_amin).data = &(((wr->p_amin).wr_field)[0]);
+    (wr->p_amin).filename = "min-" + (wr->p_areal).filename;
+    (wr->p_amin).file = &(((wr->p_amin).filename)[0]);
+    VD start_xamin { 0 };
+    (wr->p_xamin).wr_field = start_xamin;
+    (wr->p_xamin).data = &(((wr->p_xamin).wr_field)[0]);
+    (wr->p_xamin).filename = "xmin-" + (wr->p_areal).filename;
+    (wr->p_xamin).file = &(((wr->p_xamin).filename)[0]);
+    
   }
   if (p->write_ricci) { bbhp_init(&(wr->p_ricci), p, "ricci", NULL, zeros, NULL); }
   if (p->write_mtot) {

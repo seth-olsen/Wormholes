@@ -11,6 +11,7 @@
 #include <string> // for parameter input
 #include <map> // for parameter input
 #include <cstdlib> // for atoi() and atof()
+#include <iterator> // for distance()
 #include "bbhutil.h" // for output to .sdf
 #include "lapacke.h"
 

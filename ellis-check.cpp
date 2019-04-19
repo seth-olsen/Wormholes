@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 	cout << areal_name << "  written up to " << t << endl;
 	break;
       }
-      for (int j = 0; j < npts; ++j) { areal[j] = sq(ps[j])*sqrt(r2(&p,j)); }
+      for (int j = 0; j < npts; ++j) { areal[j] = sq(ps[j])*sqrt(r2(&p,j*(p.save_pt))); }
       write_sdf_direct(&areal_name[0], &areal[0], &p);
       ofs << t << c << t*(p.save_step)*(p.dt) << c << areal[zeropt] << c;
       int ind_min = distance(areal.begin(), min_element(areal.begin(), areal.end()));

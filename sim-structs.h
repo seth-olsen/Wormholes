@@ -69,6 +69,7 @@ struct sim_fields {
   VD olderPi2;
   VD res_ell;
   VD jac;
+  VD areal;
 } ;
 
 
@@ -97,6 +98,7 @@ struct sim_writers {
   BBHP p_maspect;
   BBHP p_outnull;
   BBHP p_revnull;
+  BBHP p_areal;
   BBHP p_ricci;
   BBHP p_EEtt;
   BBHP p_EEtx;
@@ -109,6 +111,8 @@ struct sim_writers {
   SSVSET get_site_vals = NULL;
   SSVSET get_bound_vals = NULL;
   void (*set_old_fields)(FLDS *) = NULL;
+  BBHP p_amin;
+  BBHP p_xamin;
 } ;
 
 

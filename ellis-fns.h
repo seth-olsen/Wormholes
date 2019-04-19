@@ -399,6 +399,10 @@ inline void get_nullex(VD& outnull, VD& revnull, const VD& f_al, const VD& f_be,
   outnull[p->lastwr] = val + ((p->indr)*dln_b(f_ps,p->lastpt) + (p->r[-(p->lastpt)]))/sq(f_ps[p->lastpt]);
   revnull[p->lastwr] = val - ((p->indr)*dln_b(f_ps,p->lastpt) + (p->r[-(p->lastpt)]))/sq(f_ps[p->lastpt]);
 }
+inline void get_areal(FLDS *f, PAR *p)
+{
+  for (int k = 0; k < (p->npts); ++k) { f->areal[k] = sq(f->Ps[k])*sqrt(r2(p,k)); }
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl sRicci(const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2, const VD& f_ps, int k)
 {
