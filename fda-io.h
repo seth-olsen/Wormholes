@@ -250,14 +250,24 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
   // write outnull
   if (p->write_outnull) {
     get_nullex(f, p);
-    int index = 0;
-    
-    write_bbhp(&(wr->p_outnull), p);
-    write_bbhp(&(wr->p_revnull), p);
+    for (int k = 0; k < (p->npts); ++k) {
+      if ((f->revnull[k]) <= 0) {
+	(wr->revnull_0).push_back(p->r[k]);
+	break;
+      }
+    }
+    for (int k = (p->lastpt); k > -1; --k) {
+      if ((f->revnull[k]) <= 0) {
+	(wr->outnull_0).push_back(p->r[k]);
+	break;
+      }
+    }
     get_areal(f, p);
     int ind_min = distance((f->areal).begin(), min_element((f->areal).begin(), (f->areal).end()));
     (wr->areal_min).push_back(f->areal[ind_min]);
     (wr->xareal_min).push_back(p->r[ind_min]);
+    write_bbhp(&(wr->p_outnull), p);
+    write_bbhp(&(wr->p_revnull), p);
     write_bbhp(&(wr->p_areal), p);
   }
   // write maspect
