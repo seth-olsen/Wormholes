@@ -103,20 +103,20 @@ vector<BBHP *> writers_init(WRS *wr, FLDS *f, PAR *p)
   }
   if (p->write_maspect) { bbhp_init(&(wr->p_maspect), p, "maspect", NULL, zeros, NULL); }
   if (p->write_outnull) {
-    bbhp_init(&(wr->p_outnull), p, "outnull", NULL, zeros, NULL);
-    bbhp_init(&(wr->p_revnull), p, "revnull", NULL, zeros, NULL);
     f->areal = f->Ps;
+    f->outnull = f->Ps;
+    f->revnull = f->Ps;
     get_areal(f, p);
+    get_nullex(f, p);
+    bbhp_init(&(wr->p_outnull), p, "outnull", &(f->outnull), zeros, NULL);
+    bbhp_init(&(wr->p_revnull), p, "revnull", &(f->revnull), zeros, NULL);
     bbhp_init(&(wr->p_areal), p, "areal", &(f->areal), zeros, NULL);
-    VD start_amin { 1.0 };
-    (wr->p_amin).wr_field = start_amin;
-    (wr->p_amin).filename = "min-" + (wr->p_areal).filename;
-    (wr->p_amin).file = &(((wr->p_amin).filename)[0]);
-    VD start_xamin { 0.0 };
-    (wr->p_xamin).wr_field = start_xamin;
-    (wr->p_xamin).filename = "xmin-" + (wr->p_areal).filename;
-    (wr->p_xamin).file = &(((wr->p_xamin).filename)[0]);
-    
+    VD start_tseries { 1.0 };
+    wr->areal_min = start_tseries;
+    start_tseries[0] = { 0.0 };
+    wr->xareal_min = start_tseries;
+    wr->outnull_0 = start_tseries;
+    wr->revnull_0 = start_tseries;
   }
   if (p->write_ricci) { bbhp_init(&(wr->p_ricci), p, "ricci", NULL, zeros, NULL); }
   if (p->write_mtot) {

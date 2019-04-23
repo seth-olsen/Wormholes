@@ -184,12 +184,28 @@ void param_set(map<str, str>& p_all, map<str, str *>& p_str,
   }
 }
 
+inline void write_notice(str outname, str message)
+{
+  cout << "\n\n" << message << endl;
+  ofstream notice;
+  notice.open(outname, ofstream::out);
+  notice << message << endl;
+  notice.close();
+  return;
+}
+
 void write_tseries(WRS *wr, FLDS *f, PAR *p)
 {
   dbl coords[2] = {-(p->dt), p->t};
-  int shape = ((wr->p_amin).wr_field).size();
-  gft_out_bbox((wr->p_amin).file, 0, &shape, 1, &(coords[0]), &(((wr->p_amin).wr_field)[0]));
-  gft_out_bbox((wr->p_xamin).file, 0, &shape, 1, &(coords[0]), &(((wr->p_xamin).wr_field)[0]));
+  int shape = (wr->areal_min).size();
+  str nm_armin = "min-" + (wr->p_areal).filename;
+  str nm_xarmin = "x" + nm_armin;
+  str nm_null0 = "zero-" + (wr->p_outnull).filename;
+  str nm_rev0 = "zero-" + (wr->p_revnull).filename;
+  gft_out_bbox(&nm_armin[0], 0, &shape, 1, &(coords[0]), &(wr->areal_min[0]));
+  gft_out_bbox(&nm_xarmin[0], 0, &shape, 1, &(coords[0]), &(wr->xareal_min[0]));
+  gft_out_bbox(&nm_null0[0], 0, &shape, 1, &(coords[0]), &(wr->outnull_0[0]));
+  gft_out_bbox(&nm_rev0[0], 0, &shape, 1, &(coords[0]), &(wr->revnull_0[0]));
   return;
 }
 
@@ -233,13 +249,15 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
   }
   // write outnull
   if (p->write_outnull) {
-    get_nullex((wr->p_outnull).wr_field, (wr->p_revnull).wr_field, f->Al, f->Be, f->Ps, p);
-    write_sdf(&(wr->p_outnull), p->t);
-    write_sdf(&(wr->p_revnull), p->t);
+    get_nullex(f, p);
+    int index = 0;
+    
+    write_bbhp(&(wr->p_outnull), p);
+    write_bbhp(&(wr->p_revnull), p);
     get_areal(f, p);
     int ind_min = distance((f->areal).begin(), min_element((f->areal).begin(), (f->areal).end()));
-    ((wr->p_amin).wr_field).push_back(f->areal[ind_min]);
-    ((wr->p_xamin).wr_field).push_back(p->r[ind_min]);
+    (wr->areal_min).push_back(f->areal[ind_min]);
+    (wr->xareal_min).push_back(p->r[ind_min]);
     write_bbhp(&(wr->p_areal), p);
   }
   // write maspect

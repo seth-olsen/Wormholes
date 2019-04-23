@@ -387,17 +387,19 @@ inline void get_outnull(VD& outnull, const VD& f_al, const VD& f_be, const VD& f
   outnull[p->lastwr] = half_outgoing_nullR(f_al, f_be, f_ps, p, p->lastpt);
 }
 /////// **** GOOD ONE BELOW (BAD ABOVE) ****
-inline void get_nullex(VD& outnull, VD& revnull, const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p) {
-  dbl val = (ddr_f(f_be,p,0) + (p->r[-(p->lastpt)])*f_be[0])/(3*f_al[0]);
-  outnull[0] = val + ((p->indr)*dln_f(f_ps,0) - (p->r[-(p->lastpt)]))/sq(f_ps[0]);
-  revnull[0] = val - ((p->indr)*dln_f(f_ps,0) - (p->r[-(p->lastpt)]))/sq(f_ps[0]);
-  for (int k = 1; k < p->lastwr; ++k) {
-    outnull[k] = half_outgoing_null(f_al, f_be, f_ps, p, (p->inds[k]).second);
-    revnull[k] = half_outgoing_null_rev(f_al, f_be, f_ps, p, (p->inds[k]).second);
+inline void get_nullex(FLDS *f, PAR *p) {
+  dbl val = (ddr_f(f->Be,p,0) + (p->r[-(p->lastpt)])*(f->Be[0]))/(3*(f->Al[0]));
+  f->outnull[0] = val + ((p->indr)*dln_f(f->Ps,0) - (p->r[-(p->lastpt)]))/sq(f->Ps[0]);
+  f->revnull[0] = val - ((p->indr)*dln_f(f->Ps,0) - (p->r[-(p->lastpt)]))/sq(f->Ps[0]);
+  for (int k = 1; k < p->lastpt; ++k) {
+    f->outnull[k] = half_outgoing_null(f->Al, f->Be, f->Ps, p, k);
+    f->revnull[k] = half_outgoing_null_rev(f->Al, f->Be, f->Ps, p, k);
   }
-  val = (ddr_b(f_be,p,p->lastpt) - (p->r[-(p->lastpt)])*f_be[p->lastpt])/(3*f_al[p->lastpt]);
-  outnull[p->lastwr] = val + ((p->indr)*dln_b(f_ps,p->lastpt) + (p->r[-(p->lastpt)]))/sq(f_ps[p->lastpt]);
-  revnull[p->lastwr] = val - ((p->indr)*dln_b(f_ps,p->lastpt) + (p->r[-(p->lastpt)]))/sq(f_ps[p->lastpt]);
+  val = (ddr_b(f->Be,p,p->lastpt) - (p->r[-(p->lastpt)])*(f->Be[p->lastpt]))/(3*(f->Al[p->lastpt]));
+  f->outnull[p->lastpt] = val + ((p->indr)*dln_b(f->Ps,p->lastpt) +
+				 (p->r[-(p->lastpt)]))/sq(f->Ps[p->lastpt]);
+  f->revnull[p->lastpt] = val - ((p->indr)*dln_b(f->Ps,p->lastpt) +
+				 (p->r[-(p->lastpt)]))/sq(f->Ps[p->lastpt]);
 }
 inline void get_areal(FLDS *f, PAR *p)
 {

@@ -70,6 +70,8 @@ struct sim_fields {
   VD res_ell;
   VD jac;
   VD areal;
+  VD outnull;
+  VD revnull;
 } ;
 
 
@@ -111,8 +113,11 @@ struct sim_writers {
   SSVSET get_site_vals = NULL;
   SSVSET get_bound_vals = NULL;
   void (*set_old_fields)(FLDS *) = NULL;
-  BBHP p_amin;
-  BBHP p_xamin;
+  VD areal_min;
+  VD xareal_min;
+  VD outnull_0;
+  VD revnull_0;
+  
 } ;
 
 
