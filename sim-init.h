@@ -108,14 +108,12 @@ vector<BBHP *> writers_init(WRS *wr, FLDS *f, PAR *p)
     f->areal = f->Ps;
     get_areal(f, p);
     bbhp_init(&(wr->p_areal), p, "areal", &(f->areal), zeros, NULL);
-    VD start_amin { f->areal[p->zeropt] };
+    VD start_amin { 1.0 };
     (wr->p_amin).wr_field = start_amin;
-    (wr->p_amin).data = &(((wr->p_amin).wr_field)[0]);
     (wr->p_amin).filename = "min-" + (wr->p_areal).filename;
     (wr->p_amin).file = &(((wr->p_amin).filename)[0]);
-    VD start_xamin { 0 };
+    VD start_xamin { 0.0 };
     (wr->p_xamin).wr_field = start_xamin;
-    (wr->p_xamin).data = &(((wr->p_xamin).wr_field)[0]);
     (wr->p_xamin).filename = "xmin-" + (wr->p_areal).filename;
     (wr->p_xamin).file = &(((wr->p_xamin).filename)[0]);
     
@@ -347,11 +345,14 @@ int params_init(PAR *p, int argc, char **argv)
   if (((p->save_pt) != 1) && (!(p->same_grids))) {
     cout << "\nWARNING: SAME_GRIDS=FALSE and SAVE_PT != 1\n" << endl;
   }
-  else if (((p->lastwr) != (p->lastpt)) || ((p->wr_shape) != (p->npts)) || ((p->zerowr) != (p->zeropt))) {
-    cout << "\nERROR: number of grid points not set correctly\n" << endl;
-    return -2;
+  else if ((p->save_pt) == 1) {
+    p->wr_dr = (p->dr);
+    if (((p->lastwr) != (p->lastpt)) || ((p->wr_shape) != (p->npts))
+	|| ((p->zerowr) != (p->zeropt))) {
+      cout << "\nERROR: number of grid points not set correctly\n" << endl;
+      return -2;
+    }
   }
-  else { p->wr_dr = (p->dr); }
   
   // lapack object declaration
   p->lp_n = (p->n_ell) * (p->npts);

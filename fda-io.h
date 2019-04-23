@@ -186,13 +186,10 @@ void param_set(map<str, str>& p_all, map<str, str *>& p_str,
 
 void write_tseries(WRS *wr, FLDS *f, PAR *p)
 {
-  int ind_min = distance((f->areal).begin(), min_element((f->areal).begin(), (f->areal).end()));
-  ((wr->p_amin).wr_field).push_back(f->areal[ind_min]);
-  ((wr->p_xamin).wr_field).push_back(p->r[ind_min]);
   dbl coords[2] = {-(p->dt), p->t};
   int shape = ((wr->p_amin).wr_field).size();
-  gft_out_bbox((wr->p_amin).file, 0, &shape, 1, &(coords[0]), (wr->p_amin).data);
-  gft_out_bbox((wr->p_xamin).file, 0, &shape, 1, &(coords[0]), (wr->p_xamin).data);
+  gft_out_bbox((wr->p_amin).file, 0, &shape, 1, &(coords[0]), &(((wr->p_amin).wr_field)[0]));
+  gft_out_bbox((wr->p_xamin).file, 0, &shape, 1, &(coords[0]), &(((wr->p_xamin).wr_field)[0]));
   return;
 }
 
@@ -240,8 +237,10 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
     write_sdf(&(wr->p_outnull), p->t);
     write_sdf(&(wr->p_revnull), p->t);
     get_areal(f, p);
+    int ind_min = distance((f->areal).begin(), min_element((f->areal).begin(), (f->areal).end()));
+    ((wr->p_amin).wr_field).push_back(f->areal[ind_min]);
+    ((wr->p_xamin).wr_field).push_back(p->r[ind_min]);
     write_bbhp(&(wr->p_areal), p);
-    write_tseries(wr, f, p);
   }
   // write maspect
   if (p->write_maspect) {
