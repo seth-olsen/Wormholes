@@ -72,6 +72,7 @@ struct sim_fields {
   VD areal;
   VD outnull;
   VD revnull;
+  VD ricci;
 } ;
 
 
@@ -117,7 +118,8 @@ struct sim_writers {
   VD xareal_min;
   VD outnull_0;
   VD revnull_0;
-  
+  VD ricci_max;
+  VD xricci_max;
 } ;
 
 

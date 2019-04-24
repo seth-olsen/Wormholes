@@ -118,7 +118,15 @@ vector<BBHP *> writers_init(WRS *wr, FLDS *f, PAR *p)
     wr->outnull_0 = start_tseries;
     wr->revnull_0 = start_tseries;
   }
-  if (p->write_ricci) { bbhp_init(&(wr->p_ricci), p, "ricci", NULL, zeros, NULL); }
+  if (p->write_ricci) {
+    f->ricci = f->Ps;
+    get_ricci(f, p);
+    bbhp_init(&(wr->p_ricci), p, "ricci", &(f->ricci), zeros, NULL);
+    VD start_tseries { (p->lsq)/(p->four_pi) };
+    wr->ricci_max = start_tseries;
+    start_tseries[0] = { 0.0 };
+    wr->xricci_max = start_tseries;
+  }
   if (p->write_mtot) {
     bbhp_init(&(wr->p_EEtt), p, "EEtt", NULL, zeros, NULL);
     bbhp_init(&(wr->p_EEtx), p, "EEtx", NULL, zeros, NULL);

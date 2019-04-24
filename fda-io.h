@@ -197,15 +197,24 @@ inline void write_notice(str outname, str message)
 void write_tseries(WRS *wr, FLDS *f, PAR *p)
 {
   dbl coords[2] = {-(p->dt), p->t};
-  int shape = (wr->areal_min).size();
-  str nm_armin = "min-" + (wr->p_areal).filename;
-  str nm_xarmin = "x" + nm_armin;
-  str nm_null0 = "zero-" + (wr->p_outnull).filename;
-  str nm_rev0 = "zero-" + (wr->p_revnull).filename;
-  gft_out_bbox(&nm_armin[0], 0, &shape, 1, &(coords[0]), &(wr->areal_min[0]));
-  gft_out_bbox(&nm_xarmin[0], 0, &shape, 1, &(coords[0]), &(wr->xareal_min[0]));
-  gft_out_bbox(&nm_null0[0], 0, &shape, 1, &(coords[0]), &(wr->outnull_0[0]));
-  gft_out_bbox(&nm_rev0[0], 0, &shape, 1, &(coords[0]), &(wr->revnull_0[0]));
+  if (p->write_outnull) {
+    int shape = (wr->areal_min).size();
+    str nm_armin = "min-" + (wr->p_areal).filename;
+    str nm_xarmin = "x" + nm_armin;
+    str nm_null0 = "zero-" + (wr->p_outnull).filename;
+    str nm_rev0 = "zero-" + (wr->p_revnull).filename;
+    gft_out_bbox(&nm_armin[0], 0, &shape, 1, &(coords[0]), &(wr->areal_min[0]));
+    gft_out_bbox(&nm_xarmin[0], 0, &shape, 1, &(coords[0]), &(wr->xareal_min[0]));
+    gft_out_bbox(&nm_null0[0], 0, &shape, 1, &(coords[0]), &(wr->outnull_0[0]));
+    gft_out_bbox(&nm_rev0[0], 0, &shape, 1, &(coords[0]), &(wr->revnull_0[0]));
+  }
+  if (p->write_ricci) {
+    int shape = (wr->ricci_max).size();
+    str nm_ricmax = "max-" + (wr->p_ricci).filename;
+    str nm_xricmax = "x" + nm_ricmax;
+    gft_out_bbox(&nm_ricmax[0], 0, &shape, 1, &(coords[0]), &(wr->ricci_max[0]));
+    gft_out_bbox(&nm_xricmax[0], 0, &shape, 1, &(coords[0]), &(wr->xricci_max[0]));
+  }
   return;
 }
 
@@ -244,8 +253,11 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
   }
   // write ricci
   if (p->write_ricci) {
-    get_ricci((wr->p_ricci).wr_field, f->Xi, f->Pi, f->Xi2, f->Pi2, f->Ps, p->inds);
-    write_sdf(&(wr->p_ricci), p->t);
+    get_ricci(f, p);
+    int ind_max = distance((f->ricci).begin(), max_element((f->ricci).begin(), (f->ricci).end()));
+    (wr->ricci_max).push_back(f->ricci[ind_max]);
+    (wr->xricci_max).push_back(p->r[ind_max]);
+    write_bbhp(&(wr->p_ricci), p);
   }
   // write outnull
   if (p->write_outnull) {

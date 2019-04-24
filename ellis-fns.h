@@ -319,6 +319,7 @@ inline void get_maspect(VD& maspect, const VD& f_al, const VD& f_be, const VD& f
   maspect[p->lastwr] = mass_aspectR(f_al, f_be, f_ps, p, p->lastpt);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
 inline dbl half_outgoing_null(const VD& alpha, const VD& beta,
 			      const VD& psi, PAR *p, int k)
 {
@@ -348,45 +349,6 @@ inline dbl half_outgoing_nullR(const VD& alpha, const VD& beta,
     
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl outgoing_null(const VD& alpha, const VD& beta,
-			 const VD& psi, PAR *p, int k)
-{
-  return (1 + (p->indr)*dln_c(psi,k)/(p->r[-k]))/sq(psi[k])
-    + (ddr_c(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k]);
-}
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl outgoing_null_rev(const VD& alpha, const VD& beta,
-			 const VD& psi, PAR *p, int k)
-{
-  return (ddr_c(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k])
-    - (1 + (p->indr)*dln_c(psi,k)/(p->r[-k]))/sq(psi[k]);
-}
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl outgoing_null0(const VD& alpha, const VD& beta,
-			  const VD& psi, PAR *p)
-{
-  return ((p->indr)*dln_f(psi,0)/(p->r[-(p->lastpt)]) - 1)/sq(psi[0])
-    - (ddr_f(beta,p,0)/(p->r[-(p->lastpt)]) + beta[0])/(3*alpha[0]);
-}
-////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl outgoing_nullR(const VD& alpha, const VD& beta,
-			  const VD& psi, PAR *p, int k)
-{
-  return (1 + (p->indr)*dln_b(psi,k)/(p->r[-k]))/sq(psi[k])
-    + (ddr_b(beta,p,k)/(p->r[-k]) - beta[k])/(3*alpha[k]);
-    
-}
-inline void get_outnull(VD& outnull, const VD& f_al, const VD& f_be, const VD& f_ps, PAR *p) {
-  outnull[0] = half_outgoing_null0(f_al, f_be, f_ps, p);
-  for (int k = 1; k < p->zerowr; ++k) {
-    outnull[k] = half_outgoing_null_rev(f_al, f_be, f_ps, p, (p->inds[k]).second);
-  }
-  for (int k = (p->zerowr) + 1; k < p->lastwr; ++k) {
-    outnull[k] = half_outgoing_null(f_al, f_be, f_ps, p, (p->inds[k]).second);
-  }
-  outnull[p->lastwr] = half_outgoing_nullR(f_al, f_be, f_ps, p, p->lastpt);
-}
-/////// **** GOOD ONE BELOW (BAD ABOVE) ****
 inline void get_nullex(FLDS *f, PAR *p) {
   dbl val = (ddr_f(f->Be,p,0) + (p->r[-(p->lastpt)])*(f->Be[0]))/(3*(f->Al[0]));
   f->outnull[0] = val + ((p->indr)*dln_f(f->Ps,0) - (p->r[-(p->lastpt)]))/sq(f->Ps[0]);
@@ -401,19 +363,21 @@ inline void get_nullex(FLDS *f, PAR *p) {
   f->revnull[p->lastpt] = val - ((p->indr)*dln_b(f->Ps,p->lastpt) +
 				 (p->r[-(p->lastpt)]))/sq(f->Ps[p->lastpt]);
 }
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
 inline void get_areal(FLDS *f, PAR *p)
 {
   for (int k = 0; k < (p->npts); ++k) { f->areal[k] = sq(f->Ps[k])*sqrt(r2(p,k)); }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
-inline dbl sRicci(const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2, const VD& f_ps, int k)
+////////////////////////////////////////////////////////////////////////////////////////////////
+inline dbl sRicci(const FLDS *f, int k)
 {
-  return (sq(f_xi[k]) - sq(f_pi[k]) - sq(f_xi2[k]) + sq(f_pi2[k])) / pw4(f_ps[k]);
+  return (sq(f->Xi[k]) - sq(f->Pi[k]) - sq(f->Xi2[k]) + sq(f->Pi2[k])) / pw4(f->Ps[k]);
 }
-void get_ricci(VD& ricci, const VD& f_xi, const VD& f_pi, const VD& f_xi2, const VD& f_pi2,
-	       const VD& f_ps, const vector< pair<int,int> >& indices)
+void get_ricci(FLDS *f, PAR *p)
 {
-  for (auto k : indices) { ricci[k.first] = sRicci(f_xi, f_pi, f_xi2, f_pi2, f_ps, k.second); }
+  for (auto k : p->inds) { f->ricci[k.first] = sRicci(f, k.second); }
 }
 ////////////////////////////////////////////////////////////////////////////////////
 // HORIZON SEARCH
