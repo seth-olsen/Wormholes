@@ -162,54 +162,71 @@ int fields_init(FLDS *f, PAR *p)
     f->Ps[k] = 1;
     f->Xi[k] = amp0 / r2(p,k);
   }
-  
-  if (abs(p->ic_Amp) > (p->tol)) {
-    if ((p->ic_r0) < (p->ic_Dsq)) {
-      for (int k = 0; k < Xeq0; ++k) {
-	f->Xi[k] += ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
-	if (!(p->clean_hyp)) { f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0); }
-      }
-    }
-    f->Xi[Xeq0] += ic_xi(p->r[Xeq0], p->ic_Amp, p->ic_Dsq, p->ic_r0);
-    if ((p->ic_r0) > -(p->ic_Dsq)) {
-      for (int k = Xeq0 + 1; k < (p->npts); ++k) {
-	f->Xi[k] += ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
-	if (!(p->clean_hyp)) { f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0); }
-      }
-    }
-    if (p->sym_pert) {
-      for (int k = 0; k < Xeq0; ++k) {
-	f->Xi[k] = f->Xi[(p->lastpt) - k];
-	if (!(p->clean_hyp)) { f->Pi[k] = f->Pi[(p->lastpt) - k]; }
-      }
-    }
-    if (!(p->clean_hyp)) { f->Pi[Xeq0] = (4*(f->Pi[Xeq0+1]) - (f->Pi[Xeq0+2]) +
-					  4*(f->Pi[Xeq0-1]) - (f->Pi[Xeq0-2])) / 6.0; }
-  }
-  
-  if (abs(p->ic2_Amp) > (p->tol)) {
-    if ((p->ic2_r0) < (p->ic2_Dsq)) {
-      for (int k = 0; k < Xeq0; ++k) {
-	f->Xi2[k] += ic_xi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
-	if (!(p->clean_hyp)) { f->Pi2[k] = ic_pi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0); }
-      }
-    }
-    f->Xi2[Xeq0] += ic_xi(p->r[Xeq0], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
-    if ((p->ic2_r0) > -(p->ic2_Dsq)) {
-      for (int k = Xeq0 + 1; k < (p->npts); ++k) {
-	f->Xi2[k] += ic_xi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
-	if (!(p->clean_hyp)) { f->Pi2[k] = ic_pi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0); }
-      }
-    }
 
-    if (p->sym_pert) {
-      for (int k = 0; k < Xeq0; ++k) {
-	f->Xi2[k] = f->Xi2[(p->lastpt) - k];
-	if (!(p->clean_hyp)) { f->Pi2[k] = f->Pi2[(p->lastpt) - k]; }
-      }
+  // FOR CHECKING SARBACH RESULTS
+  if ((p->signal_code) == 4) {
+    for (int k = 1; k < (p->lastpt); ++k) { f->Ps[k] = sqrt(exp((p->ic_Amp)*exp(-4*sq(p->r[k])))); }
+    f->Ps[0] = fda0_hyp_ps(f->Ps, p);
+    f->Ps[p->lastpt] = fdaR_hyp_ps(f->Ps, p);
+    dbl val = (ddr2_f(f->Ps,p,0) - 2*(p->r[-(p->lastpt)])*ddr_f(f->Ps,p,0))/(f->Ps[0]) + 0.25*(p->lsq)/sq(r2(p,0));
+    f->Xi[0] = sqrt(val/M_PI);
+    for (int k = 1; k < (p->lastpt); ++k) {
+      val = (ddr2_c(f->Ps,p,k) + 2*(p->r[-k])*ddr_c(f->Ps,p,k))/(f->Ps[k]) + 0.25*(p->lsq)/sq(r2(p,k));
+      f->Xi[k] = sqrt(val/M_PI);
     }
-    if (!(p->clean_hyp)) { f->Pi2[Xeq0] = (4*(f->Pi2[Xeq0+1]) - (f->Pi2[Xeq0+2]) +
-					   4*(f->Pi2[Xeq0-1]) - (f->Pi2[Xeq0-2])) / 6.0; }
+    val = (ddr2_b(f->Ps,p,p->lastpt) + 2*(p->r[-(p->lastpt)])*ddr_b(f->Ps,p,p->lastpt))/(f->Ps[p->lastpt])
+      + 0.25*(p->lsq)/sq(r2(p,p->lastpt));
+    f->Xi[p->lastpt] = sqrt(val/M_PI);
+  }
+  else {
+    if (abs(p->ic_Amp) > (p->tol)) {
+      if ((p->ic_r0) < (p->ic_Dsq)) {
+	for (int k = 0; k < Xeq0; ++k) {
+	  f->Xi[k] += ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
+	  if (!(p->clean_hyp)) { f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0); }
+	}
+      }
+      f->Xi[Xeq0] += ic_xi(p->r[Xeq0], p->ic_Amp, p->ic_Dsq, p->ic_r0);
+      if ((p->ic_r0) > -(p->ic_Dsq)) {
+	for (int k = Xeq0 + 1; k < (p->npts); ++k) {
+	  f->Xi[k] += ic_xi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0);
+	  if (!(p->clean_hyp)) { f->Pi[k] = ic_pi(p->r[k], p->ic_Amp, p->ic_Dsq, p->ic_r0); }
+	}
+      }
+      if (p->sym_pert) {
+	for (int k = 0; k < Xeq0; ++k) {
+	  f->Xi[k] = f->Xi[(p->lastpt) - k];
+	  if (!(p->clean_hyp)) { f->Pi[k] = f->Pi[(p->lastpt) - k]; }
+	}
+      }
+      if (!(p->clean_hyp)) { f->Pi[Xeq0] = (4*(f->Pi[Xeq0+1]) - (f->Pi[Xeq0+2]) +
+					    4*(f->Pi[Xeq0-1]) - (f->Pi[Xeq0-2])) / 6.0; }
+    }
+    
+    if (abs(p->ic2_Amp) > (p->tol)) {
+      if ((p->ic2_r0) < (p->ic2_Dsq)) {
+	for (int k = 0; k < Xeq0; ++k) {
+	  f->Xi2[k] += ic_xi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
+	  if (!(p->clean_hyp)) { f->Pi2[k] = ic_pi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0); }
+	}
+      }
+      f->Xi2[Xeq0] += ic_xi(p->r[Xeq0], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
+      if ((p->ic2_r0) > -(p->ic2_Dsq)) {
+	for (int k = Xeq0 + 1; k < (p->npts); ++k) {
+	  f->Xi2[k] += ic_xi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0);
+	  if (!(p->clean_hyp)) { f->Pi2[k] = ic_pi(p->r[k], p->ic2_Amp, p->ic2_Dsq, p->ic2_r0); }
+	}
+      }
+      
+      if (p->sym_pert) {
+	for (int k = 0; k < Xeq0; ++k) {
+	  f->Xi2[k] = f->Xi2[(p->lastpt) - k];
+	  if (!(p->clean_hyp)) { f->Pi2[k] = f->Pi2[(p->lastpt) - k]; }
+	}
+      }
+      if (!(p->clean_hyp)) { f->Pi2[Xeq0] = (4*(f->Pi2[Xeq0+1]) - (f->Pi2[Xeq0+2]) +
+					     4*(f->Pi2[Xeq0-1]) - (f->Pi2[Xeq0-2])) / 6.0; }
+    }
   }
 
   f->oldXi = f->Xi;
@@ -233,7 +250,7 @@ int fields_init(FLDS *f, PAR *p)
     f->olderPi2 = f->Pi2;
   }
 
-  if (!(p->static_metric)) {
+  if (((p->static_metric) == false) && ((p->signal_code) != 4)) {
     int t0_itn = solve_t0(f, p);
     if (t0_itn < 0) { return t0_itn; }
   }
