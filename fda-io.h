@@ -262,13 +262,15 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
   // write outnull
   if (p->write_outnull) {
     get_nullex(f, p);
-    for (int k = 0; k < (p->npts); ++k) {
+    int indL = (p->zeropt)/2;
+    int indR = 3*indL;
+    for (int k = indL; k < indR; ++k) {
       if ((f->revnull[k]) <= 0) {
 	(wr->revnull_0).push_back(p->r[k]);
 	break;
       }
     }
-    for (int k = (p->lastpt); k > -1; --k) {
+    for (int k = indR; k > indL; --k) {
       if ((f->revnull[k]) <= 0) {
 	(wr->outnull_0).push_back(p->r[k]);
 	break;
