@@ -550,10 +550,22 @@ dbl compute_outnull(SSV& s)
 + s.be*(2*s.dxps*s.rsq + s.ps*s.x)))/(s.al*pow(s.ps,3)*s.rsq);
 }
 
+dbl compute_outnull_byhand(SSV& s)
+{
+  return (s.dxbe - s.x*s.be/s.rsq)/(3*s.al)
+    + (s.x/s.rsq + 2*s.dxps/s.ps)/sq(s.ps);
+}
+
 dbl compute_revnull(SSV& s)
 {
   return (-2*(s.al*(2*s.dxps*s.rsq + s.ps*s.x) + pow(s.ps,2)*(-2*s.dtps*s.rsq
 + s.be*(2*s.dxps*s.rsq + s.ps*s.x))))/(s.al*pow(s.ps,3)*s.rsq);
+}
+
+dbl compute_revnull_byhand(SSV& s)
+{
+  return (s.dxbe - s.x*s.be/s.rsq)/(3*s.al)
+    - (s.x/s.rsq + 2*s.dxps/s.ps)/sq(s.ps);
 }
 
 dbl compute_maspect(SSV& s)
@@ -563,6 +575,13 @@ dbl compute_maspect(SSV& s)
 (4*s.be*s.dtps*pow(s.ps,2)*(2*s.dxps*s.rsq + s.ps*s.x))/pow(s.al,2) -
 ((pow(s.al,2) - pow(s.be,2)*pow(s.ps,4))*pow(2*s.dxps*s.rsq +
 s.ps*s.x,2))/(pow(s.al,2)*pow(s.ps,2)*s.rsq));
+}
+
+dbl compute_maspect_byhand(SSV& s)
+{
+  return 0.5*sqrt(s.rsq)*sq(s.ps) *
+    ( 1 + s.rsq*( sq(sq(s.ps)*(s.dxbe - s.x*s.be/s.rsq)/(3*s.al))
+		  - sq(s.x/s.rsq + 2*s.dxps/s.ps) ) );
 }
 
 dbl compute_ricci(SSV& s)
@@ -580,6 +599,11 @@ s.be*s.rsq*(-36*s.dtps*s.dxps*s.rsq + 2*s.ps*(-6*s.dxdtps*s.rsq + \
 4*s.dxbe*s.x)) + pow(s.be,2)*(18*pow(s.dxps,2)*pow(s.rsq,2) + \
 2*s.ps*s.rsq*(3*s.dx2ps*s.rsq + 8*s.dxps*s.x) + pow(s.ps,2)*(2*s.lsq \
 + s.xsq)))))/(pow(s.al,3)*pow(s.ps,5)*pow(s.rsq,2));
+}
+
+dbl compute_ricci_byhand(SSV& s)
+{
+  return (sq(s.xi) - sq(s.pi) - sq(s.xi2) + sq(s.pi2)) / pw4(s.ps);
 }
 
 

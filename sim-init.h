@@ -485,17 +485,12 @@ vector<BBHP *> analysis_init(WRS *wr, FLDS *f, PAR *p, int argc, char **argv) {
       writer_vec.push_back(&(wr->p_iresAl));
       keep_metric_dt = true;
     }
-    // AREAL RADIUS USING IRES_BE BBHP
     if ((arg == "iresBe") || (arg == "ibe")) {
-      bbhp_init(&(wr->p_iresBe), p, "areal"/*CHANGE*/, NULL, zeros, compute_iresBe);
+      bbhp_init(&(wr->p_iresBe), p, "iresBe", NULL, zeros, compute_iresBe);
       writer_vec.push_back(&(wr->p_iresBe));
       keep_metric_dt = true;
     }
-    else if ((arg == "areal") || (arg == "rad") || (arg == "r") || (arg == "ALL")) {
-      bbhp_init(&(wr->p_iresBe), p, "areal", NULL, zeros, compute_areal);
-      writer_vec.push_back(&(wr->p_iresBe));
-    }
-    // CHANGE WHEN GET REAL IRES_BE FN
+    // CHANGE WHEN GET REAL IRES_BE FN (currently just doing areal radius
     if ((arg == "iresPs") || (arg == "ALL") || (arg == "ips")) {
       bbhp_init(&(wr->p_iresPs), p, "iresPs", NULL, zeros, compute_iresPs);
       writer_vec.push_back(&(wr->p_iresPs));
@@ -521,26 +516,55 @@ vector<BBHP *> analysis_init(WRS *wr, FLDS *f, PAR *p, int argc, char **argv) {
       writer_vec.push_back(&(wr->p_iresPi2));
       keep_scalar_dt = true;
     }
+    if ((arg == "areal") || (arg == "rad") || (arg == "r") || (arg == "ALL")) {
+      bbhp_init(&(wr->p_areal), p, "areal", NULL, zeros, compute_areal);
+      writer_vec.push_back(&(wr->p_iresBe));
+    }
+    
     if ((arg == "outnull") || (arg == "ALL") || (arg == "null")) {
       bbhp_init(&(wr->p_outnull), p, "outnull", NULL, zeros, compute_outnull);
       writer_vec.push_back(&(wr->p_outnull));
       keep_metric_dt = true;
     }
+    else if ((arg == "outnull_byhand") || (arg == "outnull_hand") ||
+	     (arg == "null_byhand") || (arg == "null_hand")) {
+      bbhp_init(&(wr->p_outnull), p, "outnull_byhand", NULL, zeros, compute_outnull_byhand);
+      writer_vec.push_back(&(wr->p_outnull));
+    }
+    
     if ((arg == "revnull") || (arg == "ALL") || (arg == "rnull")) {
       bbhp_init(&(wr->p_revnull), p, "revnull", NULL, zeros, compute_revnull);
       writer_vec.push_back(&(wr->p_revnull));
       keep_metric_dt = true;
     }
+    else if ((arg == "revnull_byhand") || (arg == "revnull_hand") ||
+	     (arg == "rnull_byhand") || (arg == "rnull_hand")) {
+      bbhp_init(&(wr->p_revnull), p, "revnull_byhand", NULL, zeros, compute_revnull_byhand);
+      writer_vec.push_back(&(wr->p_revnull));
+    }
+    
     if ((arg == "maspect") || (arg == "ALL") || (arg == "mass")) {
       bbhp_init(&(wr->p_maspect), p, "maspect", NULL, zeros, compute_maspect);
       writer_vec.push_back(&(wr->p_maspect));
       keep_metric_dt = true;
     }
+    else if ((arg == "maspect_byhand") || (arg == "maspect_hand") ||
+	     (arg == "mass_byhand") || (arg == "mass_hand")) {
+      bbhp_init(&(wr->p_maspect), p, "maspect_byhand", NULL, zeros, compute_maspect_byhand);
+      writer_vec.push_back(&(wr->p_maspect));
+    }
+    
     if ((arg == "ricci") || (arg == "ALL") || (arg == "ric")) {
       bbhp_init(&(wr->p_ricci), p, "ricci", NULL, zeros, compute_ricci);
       writer_vec.push_back(&(wr->p_ricci));
       keep_metric_dt = true;
     }
+    else if ((arg == "ricci_byhand") || (arg == "ricci_hand") ||
+	     (arg == "ric_byhand") || (arg == "ric_hand")) {
+      bbhp_init(&(wr->p_ricci), p, "ricci_byhand", NULL, zeros, compute_ricci_byhand);
+      writer_vec.push_back(&(wr->p_ricci));
+    }
+    
     if ((arg == "EEtt") || (arg == "ALL") || (arg == "tt")) {
       bbhp_init(&(wr->p_EEtt), p, "EEtt", NULL, zeros, compute_EEtt);
       writer_vec.push_back(&(wr->p_EEtt));
