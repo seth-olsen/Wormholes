@@ -52,8 +52,8 @@ int main(int argc, char **argv)
       // SOLVE FOR NEXT STEP
       err_code = fields_step(&f, &p, i);
       if (err_code) {
+	write_tseries(&wr, &f, &p);
 	cout << "\nFIELD STEP error code = " << err_code << endl;
-	if (p.write_outnull) { write_tseries(&wr, &f, &p); }
 	gft_close_all();
 	return err_code;
       }
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 	write_diagnostics(&wr, &f, &p);
       }
     }
-    if (p.write_outnull) { write_tseries(&wr, &f, &p); }
+    write_tseries(&wr, &f, &p);
   }
   else {
     str al_nm = "Al-" + (p.outfile) + ".sdf";

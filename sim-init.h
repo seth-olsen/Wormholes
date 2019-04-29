@@ -166,7 +166,8 @@ int fields_init(FLDS *f, PAR *p)
   // FOR CHECKING SARBACH RESULTS
   if ((p->signal_code) == 4) {
     for (int k = 1; k < (p->lastpt); ++k) {
-      f->Ps[k] = sqrt(exp((p->ic_Amp)*exp(-sq((p->r[k]) - (p->ic_r0))/(p->ic_Dsq))));
+      //f->Ps[k] = exp(0.5*(p->ic_Amp)*exp(-sq((p->r[k]) - (p->ic_r0))/(p->ic_Dsq)));
+      f->Ps[k] = exp(0.5*(p->ic_Amp)*exp(-4*sq(p->r[k])));
     }
     f->Ps[0] = fda0_hyp_ps(f->Ps, p);
     f->Ps[p->lastpt] = fdaR_hyp_ps(f->Ps, p);

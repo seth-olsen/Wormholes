@@ -377,7 +377,7 @@ inline dbl sRicci(const FLDS *f, int k)
 }
 void get_ricci(FLDS *f, PAR *p)
 {
-  for (auto k : p->inds) { f->ricci[k.first] = sRicci(f, k.second); }
+  for (int k = 0; k < p->npts; ++k) { f->ricci[k] = sRicci(f, k); }
 }
 ////////////////////////////////////////////////////////////////////////////////////
 // HORIZON SEARCH

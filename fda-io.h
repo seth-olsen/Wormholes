@@ -271,7 +271,7 @@ void write_diagnostics(WRS *wr, FLDS *f, PAR *p)
       }
     }
     for (int k = indR; k > indL; --k) {
-      if ((f->revnull[k]) <= 0) {
+      if ((f->outnull[k]) <= 0) {
 	(wr->outnull_0).push_back(p->r[k]);
 	break;
       }
